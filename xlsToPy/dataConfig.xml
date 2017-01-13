@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <xlslFolder>E:\FBG\Server\kbengine\fbgServer\xls</xlslFolder>
+  <outputFolder > E:\FBG\Server\kbengine\fbgServer\scripts\data</outputFolder>
+  <scriptPath >E:\FBG\Server\kbengine\kbe\tools\xlsx2py\xlsx2py\xlsx2py.py</scriptPath >
+
+</root>
+
