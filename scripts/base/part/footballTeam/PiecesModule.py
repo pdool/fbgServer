@@ -191,7 +191,7 @@ class PiecesModule:
 
 
 class PieceItemKeys:
-    uuid = "uuid"
+    uuid = "UUID"
     itemID = "itemID"
     amount = "amount"
     itemType = "itemType"

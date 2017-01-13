@@ -142,7 +142,7 @@ class DiamondModule:
 
         return self.__insertEquip(configID, addCount)
 class DiamondItemKeys:
-    uuid = "uuid"
+    uuid = "UUID"
     itemID = "itemID"
     amount = "amount"
     itemType = "itemType"

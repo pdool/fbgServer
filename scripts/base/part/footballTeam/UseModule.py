@@ -51,7 +51,7 @@ class UseModule:
         else:
             self.__updateUse(configID, count)
 
-    # 减少碎片
+    # 减少消耗品
     def decUses(self, uuid, count):
         if uuid not in self.useContainer:
             self.onUseError(UseModuleError.Use_not_exist)
@@ -144,7 +144,7 @@ class UseModule:
     # --------------------------------------------------------------------------------------------
 
 class UseItemKeys:
-    uuid = "uuid"
+    uuid = "UUID"
     itemID = "itemID"
     amount = "amount"
     itemType = "itemType"

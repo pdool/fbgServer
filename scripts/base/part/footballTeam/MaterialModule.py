@@ -40,7 +40,7 @@ class MaterialModule:
         pass
 
         # 增加消耗品
-
+    # 增加材料
     def addMaterial(self, configID, count):
         # 1、是否可以合并
         togetherCount = 1
@@ -53,8 +53,7 @@ class MaterialModule:
         else:
             self.__updateUse(configID, count)
 
-            # 减少碎片
-
+    # 减少材料
     def decMaterial(self, uuid, count):
         if uuid not in self.materialContainer:
             self.onMaterialError(MaterialModuleError.Use_not_exist)
@@ -147,7 +146,7 @@ class MaterialModule:
         # --------------------------------------------------------------------------------------------
 
 class MaterialItemKeys:
-    uuid = "uuid"
+    uuid = "UUID"
     itemID = "itemID"
     amount = "amount"
     itemType = "itemType"

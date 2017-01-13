@@ -12,7 +12,7 @@ from part.BagModule import ItemTypeEnum
 from itemsGift import itemsGiftConfig
 from itemGiftChange import itemGiftChangeConfig
 class GiftKeys:
-    uuid = "uuid"
+    uuid = "UUID"
     itemID = "itemID"
     amount = "amount"
     itemType = "itemType"
