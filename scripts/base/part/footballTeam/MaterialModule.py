@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __author__ = 'chongxin'
-__createTime__  = '2017年1月5日'
+__createTime__  = '2017年1月13日'
 
 import util
 from KBEDebug import *
@@ -39,7 +39,6 @@ class MaterialModule:
         KBEngine.executeRawDatabaseCommand(sql, cb)
         pass
 
-        # 增加消耗品
     # 增加材料
     def addMaterial(self, configID, count):
         # 1、是否可以合并
@@ -57,13 +56,13 @@ class MaterialModule:
     def decMaterial(self, uuid, count):
         if uuid not in self.materialContainer:
             self.onMaterialError(MaterialModuleError.Use_not_exist)
-            return False
+            return
 
         curCount = self.materialContainer[uuid]["amount"]
 
         if curCount < count:
             self.onMaterialError(MaterialModuleError.Use_not_enough)
-            return False
+            return
 
         if curCount > count:
             setMap = {"amount": curCount - count}
@@ -72,9 +71,8 @@ class MaterialModule:
 
             def cb(result, rownum, error):
                 if error is not None:
-                    return False
+                    return
                 self.materialContainer[uuid]["amount"] = curCount - count
-                return True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
         elif curCount == count:
@@ -83,11 +81,10 @@ class MaterialModule:
 
             def cb(result, rownum, error):
                 if error is not None:
-                    return False
+                    return
                 del self.materialContainer[uuid]
                 self.bagUUIDList.remove(uuid)
                 self.writeToDB()
-                return True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -104,12 +101,10 @@ class MaterialModule:
         def cb(result, rownum, error):
             if rownum != 1:
                 self.client.onMaterialError(1)
-                return False
             else:
                 self.materialContainer[rowValueMap["UUID"]] = rowValueMap
                 self.bagUUIDList.append(rowValueMap["UUID"])
                 self.writeToDB()
-                return True
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -118,10 +113,11 @@ class MaterialModule:
     def __updateMaterial(self, configID, addCount):
 
         # 1、是否存在
+        isFind = False
         for item in self.materialContainer.values():
             if item["itemID"] != configID:
                 continue
-
+            isFind = True
             curCount = item["amount"]
 
             setMap = {"amount": curCount + addCount}
@@ -134,6 +130,8 @@ class MaterialModule:
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
+        if isFind == True:
+            return
         return self.__insertMaterial(configID, addCount)
 
         # --------------------------------------------------------------------------------------------

@@ -63,13 +63,13 @@ class DiamondModule:
     def decDiamond(self,uuid,count):
         if uuid not in self.diamondsContainer:
             self.onDiamondError(DiamondModuleError.Diamond_not_exist)
-            return False
+            return
 
         curCount = self.diamondsContainer[uuid]["amount"]
 
         if curCount < count:
             self.onDiamondError(DiamondModuleError.Diamond_not_enough)
-            return False
+            return
 
         if curCount > count:
             setMap = {"amount": curCount - count}
@@ -78,9 +78,9 @@ class DiamondModule:
 
             def cb(result, rownum, error):
                 if error is not None:
-                    return False
+                    return
                 self.diamondsContainer[uuid]["amount"] = curCount - count
-                return True
+                return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
         elif curCount == count:
@@ -89,10 +89,10 @@ class DiamondModule:
 
             def cb(result, rownum, error):
                 if error is not None:
-                    return False
+                    return
                 del self.diamondsContainer[uuid]
                 self.bagUUIDList.remove(uuid)
-                return True
+                return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -110,17 +110,14 @@ class DiamondModule:
         def cb(result, rownum, error):
             if rownum != 1:
                 self.client.onPieceError(1)
-                return False
             else:
                 self.diamondsContainer[rowValueMap["UUID"]] = rowValueMap
                 self.bagUUIDList.append(rowValueMap["UUID"])
                 self.writeToDB()
-                return True
 
 
         KBEngine.executeRawDatabaseCommand(sql,cb)
 
-        pass
     def __updatePieces(self, configID, addCount):
 
         # 1、是否存在
@@ -136,7 +133,6 @@ class DiamondModule:
 
             def cb(result, rownum, error):
                 self.diamondsContainer[item["UUID"]]["amount"] = curCount + addCount
-                return True
 
             KBEngine.executeRawDatabaseCommand(sql,cb)
 

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-itemsUse = {1002001: {'id': 1002001, 'addValue': 100, 'addType': 1},
-            1002002: {'id': 1002002, 'addValue': 100000, 'addType': 2},
-            1002003: {'id': 1002003, 'addValue': 100000, 'addType': 3},
-            1002004: {'id': 1002004, 'addValue': 1000, 'addType': 3}}
+itemsUseConfig = {102001: {'addPropName': 'bodyPower', 'addValue': '+50', 'id': 102001},
+                  102002: {'addPropName': 'gold', 'addValue': '+10000', 'id': 102002},
+                  102003: {'addPropName': 'gold', 'addValue': '+100000', 'id': 102003},
+                  102004: {'addPropName': 'gold', 'addValue': '*1.2', 'id': 102004},
+                  102005: {'addPropName': 'exp', 'addValue': '+1000', 'id': 102005},
+                  102006: {'addPropName': 'exp', 'addValue': '+20000', 'id': 102006}}
 
 allDatas = {
-    '消耗品': itemsUse,
+    '消耗品': itemsUseConfig,
 }

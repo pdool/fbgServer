@@ -80,13 +80,13 @@ class GiftModule:
     def decGift(self, uuid, count = 1):
         if uuid not in self.giftContainer:
             self.onGiftError(GiftModuleError.Gift_not_exist)
-            return False
+            return
 
         curCount = self.giftContainer[uuid]["amount"]
 
         if curCount < count:
             self.onGiftError(GiftModuleError.Gift_not_enough)
-            return False
+            return
 
         if curCount > count:
             setMap = {"amount": curCount - count}
@@ -95,9 +95,9 @@ class GiftModule:
 
             def cb(result, rownum, error):
                 if error is not None:
-                    return False
+                    return
                 self.giftContainer[uuid]["amount"] = curCount - count
-                return True
+                return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
         elif curCount == count:
@@ -106,11 +106,10 @@ class GiftModule:
 
             def cb(result, rownum, error):
                 if error is not None:
-                    return False
+                    return
                 del self.giftContainer[uuid]
                 self.bagUUIDList.remove(uuid)
                 self.writeToDB()
-                return True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -127,12 +126,12 @@ class GiftModule:
         def cb(result, rownum, error):
             if rownum != 1:
                 self.client.onGiftError(GiftModuleError.Gift_db_error)
-                return False
+                return
             else:
                 self.giftContainer[rowValueMap["UUID"]] = rowValueMap
                 self.bagUUIDList.append(rowValueMap["UUID"])
                 self.writeToDB()
-                return True
+                return
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -140,10 +139,11 @@ class GiftModule:
     def __updateGifts(self, configID, addCount):
 
         # 1、是否存在
+        isFind = False
         for item in self.giftContainer.values():
             if item["itemID"] != configID:
                 continue
-
+            isFind = True
             curCount = item["amount"]
 
             setMap = {"amount": curCount + addCount}
@@ -156,6 +156,8 @@ class GiftModule:
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
+        if isFind == True:
+            return
         return self.__insertGift(configID, addCount)
 
     # --------------------------------------------------------------------------------------------
@@ -198,8 +200,7 @@ class GiftModule:
             # 配置出错
             return
         # 删除礼包
-        if self.decGift(uuid) != True:
-            return
+        self.decGift(uuid)
         # 加进背包
         self.putItemInBag(itemId,num)
 
@@ -285,8 +286,7 @@ class GiftModule:
         print(itemId)
         print(num)
         # # 删除礼包
-        if self.decGift(uuid) != True:
-            return
+        self.decGift(uuid)
         # 加进背包
         self.putItemInBag(itemId, num)
 

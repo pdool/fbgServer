@@ -74,13 +74,13 @@ class EquipsModule:
     def decEquip(self, uuid, count):
         if uuid not in self.EquipsContainer:
             self.onEquipError(EquipModuleError.Equip_not_exist)
-            return False
+            return
 
         curCount = self.EquipsContainer[uuid]["amount"]
 
         if curCount < count:
             self.onEquipError(EquipModuleError.Equip_not_enough)
-            return False
+            return
 
         if curCount > count:
             setMap = {"amount": curCount - count}
@@ -89,9 +89,8 @@ class EquipsModule:
 
             def cb(result, rownum, error):
                 if error is not None:
-                    return False
+                    return
                 self.EquipsContainer[uuid]["amount"] = curCount - count
-                return True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
         elif curCount == count:
@@ -100,10 +99,10 @@ class EquipsModule:
 
             def cb(result, rownum, error):
                 if error is not None:
-                    return False
+                    return
                 del self.EquipsContainer[uuid]
                 self.bagUUIDList.remove(uuid)
-                return True
+                return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -131,12 +130,12 @@ class EquipsModule:
         def cb(result, rownum, error):
             if rownum != 1:
                 self.client.onPieceError(1)
-                return False
+                return
             else:
                 self.EquipsContainer[rowValueMap["UUID"]] = rowValueMap
                 self.bagUUIDList.append(rowValueMap["UUID"])
                 self.writeToDB()
-                return True
+                return
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -145,10 +144,11 @@ class EquipsModule:
     def __updateEquips(self, configID, addCount):
 
         # 1、是否存在
+        isFind = False
         for item in self.EquipsContainer.values():
             if item["itemID"] != configID:
                 continue
-
+            isFind = True
             curCount = item["amount"]
 
             setMap = {"amount": curCount + addCount}
@@ -157,10 +157,11 @@ class EquipsModule:
 
             def cb(result, rownum, error):
                 self.EquipsContainer[item["UUID"]]["amount"] = curCount + addCount
-                return True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
+        if isFind == True:
+            return
         return self.__insertEquip(configID, addCount)
 
 

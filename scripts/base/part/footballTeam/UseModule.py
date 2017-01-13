@@ -8,6 +8,7 @@ from KBEDebug import *
 from part.BagModule import ItemTypeEnum
 from itemsConfig import itemsIndex
 from ErrorCode import UseModuleError
+from itemsUse import itemsUseConfig
 
 """
 消耗品模块
@@ -111,15 +112,15 @@ class UseModule:
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
-        pass
 
     def __updateUse(self, configID, addCount):
 
+        isFind = False
         # 1、是否存在
         for item in self.useContainer.values():
             if item["itemID"] != configID:
                 continue
-
+            isFind = True
             curCount = item["amount"]
 
             setMap = {"amount": curCount + addCount}
@@ -128,16 +129,44 @@ class UseModule:
 
             def cb(result, rownum, error):
                 self.useContainer[item["UUID"]]["amount"] = curCount + addCount
-                return True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
-        return self.__insertUse(configID, addCount)
+        if isFind == False:
+            return self.__insertUse(configID, addCount)
+        else:
+            return True
 
     # --------------------------------------------------------------------------------------------
     #                              客户端调用函数
     # --------------------------------------------------------------------------------------------
+    def onClientUse(self,uuid,num):
+        # 1、验证是否存在
+        if uuid not in self.useContainer:
+            self.onUseError(UseModuleError.Use_not_exist)
+            return
+        # 2、验证数量
 
+        curCount = self.useContainer[uuid][UseItemKeys.amount]
+        if curCount < num:
+            self.onUseError(UseModuleError.Use_not_enough)
+            return False
+
+        # 扣除成功
+        self.decUses(uuid,num)
+
+        # 增加属性
+        itemID = self.useContainer[uuid][UseItemKeys.itemID]
+        addPropName =  itemsUseConfig[itemID][UseItemKeys.addPropName]
+
+
+        value = getattr(self, addPropName)
+        f = str(value) + "+50"
+        result = eval(f)
+
+        self.addPropValue(addPropName,result)
+
+        pass
 
     # --------------------------------------------------------------------------------------------
     #                              工具函数
@@ -148,3 +177,5 @@ class UseItemKeys:
     itemID = "itemID"
     amount = "amount"
     itemType = "itemType"
+
+    addPropName = "addPropName"

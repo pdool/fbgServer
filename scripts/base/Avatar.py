@@ -15,6 +15,7 @@ from part.FriendModule import FriendModule,FriendInfoKey,FriendOnlineState
 from part.BagModule import BagModule
 from part.ChatModule import ChatModule
 from part.CardMgrModule import CardMgrModule
+from part.PropMgrModule import PropMgrModule
 import util
 
 #使用技巧 先放在根级目录。，调好之后拖走，编辑器自动组织引用
@@ -33,6 +34,7 @@ class Avatar(KBEngine.Proxy,
              MaterialModule,
              PiecesModule,
              UseModule,
+             PropMgrModule,
              ):
     """
     角色实体

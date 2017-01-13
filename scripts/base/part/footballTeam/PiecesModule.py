@@ -62,13 +62,13 @@ class PiecesModule:
     def decPieces(self,uuid,count):
         if uuid not in self.piecesContainer:
             self.onPieceError(PieceCombineError.Piece_not_exist)
-            return False
+            return
 
         curCount = self.piecesContainer[uuid]["amount"]
 
         if curCount < count:
             self.onPieceError(PieceCombineError.Piece_not_enough)
-            return False
+            return
 
         if curCount > count:
             setMap = {"amount": curCount - count}
@@ -77,9 +77,8 @@ class PiecesModule:
 
             def cb(result, rownum, error):
                 if error is not None:
-                    return False
+                    return
                 self.piecesContainer[uuid]["amount"] = curCount - count
-                return True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
         elif curCount == count:
@@ -92,7 +91,6 @@ class PiecesModule:
                 del self.piecesContainer[uuid]
                 self.bagUUIDList.remove(uuid)
                 self.writeToDB()
-                return True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -112,12 +110,10 @@ class PiecesModule:
         def cb(result, rownum, error):
             if rownum != 1:
                 self.client.onPieceError(1)
-                return False
             else:
                 self.piecesContainer[rowValueMap["UUID"]] = rowValueMap
                 self.bagUUIDList.append(rowValueMap["UUID"])
                 self.writeToDB()
-                return True
 
 
         KBEngine.executeRawDatabaseCommand(sql,cb)
@@ -126,10 +122,11 @@ class PiecesModule:
     def __updatePieces(self, configID, addCount):
 
         # 1、是否存在
+        isFind = False
         for item in self.piecesContainer.values():
             if item["itemID"] != configID:
                 continue
-
+            isFind = True
             curCount = item["amount"]
 
             setMap = {"amount": curCount + addCount}
@@ -138,10 +135,11 @@ class PiecesModule:
 
             def cb(result, rownum, error):
                 self.piecesContainer[item["UUID"]]["amount"] = curCount + addCount
-                return True
 
             KBEngine.executeRawDatabaseCommand(sql,cb)
 
+        if isFind == True:
+            return
         return self.__insertPieces(configID, addCount)
 
 
@@ -174,8 +172,6 @@ class PiecesModule:
         self.decPieces(uuid,needCount)
 
         self.addCard(cardID)
-
-
 
         pass
 
