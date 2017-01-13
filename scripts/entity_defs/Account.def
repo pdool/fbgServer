@@ -1,0 +1,43 @@
+<root>
+	<Properties>
+		<lastSelCharacter>
+			<Type>			DBID				</Type>
+			<Flags>			BASE_AND_CLIENT			</Flags>
+			<Default>		0				</Default>
+			<Persistent>		true				</Persistent>
+		</lastSelCharacter>
+		
+		<activeCharacter>
+			<Type>			MAILBOX				</Type>
+			<Flags>			BASE				</Flags>
+		</activeCharacter>
+		
+		<lastClientIpAddr>
+			<Type>			STRING				</Type>
+			<Flags>			BASE				</Flags>
+			<Default>		0				</Default>
+            <Persistent>		true				</Persistent>
+		</lastClientIpAddr>
+	</Properties>
+
+	<ClientMethods>
+        <onCreateAvatarFail>
+        </onCreateAvatarFail>
+	</ClientMethods>
+
+	<BaseMethods>
+		<reqCreateAvatar>
+			<Exposed/>
+			<Arg>	UINT8	</Arg>	<!-- roleType -->
+			<Arg>	UNICODE	</Arg>	<!-- name -->
+		</reqCreateAvatar>
+        <reqRemoveAvatar>
+			<Exposed/>
+		</reqRemoveAvatar>
+
+	</BaseMethods>
+
+	<CellMethods>
+	</CellMethods>
+
+</root>

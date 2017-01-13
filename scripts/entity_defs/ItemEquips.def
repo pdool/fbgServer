@@ -1,0 +1,85 @@
+<root>
+	<Properties>
+
+       <!--角色索引-->
+        <roleID>
+            <Type> UINT64       </Type>
+            <Flags>         BASE            </Flags>
+            <Persistent>        true                </Persistent>
+        </roleID>
+
+       <!--背包索引-->
+        <UUID>
+            <Type> UINT64 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </UUID>
+
+        <!--配置ID-->
+        <itemID>
+            <Type> UINT64 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </itemID>
+          <!--数量-->
+        <amount>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </amount>
+
+<!--以上是通用背包属性，必须有-->
+
+        <shoot>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </shoot>
+
+        <pass>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </pass>
+
+        <reel>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </reel>
+
+        <defend>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </defend>
+
+        <trick>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </trick>
+
+        <steal>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </steal>
+
+        <controll>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </controll>
+        <keep>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </keep>
+
+		</Properties>
+
+	<BaseMethods>
+	</BaseMethods>
+
+</root>

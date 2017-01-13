@@ -1,0 +1,72 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+
+
+
+	</Properties>
+
+	<BaseMethods>
+        <onClientWorldChat>
+            <Exposed/>
+            <Arg>UNICODE</Arg>
+        </onClientWorldChat>
+
+        <onClientClubChat>
+            <Exposed/>
+            <Arg>UNICODE</Arg>
+        </onClientClubChat>
+
+        <onClientAdChat>
+            <Exposed/>
+            <Arg>UNICODE</Arg>
+        </onClientAdChat>
+
+       <onClientPrivate>
+            <Exposed/>
+           <Arg>DBID</Arg>
+           <Arg>UNICODE</Arg>
+        </onClientPrivate>
+
+	</BaseMethods>
+
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+
+
+
+       <onWorldChat>
+           <Arg>Message_INFO</Arg>
+        </onWorldChat>
+
+       <onAdChat>
+           <Arg>Message_INFO</Arg>
+       </onAdChat>
+
+       <onPrivateChat>
+           <Arg>Message_INFO</Arg>
+       </onPrivateChat>
+
+
+
+
+
+
+
+
+
+
+
+        <!--错误码-->
+        <onChatError>
+             <Arg>UINT32</Arg>
+        </onChatError>
+	</ClientMethods>
+</root>
+

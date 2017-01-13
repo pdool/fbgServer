@@ -1,0 +1,89 @@
+<root>
+	<Properties>
+			<to_dbid>
+				<Type> DBID </Type>
+                <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</to_dbid>
+			<!-- 是否需要解析 0:公共邮件，1:私人，2联盟 -->
+			<mail_type>
+				<Type> INT8 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</mail_type>
+			<!-- 邮件主题 -->
+			<title>
+				<Type> UNICODE </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</title>
+            <!-- 发邮件人名字 -->
+			<from_name>
+				<Type> UNICODE </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</from_name>
+			<!-- 邮件文字内容 -->
+			<text>
+				<Type> UNICODE </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</text>
+			<!-- 邮件时间 -->
+			<time>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</time>
+			<!--附件-->
+			<attachment>
+				<Type> STRING </Type>
+                <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</attachment>
+
+			<!--邮件状态-->
+			<state>
+				<Type> INT8 </Type>
+                <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+                <Default>		1				</Default><!--0:未读 1 已读 -->
+			</state>
+			<!--扩展信息-->
+			<extern_info>
+				<Type> STRING </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</extern_info>
+		</Properties>
+
+	<BaseMethods>
+        <!--发送邮件给玩家-->
+        <sendMailToPlayer>
+            <Arg>	MAIL_INFO	</Arg>	<!-- roleType -->
+        </sendMailToPlayer>
+
+        <!--根据类型获取所有的邮件-->
+        <getMailByType>
+            <Arg>	UINT64	</Arg>	<!-- 玩家DBID -->
+            <Arg>   UINT8    </Arg> <!--邮件类型-->
+        </getMailByType>
+        <!--读取邮件-->
+        <readMail>
+                 <Arg>	INT32	</Arg>	<!-- 邮件Id -->
+        </readMail>
+        <!--删除邮件-->
+        <delMail>
+                 <Arg>	INT32	</Arg>	<!-- 邮件Id -->
+        </delMail>
+        <!--一键删除所有邮件-->
+        <delAllMail>
+                 <Arg>	UINT64	</Arg>	<!-- 玩家DBID -->
+        </delAllMail>
+        <!--获取所有附件-->
+        <getAllAttachment>
+                <Arg>	UINT64	</Arg>	<!-- 玩家DBID -->
+        </getAllAttachment>
+	</BaseMethods>
+
+</root>

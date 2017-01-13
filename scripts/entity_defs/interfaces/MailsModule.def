@@ -1,0 +1,62 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+	</Properties>
+
+	<BaseMethods>
+        <!--发送邮件-->
+        <sendMail>
+            <Exposed/>
+            <Arg>	UINT64	</Arg>	<!-- to_DBID -->
+            <Arg>	UINT8	</Arg>	<!-- mailType -->
+            <Arg>	UNICODE	</Arg>	<!-- title -->
+            <Arg>	UNICODE	</Arg>	<!-- text -->
+            <Arg>	UNICODE	</Arg>	<!-- attachment -->
+            <Arg>	UNICODE	</Arg>	<!-- extern_info -->
+        </sendMail>
+        <!--读取邮件-->
+        <readMail>
+            <Exposed/>
+            <Arg>	UINT64	</Arg>	<!-- 时间戳 -->
+        </readMail>
+        <!--获取所有邮件列表-->
+        <getMail>
+            <Exposed/>
+        </getMail>
+
+        <delMail>
+            <Exposed/>
+             <Arg>	UINT64	</Arg>	<!-- 时间戳 -->
+        </delMail>
+
+        <delAllMailByType>
+            <Exposed/>
+            <Arg>	UINT8	</Arg>	<!-- mailType -->
+        </delAllMailByType>
+
+
+        <!--服务器间方法-->
+
+        <!--收到新的邮件-->
+        <recNewMail>
+            <Arg> PY_DICT </Arg>
+
+        </recNewMail>
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+
+        <onGetMails>
+            <Arg>MAIL_INFO_LIST</Arg>
+        </onGetMails>
+
+
+	</ClientMethods>
+</root>
+

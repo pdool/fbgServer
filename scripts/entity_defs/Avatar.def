@@ -1,0 +1,148 @@
+<root>
+	<Implements>
+        <Interface>	MailsModule		    </Interface>
+        <Interface>	LotteryModule		    </Interface>
+        <Interface>	ShopModule		        </Interface>
+        <Interface>	FriendModule		    </Interface>
+        <Interface>	BodyPowerModule		</Interface>
+        <Interface>	ChatModule		        </Interface>
+        <Interface>	BagModule		        </Interface>
+        <Interface>	CardMgrModule		    </Interface>
+        <Interface>	PiecesModule		    </Interface>
+	</Implements>
+
+	<Properties>
+
+		<!--  主属性(需要存DB)begin -->
+		<!-- 玩家昵称 -->
+		<name>
+			<Type> UNICODE </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+		</name>
+        <!--账号ID-->
+        <roleId>
+            <Type> UINT32 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+        </roleId>
+        <!--账号头像-->
+        <photoIndex>
+            <Type> STRING </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+        </photoIndex>
+        <!--等级-->
+		<level>
+			<Type>	UINT16					</Type>
+			<Flags>	BASE_AND_CLIENT		</Flags>
+			<Persistent>	true				</Persistent>
+            <Default> 1 </Default>
+		</level>
+        <!--经验-->
+        <exp>
+			<Type>	UINT32					</Type>
+			<Flags>	BASE_AND_CLIENT	    </Flags>
+			<Persistent>	true			</Persistent>
+            <Default> 0 </Default>
+		</exp>
+        <!--个性签名-->
+        <slogan>
+            <Type> UNICODE </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+        </slogan>
+        <club>
+            <Type> UNICODE </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+        </club>
+        <!--所属势力-->
+        <nation>
+            <Type> UINT8 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+        </nation>
+        <!--战斗力-->
+        <fightValue>
+            <Type> UINT32 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+        </fightValue>
+        <!--vip等级-->
+        <vipLevel>
+            <Type>	UINT8						</Type>
+			<Flags>	BASE_AND_CLIENT						</Flags>
+			<Persistent>	true						</Persistent>
+            <Default> 1 </Default>
+        </vipLevel>
+        <!--球员位置-->
+        <rolePosition>
+			<Type>	UINT8						</Type>
+			<Flags>	BASE_AND_CLIENT						</Flags>
+			<Persistent>	true						</Persistent>
+		</rolePosition>
+
+
+
+        <!--玩家金币-->
+		<gold>
+			<Type> UINT32 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+			<Default> 0 </Default>
+		</gold>
+
+		<!--玩家钻石-->
+		<diamond>
+			<Type> UINT32 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+			<Default> 0 </Default>
+		</diamond>
+
+        <!--玩家充值RMB-->
+		<rmb>
+			<Type> UINT32 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+			<Default> 0 </Default>
+		</rmb>
+
+
+
+        <logoutTime>
+            <Type> INT32 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+        </logoutTime>
+
+	</Properties>
+
+	<BaseMethods>
+        <onPlayerMgrCmd>
+             <Arg> STRING </Arg>
+             <Arg> PY_DICT </Arg>
+        </onPlayerMgrCmd>
+
+
+    <onClientGM>
+            <Exposed/>
+            <Arg> STRING </Arg>
+    </onClientGM>
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+        <onEnterScene><!--通知客户端进入场景-->
+        </onEnterScene>
+
+
+        <onOperateSuc>
+            <Arg> STRING </Arg>  <!--方法名-->
+        </onOperateSuc>
+	</ClientMethods>
+</root>
+

@@ -1,0 +1,39 @@
+<root>
+	<Properties>
+
+       <!--角色索引-->
+        <roleID>
+            <Type> UINT64       </Type>
+            <Flags>         BASE            </Flags>
+            <Persistent>        true                </Persistent>
+        </roleID>
+
+       <!--背包索引-->
+        <UUID>
+            <Type> UINT64 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </UUID>
+
+        <!--配置ID-->
+        <itemID>
+            <Type> UINT64 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </itemID>
+          <!--数量-->
+        <amount>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </amount>
+
+<!--以上是通用背包属性，必须有-->
+
+
+		</Properties>
+
+	<BaseMethods>
+	</BaseMethods>
+
+</root>

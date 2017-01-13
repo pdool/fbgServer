@@ -1,0 +1,33 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+
+
+
+	</Properties>
+
+	<BaseMethods>
+        <onClientCommbine>
+            <Exposed/>
+            <Arg>UINT64</Arg>
+        </onClientCommbine>
+
+
+	</BaseMethods>
+
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+
+
+        <onPieceError>
+             <Arg>UINT32</Arg>
+        </onPieceError>
+	</ClientMethods>
+</root>
+

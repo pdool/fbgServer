@@ -1,0 +1,67 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+    <!--背包的大小-->
+        <bagSize>
+            <Type>			UINT32                   </Type>
+			<Flags>			BASE_AND_CLIENT		  </Flags>
+			<Default>						          </Default>
+			<Persistent>		true		          </Persistent>
+        </bagSize>
+
+        <!--各个Item的UUID-->
+        <bagUUIDList>
+            <Type>			ARRAY <of> UINT64 </of>                 </Type>
+			<Flags>			BASE		  </Flags>
+			<Default>						          </Default>
+			<Persistent>		true		          </Persistent>
+        </bagUUIDList>
+
+        <!--打开礼包的概率-->
+        <openGiftPercentList>
+            <Type>			ARRAY <of> Gift_Info </of>                 </Type>
+			<Flags>			BASE		  </Flags>
+			<Default>						          </Default>
+			<Persistent>		true		          </Persistent>
+        </openGiftPercentList>
+
+	</Properties>
+
+	<BaseMethods>
+
+       <!--获得装备列表-->
+        <onClientGetItemList>
+            <Exposed/>
+        </onClientGetItemList>
+
+        <!--出售-->
+        <onClientSellBatch>
+            <Exposed/>
+            <Arg> ARRAY <of> UINT64 </of></Arg>
+        </onClientSellBatch>
+
+        <!--单个出售-->
+        <onClientSellOne>
+            <Exposed/>
+            <Arg>  UINT64 </Arg>
+            <Arg>  UINT32 </Arg>
+        </onClientSellOne>
+
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+        <!--返回装备列表-->
+        <onGetItemList>
+            <Arg>  ARRAY <of> Item_Info </of>> </Arg>
+        </onGetItemList>
+
+
+	</ClientMethods>
+</root>
+

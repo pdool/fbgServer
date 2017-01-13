@@ -1,0 +1,36 @@
+<root>
+	<Properties>
+
+       <!--角色索引-->
+        <roleID>
+            <Type> UINT64       </Type>
+            <Flags>         BASE            </Flags>
+            <Persistent>        true                </Persistent>
+        </roleID>
+
+       <!--背包索引-->
+        <UUID>
+            <Type> UINT64 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </UUID>
+
+        <!--配置ID-->
+        <itemID>
+            <Type> UINT64 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </itemID>
+          <!--配置ID-->
+        <amount>
+            <Type> UINT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+        </amount>
+
+		</Properties>
+
+	<BaseMethods>
+	</BaseMethods>
+
+</root>

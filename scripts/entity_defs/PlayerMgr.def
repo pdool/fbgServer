@@ -1,0 +1,66 @@
+<root>
+
+
+	<BaseMethods>
+
+        <!--玩家登陆注册-->
+        <playerLogin>
+            <Arg> MAILBOX </Arg>
+             <Arg> UINT64 </Arg>  <!-- dbid-->
+            <Arg> PY_DICT </Arg>  <!-- palyerInfo-->
+        </playerLogin>
+
+        <!--玩家下线取消注册-->
+        <playerOffline>
+             <Arg> UINT64 </Arg>
+        </playerOffline>
+
+        <onCmdByDBID>
+            <Arg> UINT64 </Arg>
+            <Arg> STRING </Arg>
+            <Arg> PY_DICT </Arg>
+        </onCmdByDBID>
+
+        <queryPlayerInfo>
+            <Arg> UINT64 </Arg><!--被查询者的dbid-->
+            <Arg> STRING </Arg><!--调用被查询者的方法-->
+            <Arg> MAILBOX </Arg><!--查询者的mailbox-->
+            <Arg> STRING </Arg><!--查询完成后回调的方法-->
+        </queryPlayerInfo>
+
+        <getRecommendList>
+            <Arg> PY_LIST </Arg>
+            <Arg> UINT64 </Arg>
+            <Arg> MAILBOX </Arg>
+            <Arg> STRING </Arg>
+        </getRecommendList>
+
+
+        <onQueryFriendInfo>
+            <Arg> UINT64 </Arg>
+            <Arg> STRING </Arg>
+            <Arg> MAILBOX </Arg>
+            <Arg> STRING </Arg>
+        </onQueryFriendInfo>
+
+        <onAcceptAddFriend>
+            <Arg> UINT64 </Arg>
+            <Arg> UINT64 </Arg>
+            <Arg> STRING </Arg>
+        </onAcceptAddFriend>
+
+        <sendWorldChat>
+            <Arg> UINT64 </Arg>
+            <Arg> PY_DICT </Arg>
+        </sendWorldChat>
+
+
+        <sendPrivateChat>
+            <Arg> UINT64 </Arg>
+            <Arg> UINT64 </Arg>
+            <Arg> PY_DICT </Arg>
+        </sendPrivateChat>
+
+	</BaseMethods>
+
+</root>

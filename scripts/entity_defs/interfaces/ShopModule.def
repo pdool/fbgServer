@@ -1,0 +1,48 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+
+        <monthRebateTimes>
+            <Type>			UINT32  </Type>
+			<Flags>			BASE_AND_CLIENT				</Flags>
+			<Default>						</Default>
+			<Persistent>		true		</Persistent>
+        </monthRebateTimes>
+
+        <seasonRebateTimes>
+            <Type>			UINT32  </Type>
+			<Flags>			BASE_AND_CLIENT				</Flags>
+			<Default>						</Default>
+			<Persistent>		true		</Persistent>
+        </seasonRebateTimes>
+
+
+        <firstBuyInfo>
+			<Type>			ARRAY <of> UINT8 </of> </Type>
+			<Flags>			BASE_AND_CLIENT				</Flags>
+			<Default>						</Default>
+			<Persistent>		true		</Persistent>
+		</firstBuyInfo>
+	</Properties>
+
+	<BaseMethods>
+        <onClientCharge>
+            <Exposed/>
+			<Arg>	UINT8	</Arg>	<!-- cardID -->
+        </onClientCharge>
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+
+
+
+
+	</ClientMethods>
+</root>
+

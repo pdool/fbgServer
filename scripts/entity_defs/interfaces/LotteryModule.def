@@ -1,0 +1,69 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+
+        <!--钞票抽免费次数-->
+        <goldFreeTimes>
+			<Type>			INT8			</Type>
+			<Flags>			BASE_AND_CLIENT				</Flags>
+            <Persistent> true </Persistent>
+			<Default> 0 </Default>
+		</goldFreeTimes>
+        <goldLastTime>
+			<Type>			INT32			</Type>
+			<Flags>			BASE_AND_CLIENT				</Flags>
+            <Persistent> true </Persistent>
+			<Default> 0 </Default>
+		</goldLastTime>
+
+
+<!--钻石抽免费次数-->
+        <diamondFreeTimes>
+			<Type>			INT8			</Type>
+			<Flags>			BASE_AND_CLIENT				</Flags>
+            <Persistent> true </Persistent>
+			<Default> 0 </Default>
+		</diamondFreeTimes>
+
+        <diamondLastTime>
+			<Type>			INT32			</Type>
+			<Flags>			BASE_AND_CLIENT				</Flags>
+            <Persistent> true </Persistent>
+			<Default> 0 </Default>
+		</diamondLastTime>
+
+<!--十连抽是否首抽-->
+        <tenFirstCall>
+            <Type>			INT8			</Type>
+			<Flags>			BASE_AND_CLIENT</Flags>
+            <Persistent> true </Persistent>
+			<Default> 0 </Default>
+        </tenFirstCall>
+
+
+	</Properties>
+
+	<BaseMethods>
+        <onClientLottery>
+            <Exposed/>
+            <Arg> INT8 </Arg>
+        </onClientLottery>
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+        <lotteryResult>
+            <Arg> INT8 </Arg>
+            <Arg> STRING </Arg>
+        </lotteryResult>
+
+
+
+	</ClientMethods>
+</root>
+

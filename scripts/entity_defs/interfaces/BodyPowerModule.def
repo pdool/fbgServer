@@ -1,0 +1,46 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+
+    <!--体力-->
+    <bodyPower>
+        <Type> UINT32 </Type>
+        <Flags> BASE_AND_CLIENT </Flags>
+        <Persistent> true </Persistent>
+        <Default> 0 </Default>
+    </bodyPower>
+    <!--体力每日可购买次数-->
+    <bodyPowerBuyTimes>
+        <Type> UINT32 </Type>
+        <Flags> BASE_AND_CLIENT </Flags>
+        <Persistent> true </Persistent>
+        <Default> 0 </Default>
+    </bodyPowerBuyTimes>
+
+
+
+	</Properties>
+
+	<BaseMethods>
+           <!--购买体力-->
+        <onClientBuyPower>
+            <Exposed/>
+            <Arg> UINT32</Arg>
+        </onClientBuyPower>
+
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+        <!--错误码-->
+        <onBodyPowerError>
+             <Arg>UINT32</Arg>
+        </onBodyPowerError>
+	</ClientMethods>
+</root>
+

@@ -1,0 +1,132 @@
+<root>
+	<Properties>
+			<roleID>
+				<Type> DBID </Type>
+                <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</roleID>
+           <!-- 是否是本身所代表的的卡牌 -->
+			<isSelf>
+				<Type> UINT8 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+                <Default> 0    </Default>
+			</isSelf>
+
+           <!-- 配置ID -->
+			<configID>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+                <Default> 0    </Default>
+			</configID>
+
+        <!--等级-->
+            <level>
+				<Type> UINT32 </Type>
+                <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+                 <Default> 1    </Default>
+			</level>
+            <!--经验-->
+            <exp>
+				<Type> UINT32 </Type>
+                <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+                <Default> 0    </Default>
+			</exp>
+        <!--星级-->
+            <star>
+				<Type> UINT32 </Type>
+                <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+                 <Default> 0    </Default>
+			</star>
+
+
+			<brokenLayer>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+                 <Default> 0    </Default>
+			</brokenLayer>
+
+        <!-- 射门 -->
+			<shoot>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</shoot>
+       <!-- 防守 -->
+			<defend>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</defend>
+       <!-- 传球 -->
+			<passBall>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</passBall>
+       <!-- 拦截 -->
+			<trick>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</trick>
+       <!-- 盘带 -->
+			<reel>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</reel>
+       <!-- 抢断 -->
+			<steal>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</steal>
+       <!-- 控球 -->
+			<controll>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</controll>
+       <!-- 守门 -->
+			<keep>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</keep>
+
+       <!-- 技术 -->
+			<tech>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</tech>
+
+       <!-- 身体 -->
+			<health>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</health>
+
+               <!-- 是否上阵 -->
+			<inTeam>
+				<Type> UINT32 </Type>
+                 <Flags>			BASE			</Flags>
+                <Persistent>		true				</Persistent>
+			</inTeam>
+
+
+
+    </Properties>
+
+	<BaseMethods>
+
+	</BaseMethods>
+
+</root>

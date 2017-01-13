@@ -1,0 +1,206 @@
+<root>
+	<OBJECT_ID>			INT32		</OBJECT_ID>
+	<BOOL>				UINT8		</BOOL>
+	<CONTROLLER_ID>		INT32		</CONTROLLER_ID>
+	<EXPERIENCE>		INT32		</EXPERIENCE>
+	<ITEM_ID>			INT32		</ITEM_ID>
+	<SKILLID>			INT32		</SKILLID>
+	<QUESTID>			INT32		</QUESTID>
+	<DBID>				UINT64		</DBID>
+	<UID>				UINT64		</UID>
+	<UID1>				PYTHON		</UID1>	
+	<ENTITY_ID>			INT32		</ENTITY_ID>
+	<ENTITY_NO>			UINT32		</ENTITY_NO>
+	<SPACE_ID>			UINT32		</SPACE_ID>
+	<POSITION3D>		VECTOR3		</POSITION3D>
+	<DIRECTION3D>		VECTOR3		</DIRECTION3D>
+	<ENTITY_UTYPE>		UINT32		</ENTITY_UTYPE>
+	
+	<DAMAGE_TYPE>		INT32		</DAMAGE_TYPE>
+	<ENMITY>			DAMAGE_TYPE	 </ENMITY>
+	<HP>				INT32		</HP>
+	<MP>				INT32		</MP>
+	
+	<ENTITY_STATE> INT8		</ENTITY_STATE>
+	<ENTITY_SUBSTATE> UINT8	</ENTITY_SUBSTATE>
+	<ENTITY_FORBIDS> INT32	</ENTITY_FORBIDS>
+	<ENTITY_FORBID_COUNTER> ARRAY <of> INT8 </of>	</ENTITY_FORBID_COUNTER>
+	
+	<ENTITYID_LIST> ARRAY <of> ENTITY_ID </of>	</ENTITYID_LIST>
+	
+    <ROLE_INFO> FIXED_DICT
+		<Properties>
+			<!-- 活动编号 -->
+			<dbid>
+				<Type> UINT64 </Type>
+			</dbid>
+			<!-- 活动类别 -->
+			<roleType>
+				<Type> INT8 </Type>
+			</roleType>
+			<!-- 活动名字 -->
+			<name>
+				<Type> UNICODE </Type>
+			</name>
+
+		</Properties>
+	</ROLE_INFO>
+
+	<!-- 活动列表 -->
+	<ROLE_INFO_LIST> FIXED_DICT
+		<Properties>
+			<values>
+				<Type> ARRAY <of> ROLE_INFO </of> </Type>
+			</values>
+		</Properties>
+	</ROLE_INFO_LIST>
+
+    <MAIL_INFO> FIXED_DICT
+		<Properties>
+			<!--  0:公共邮件，1:私人，2联盟 -->
+			<mail_type>
+				<Type> INT8 </Type>
+			</mail_type>
+			<!-- 邮件主题 -->
+			<title>
+				<Type> UNICODE </Type>
+			</title>
+            <!-- 发邮件人名字 -->
+			<from_name>
+				<Type> UNICODE </Type>
+			</from_name>
+
+			<!-- 邮件文字内容 -->
+			<text>
+				<Type> UNICODE </Type>
+			</text>
+			<!-- 邮件时间 -->
+			<time>
+				<Type> UINT32 </Type>
+			</time>
+			<!--附件-->
+			<attachment>
+				<Type> STRING </Type>
+			</attachment>
+			<!--邮件状态-->
+			<state>
+				<Type> INT8 </Type>
+			</state>
+			<!--扩展信息-->
+			<extern_info>
+				<Type> STRING </Type>
+			</extern_info>
+		</Properties>
+	</MAIL_INFO>
+
+    <MAIL_INFO_LIST> FIXED_DICT
+		<Properties>
+			<values>
+				<Type> ARRAY <of> MAIL_INFO </of> </Type>
+			</values>
+		</Properties>
+	</MAIL_INFO_LIST>
+
+    <SHOP_INFO> FIXED_DICT
+		<Properties>
+			<goods_Id><!-- 货品ID-->
+				<Type> INT8 </Type>
+			</goods_Id>
+            <is_first><!-- 是否首冲-->
+                <Type> INT8 </Type>
+                <Default>		0				</Default>
+            </is_first>
+		</Properties>
+	</SHOP_INFO>
+
+
+	<EXAMPLES>	FIXED_DICT
+		<Properties>
+			<k1>
+				<Persistent>	false	</Persistent>
+				<Type>	INT64	</Type>
+			</k1>
+			
+			<k2>
+				<Type>	INT64	</Type>
+			</k2>
+		</Properties>
+	</EXAMPLES>	
+
+
+    <Friend_INFO>  FIXED_DICT
+        <Properties>
+            <dbid>            <Type> DBID     </Type>     </dbid><!--dbid-->
+            <photoIndex>     <Type> STRING    </Type>     </photoIndex><!--photoIndex-->
+            <name>            <Type> UNICODE  </Type>     </name><!--name-->
+            <level>           <Type> UINT32    </Type>      </level> <!--level-->
+            <vipLevel>        <Type> UINT32    </Type>     </vipLevel><!--vipLevel-->
+            <fightValue>      <Type> UINT32    </Type>     </fightValue><!--fightValue-->
+            <clubName>        <Type> UNICODE  </Type>     </clubName><!--clubName-->
+            <onlineState>     <Type> INT32   </Type>     </onlineState><!--onlineState-->
+        </Properties>
+    </Friend_INFO>
+
+
+    <FRIEND_INFO_LIST> FIXED_DICT
+		<Properties>
+			<values>
+				<Type> ARRAY <of> Friend_INFO </of> </Type>
+			</values>
+		</Properties>
+	</FRIEND_INFO_LIST>
+
+
+
+    <Message_INFO>  FIXED_DICT
+        <Properties>
+            <message>         <Type> UNICODE  </Type>     </message><!--dbid-->
+            <photoIndex>     <Type> STRING    </Type>     </photoIndex><!--photoIndex-->
+            <name>            <Type> UNICODE   </Type>     </name><!--name-->
+            <level>           <Type> UINT32    </Type>     </level> <!--level-->
+            <vipLevel>        <Type> UINT32    </Type>     </vipLevel><!--vipLevel-->
+            <sendTime>        <Type> UINT32    </Type>     </sendTime><!--sendTime-->
+        </Properties>
+    </Message_INFO>
+
+    <Item_Info>  FIXED_DICT
+        <Properties>
+            <UUID>              <Type> UINT64   </Type>     </UUID><!--configID-->
+            <itemID>            <Type> UINT64   </Type>     </itemID><!--configID-->
+            <amount>            <Type> UINT32   </Type>     </amount><!--name-->
+        </Properties>
+    </Item_Info>
+
+    <Player_Info>  FIXED_DICT
+        <Properties>
+            <playerID>          <Type> UINT64   </Type>     </playerID><!--配置ID-->
+            <level>              <Type> UINT32   </Type>     </level><!--配置ID-->
+            <exp>                <Type> UINT32   </Type>     </exp><!--配置ID-->
+            <star>               <Type> UINT32  </Type>     </star><!--突破-->
+            <brokenLayer>       <Type> UINT32  </Type>     </brokenLayer><!--突破-->
+            <fightValue>        <Type> UINT64   </Type>     </fightValue><!--configID-->
+            <shoot>              <Type> UINT32  </Type>     </shoot><!--射门-->
+            <defend>             <Type> UINT32  </Type>     </defend><!--防守-->
+            <pass>               <Type> UINT32  </Type>     </pass><!--传球-->
+            <trick>              <Type> UINT32  </Type>     </trick><!--拦截-->
+            <reel>               <Type> UINT32  </Type>     </reel><!--盘带-->
+            <steal>              <Type> UINT32  </Type>     </steal><!--抢断-->
+            <controll>           <Type> UINT32  </Type>     </controll><!--控球-->
+            <keep>               <Type> UINT32  </Type>     </keep><!--守门-->
+            <tech>               <Type> UINT32  </Type>     </tech><!--技术-->
+            <health>             <Type> UINT32  </Type>     </health><!--身体-->
+
+        </Properties>
+    </Player_Info>
+
+
+    <Gift_Info>  FIXED_DICT
+        <Properties>
+            <giftId>              <Type> UINT64   </Type>     </giftId><!--礼包ID-->
+            <percentIndex>            <Type> UINT32   </Type>     </percentIndex><!--关键道具抽到的次数-->
+        </Properties>
+    </Gift_Info>
+
+
+
+</root>
