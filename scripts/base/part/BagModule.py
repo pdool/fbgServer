@@ -32,7 +32,7 @@ class BagModule:
 
         retItems = []
         for uuid in self.bagUUIDList:
-            item = self.getItemByUUID(uuid)
+            _,item = self.getItemByUUID(uuid)
             if item  is None:
                 continue
             value = {}
@@ -49,7 +49,7 @@ class BagModule:
 
         for uuid in uuidList:
             # 获得装备
-            item = self.getItemByUUID(uuid)
+            _,item = self.getItemByUUID(uuid)
             if item != None:
                 # 获得数量
                 amount = item["amount"]
@@ -59,7 +59,7 @@ class BagModule:
 
     def onClientSellOne(self,uuid,num):
 
-        item = self.getItemByUUID(uuid)
+        itemType,item = self.getItemByUUID(uuid)
 
         if item is None:
             return
@@ -75,7 +75,6 @@ class BagModule:
 
         sellMoney = self.gold + num * price
 
-        itemType =  item["itemType"]
         result = False
         if itemType == ItemTypeEnum.Diamond:
             result = self.decDiamond(self,uuid,num)
@@ -100,20 +99,27 @@ class BagModule:
 
     def getItemByUUID(self,uuid):
         item = None
+        itemType = ItemTypeEnum.Wrong
         if uuid in self.equipsContainer:
             item = self.equipsContainer[uuid]
+            itemType = ItemTypeEnum.Equips
         elif uuid in self.useContainer:
             item = self.useContainer[uuid]
+            itemType = ItemTypeEnum.Use
         elif uuid in self.materialContainer:
             item = self.materialContainer[uuid]
+            itemType = ItemTypeEnum.Material
         elif uuid in self.diamondsContainer:
             item = self.diamondsContainer[uuid]
+            itemType = ItemTypeEnum.Diamond
         elif uuid in self.piecesContainer:
             item = self.piecesContainer[uuid]
+            itemType = ItemTypeEnum.Pieces
         elif uuid in self.giftContainer:
             item = self.giftContainer[uuid]
+            itemType = ItemTypeEnum.Gift
 
-        return item
+        return itemType,item
 
     # 加一个道具到背包，并分发到各个容器
     def putItemInBag(self,itemID,num):
@@ -142,6 +148,10 @@ class ItemOrderBy:
     byQualityOrder = 2
 
 class ItemTypeEnum:
+
+    # 错误类型
+    Wrong = 1000
+
     Equips = 1001
     # 消耗品
     Use = 1002

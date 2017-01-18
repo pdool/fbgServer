@@ -8,7 +8,7 @@
 	<Account hasClient="true"></Account>
 	<Avatar hasClient="true"></Avatar> <!-- <Avatar hasCell="true" hasBase="true" hasClient="true"></Avatar> -->
 
-    <Mails></Mails>
+    <Mails/>
     <PlayerMgr/>
     <Card/>
     <ItemPieces/>

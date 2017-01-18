@@ -30,7 +30,7 @@
 			</level>
             <!--经验-->
             <exp>
-				<Type> UINT32 </Type>
+				<Type> UINT64 </Type>
                 <Flags>			BASE			</Flags>
                 <Persistent>		true				</Persistent>
                 <Default> 0    </Default>
@@ -43,7 +43,7 @@
                  <Default> 0    </Default>
 			</star>
 
-
+            <!--突破层数-->
 			<brokenLayer>
 				<Type> UINT32 </Type>
                  <Flags>			BASE			</Flags>
@@ -116,7 +116,7 @@
 
                <!-- 是否上阵 -->
 			<inTeam>
-				<Type> UINT32 </Type>
+				<Type> UINT8 </Type>
                  <Flags>			BASE			</Flags>
                 <Persistent>		true				</Persistent>
 			</inTeam>

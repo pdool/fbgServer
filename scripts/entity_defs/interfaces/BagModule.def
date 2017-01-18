@@ -49,6 +49,17 @@
             <Arg>  UINT32 </Arg>
         </onClientSellOne>
 
+
+
+
+
+
+
+
+
+
+
+
 	</BaseMethods>
 
 	<CellMethods>
@@ -58,7 +69,7 @@
 	<ClientMethods>
         <!--返回装备列表-->
         <onGetItemList>
-            <Arg>  ARRAY <of> Item_Info </of>> </Arg>
+            <Arg>  ARRAY <of> Item_Info </of> </Arg>
         </onGetItemList>
 
 

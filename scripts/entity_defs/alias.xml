@@ -175,7 +175,7 @@
         <Properties>
             <playerID>          <Type> UINT64   </Type>     </playerID><!--配置ID-->
             <level>              <Type> UINT32   </Type>     </level><!--配置ID-->
-            <exp>                <Type> UINT32   </Type>     </exp><!--配置ID-->
+            <exp>                <Type> UINT64   </Type>     </exp><!--配置ID-->
             <star>               <Type> UINT32  </Type>     </star><!--突破-->
             <brokenLayer>       <Type> UINT32  </Type>     </brokenLayer><!--突破-->
             <fightValue>        <Type> UINT64   </Type>     </fightValue><!--configID-->
@@ -201,6 +201,16 @@
         </Properties>
     </Gift_Info>
 
-
+    <Card_Info>  FIXED_DICT
+        <Properties>
+            <DBID>              <Type> UINT64   </Type>     </DBID>
+            <configID>         <Type> UINT64   </Type>     </configID>
+            <level>            <Type> UINT32   </Type>     </level>
+            <star>             <Type> UINT32   </Type>     </star>
+            <exp>             <Type> UINT64   </Type>     </exp>
+            <inTeam>          <Type> UINT8   </Type>     </inTeam>
+            <isSelf>          <Type> UINT8   </Type>     </isSelf>
+        </Properties>
+    </Card_Info>
 
 </root>

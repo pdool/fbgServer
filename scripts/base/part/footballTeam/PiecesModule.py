@@ -5,15 +5,15 @@ __author__ = 'chongxin'
 __createTime__  = '2017年1月5日'
 
 import util
-from KBEDebug import *
 from ErrorCode import PieceCombineError
-from itemsPieces import itemsPiecesConfig
+from KBEDebug import *
 from itemsConfig import itemsIndex
-from part.BagModule import ItemTypeEnum
+from itemsPieces import itemsPiecesConfig
 
 if __name__ == "__main__":
     print(__file__)
     pass
+
 """
 碎片合成模块
 """
@@ -38,7 +38,6 @@ class PiecesModule:
                 pieceItem[PieceItemKeys.uuid] = int(result[i][0])
                 pieceItem[PieceItemKeys.itemID] = int(result[i][1])
                 pieceItem[PieceItemKeys.amount] = int(result[i][2])
-                pieceItem[PieceItemKeys.itemType] = ItemTypeEnum.Pieces
                 self.piecesContainer[ pieceItem[PieceItemKeys.uuid]] = pieceItem
 
 
@@ -179,6 +178,11 @@ class PiecesModule:
     def onClientBroke(self,uuid):
         pass
 
+    def onClientGetAllPieces(self):
+
+        DEBUG_MSG("-------------onClientGetAllPieces-------------------------------")
+        self.client.onGetAllPieces(list(self.piecesContainer.values()))
+        pass
 
     # --------------------------------------------------------------------------------------------
     #                              工具函数
@@ -190,4 +194,3 @@ class PieceItemKeys:
     uuid = "UUID"
     itemID = "itemID"
     amount = "amount"
-    itemType = "itemType"

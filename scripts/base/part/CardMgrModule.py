@@ -6,6 +6,11 @@ __createTime__  = '2017年1月5日'
 
 import util
 from KBEDebug import *
+
+class PlayerInfoSelfStatus:
+    notSelf = 0
+    isSelf = 1
+
 class CardMgrModule:
 
     def __init__(self):
@@ -46,22 +51,25 @@ class CardMgrModule:
     # --------------------------------------------------------------------------------------------
 
     def onClientGetAllCardInfo(self):
-
+        DEBUG_MSG("-----------------onClientGetAllCardInfo 1-------------------------------------")
         playerInfos = []
         for id in self.cardIDList:
             player = KBEngine.entities.get(id)
 
             playerInfo = {}
-            for k in PlayerInfoKeys.__dict__:
-                if not k.startswith("__"):
-                    key = PlayerInfoKeys.__dict__[k]
-                    if hasattr(player,key):
-                        value = getattr(player,key)
-                        playerInfo[PlayerInfoKeys.__dict__[k]] = value
+            playerInfo["DBID"] = player.databaseID
+            playerInfo["configID"] = player.configID
+            playerInfo["level"] = player.level
+            playerInfo["star"] = player.star
+            playerInfo["exp"] = player.exp
+            playerInfo["inTeam"] = player.inTeam
+            playerInfo["isSelf"] = player.isSelf
+
             playerInfos.append(playerInfo)
 
 
-        self.onGetPlayerInfo(playerInfos)
+        DEBUG_MSG("-----------------onClientGetAllCardInfo 2-------------------------------------")
+        self.client.onGetAllCardInfo(playerInfos)
 
 
 
@@ -71,7 +79,7 @@ class CardMgrModule:
     #                              工具函数调用函数
     # --------------------------------------------------------------------------------------------
 
-    def addCard(self,configID,isSelf = 0):
+    def addCard(self,configID,isSelf = PlayerInfoSelfStatus.notSelf):
 
         if configID not in cardsConfig:
             return
@@ -91,6 +99,8 @@ class CardMgrModule:
             card.reel = config["reel"]
             card.controll = config["controll"]
             card.keep = config["keep"]
+            card.inTeam = PlayerInfoTeamStatus.notInTeam
+
             card.writeToDB(self.__onCardSaved)
         else:
             DEBUG_MSG("card is not None")
@@ -116,5 +126,7 @@ class PlayerInfoKeys:
 
 
 
-
+class PlayerInfoTeamStatus:
+    notInTeam = 0
+    inTeam = 1
 

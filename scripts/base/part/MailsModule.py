@@ -72,8 +72,9 @@ class MailsModule:
     def getMail(self):
         mails = {}
         mails["values"] = self.mails
+
+
         self.client.onGetMails(mails)
-        DEBUG_MSG("-----------------------------------------" + str(util.getCurrentTime()))
 
 
     def readMail(self, mailTime):
@@ -82,12 +83,10 @@ class MailsModule:
 
         state = Mails.Mail_State_read
         def updateSucCB(result, rownum, error):
-            DEBUG_MSG("---------------------------------------1----------------------------------------------")
             if findKey != -1:
                 self.mails[findKey]["state"] = state
 
                 self.client.onOperateSuc("readMail")
-                DEBUG_MSG("-------------------------------------2------------------------------------------------")
 
 
         for i in range(mailsCount):

@@ -16,7 +16,7 @@ from part.BagModule import ItemTypeEnum
 class DiamondModule:
 
     def __init__(self):
-        # 球员碎片容器
+        # 宝石容器
         self.diamondsContainer = {}
     def loadDiamonds(self):
         colTupe = ("sm_UUID", "sm_itemID","sm_amount")

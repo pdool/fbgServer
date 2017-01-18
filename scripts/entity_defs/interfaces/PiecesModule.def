@@ -9,11 +9,16 @@
 	</Properties>
 
 	<BaseMethods>
+        <!--碎片合成-->
         <onClientCommbine>
             <Exposed/>
             <Arg>UINT64</Arg>
         </onClientCommbine>
 
+        <!--获得所有的碎片信息-->
+        <onClientGetAllPieces>
+            <Exposed/>
+        </onClientGetAllPieces>
 
 	</BaseMethods>
 
@@ -28,6 +33,11 @@
         <onPieceError>
              <Arg>UINT32</Arg>
         </onPieceError>
+
+        <!--返回所有的碎片信息-->
+        <onGetAllPieces>
+            <Arg>  ARRAY <of> Item_Info </of> </Arg>
+        </onGetAllPieces>
 	</ClientMethods>
 </root>
 

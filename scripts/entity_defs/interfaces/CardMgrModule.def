@@ -19,7 +19,10 @@
 	</Properties>
 
 	<BaseMethods>
-
+        <!--客户端请求所有的卡牌信息-->
+        <onClientGetAllCardInfo>
+            <Exposed/>
+        </onClientGetAllCardInfo>
 	</BaseMethods>
 
 	<CellMethods>
@@ -27,7 +30,9 @@
 	</CellMethods>
 
 	<ClientMethods>
-
+        <onGetAllCardInfo>
+            <Arg> ARRAY <of> Card_Info </of> </Arg>
+        </onGetAllCardInfo>
 
 	</ClientMethods>
 </root>
