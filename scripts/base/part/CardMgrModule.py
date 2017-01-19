@@ -123,7 +123,6 @@ class CardMgrModule:
         resultExp = eval(str(exp) + addValueF)
 
         # 升级配置
-        ERROR_MSG("---------------dasdasdsa------------------------" + str(level))
         levelUpgradeConfig = cardLevelUpgradeConfig[level + 1]
         upExp = levelUpgradeConfig["maxExp"]
 
@@ -148,6 +147,8 @@ class CardMgrModule:
 
             levelUpgradeConfig = cardLevelUpgradeConfig[card.level + 1]
             upExp = levelUpgradeConfig["maxExp"]
+
+        self.exp = resultExp
 
         card.writeToDB()
 
