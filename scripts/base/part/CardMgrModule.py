@@ -148,7 +148,7 @@ class CardMgrModule:
             levelUpgradeConfig = cardLevelUpgradeConfig[card.level + 1]
             upExp = levelUpgradeConfig["maxExp"]
 
-        self.exp = resultExp
+        card.exp = resultExp
 
         card.writeToDB()
 
