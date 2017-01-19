@@ -82,9 +82,15 @@ class MaterialModuleError:
     Material_not_enough = 2
     # 操作数据库出错
     Material_db_error = 3
-
-
-
+class CardMgrModuleError:
+    # 卡不存在
+    Card_not_exist = 1
+    # 不是经验丹
+    Card_not_exp_use = 2
+    # 数量不足
+    Card_not_enough_use = 3
+    # 已经最高等级
+    Card_is_max_level = 4
 
 
 

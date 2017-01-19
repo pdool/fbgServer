@@ -98,8 +98,12 @@ class BagModule:
     # --------------------------------------------------------------------------------------------
 
     def getItemByUUID(self,uuid):
-        item = None
         itemType = ItemTypeEnum.Wrong
+        item = None
+
+        if uuid not in self.bagUUIDList:
+            return itemType,item
+
         if uuid in self.equipsContainer:
             item = self.equipsContainer[uuid]
             itemType = ItemTypeEnum.Equips

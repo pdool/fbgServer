@@ -23,6 +23,15 @@
         <onClientGetAllCardInfo>
             <Exposed/>
         </onClientGetAllCardInfo>
+
+        <!--客户端请求升级卡牌信息-->
+        <onClientLevelUp>
+            <Exposed/>
+            <Arg> UINT64 </Arg><!--球员ID-->
+            <Arg> UINT64 </Arg><!--经验丹UUID-->
+            <Arg> UINT32 </Arg><!--经验丹数量-->
+        </onClientLevelUp>
+
 	</BaseMethods>
 
 	<CellMethods>

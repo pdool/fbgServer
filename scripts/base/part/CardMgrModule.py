@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 from cardsConfig import cardsConfig
+from ErrorCode import CardMgrModuleError
+from part.BagModule import  ItemTypeEnum
+from cardLevelUpgradeConfig import cardLevelUpgradeConfig
+from cardLevelUpgradeConfig import levelIniConfig
+from itemsUse import itemsUseConfig
 
 __author__ = 'chongxin'
 __createTime__  = '2017年1月5日'
@@ -51,7 +56,6 @@ class CardMgrModule:
     # --------------------------------------------------------------------------------------------
 
     def onClientGetAllCardInfo(self):
-        DEBUG_MSG("-----------------onClientGetAllCardInfo 1-------------------------------------")
         playerInfos = []
         for id in self.cardIDList:
             player = KBEngine.entities.get(id)
@@ -68,12 +72,84 @@ class CardMgrModule:
             playerInfos.append(playerInfo)
 
 
-        DEBUG_MSG("-----------------onClientGetAllCardInfo 2-------------------------------------")
         self.client.onGetAllCardInfo(playerInfos)
 
+    # 球员升级
+    def onClientLevelUp(self,cardID,uuid,num):
+        # 1、判断球员是否存在
+        # 2、判断道具是否存在
+        # 3、判断数量
+        # 4、判断等级
+        # 5、扣除
+        # 6、增加属性
+        # 7、保存
+        if cardID not in self.cardIDList:
+            self.onCardError(CardMgrModuleError.Card_not_exist)
+            return
+
+        card = KBEngine.entities.get(cardID)
+
+        itemType,item = self.getItemByUUID(uuid)
+
+        if itemType != ItemTypeEnum.Use:
+            self.onCardError(CardMgrModuleError.Card_not_exp_use)
+            return
+
+        if item["amount"] < num:
+            self.onCardError(CardMgrModuleError.Card_not_enough_use)
+            return
+        # 当前等级，经验
+        level = card.level
+        exp = card.exp
+
+        # 等级配置
+        levelConfig = levelIniConfig[0]
+        # 最高等级
+        maxLevel = levelConfig["maxLevel"]
+
+        if level >= maxLevel:
+            self.onCardError(CardMgrModuleError.Card_is_max_level)
+            return
 
 
 
+        itemID = item["itemID"]
+        addPropName = itemsUseConfig[itemID]["addPropName"]
+
+        if addPropName != "exp":
+            self.onCardError(CardMgrModuleError.Card_not_exp_use)
+            return
+        addValueF = itemsUseConfig[itemID]["addValue"]
+        resultExp = eval(str(exp) + addValueF)
+
+        # 升级配置
+        ERROR_MSG("---------------dasdasdsa------------------------" + str(level))
+        levelUpgradeConfig = cardLevelUpgradeConfig[level + 1]
+        upExp = levelUpgradeConfig["maxExp"]
+
+        self.decUses(uuid,num)
+
+        # 循环
+        while (resultExp > upExp):
+            resultExp = resultExp - upExp
+
+            card.level      = card.level    + 1
+            card.shoot      = card.shoot    + levelUpgradeConfig["shoot"]
+            card.passBall   = card.passBall + levelUpgradeConfig["pass"]
+            card.reel       = card.reel     + levelUpgradeConfig["reel"]
+            card.defend     = card.defend   + levelUpgradeConfig["defend"]
+            card.trick      = card.trick    + levelUpgradeConfig["trick"]
+            card.steal      = card.steal    + levelUpgradeConfig["steal"]
+            card.controll   = card.controll + levelUpgradeConfig["controll"]
+            card.keep       = card.keep     + levelUpgradeConfig["keep"]
+
+            if card.level + 1 > maxLevel:
+                break
+
+            levelUpgradeConfig = cardLevelUpgradeConfig[card.level + 1]
+            upExp = levelUpgradeConfig["maxExp"]
+
+        card.writeToDB()
 
     # --------------------------------------------------------------------------------------------
     #                              工具函数调用函数
@@ -81,7 +157,12 @@ class CardMgrModule:
 
     def addCard(self,configID,isSelf = PlayerInfoSelfStatus.notSelf):
 
+        # 1、判断是否存在
+
         if configID not in cardsConfig:
+            return
+
+        if self.isCardExist(configID) == True:
             return
 
         config = cardsConfig[configID]
@@ -92,6 +173,7 @@ class CardMgrModule:
             card.roleID = self.databaseID
             card.configID = config["id"]
             card.isSelf =isSelf
+            card.level = 1
             card.shoot = config["shoot"]
             card.defend =  config["defend"]
             card.passBall = config["pass"]
@@ -116,6 +198,13 @@ class CardMgrModule:
         self.writeToDB()
         self.cardIDList.append(card.id)
 
+    def isCardExist(self,cardID):
+        for id in self.cardIDList:
+            player = KBEngine.entities.get(id)
+
+            if player.configID == cardID:
+                return True
+        return False
 
 class PlayerInfoKeys:
     configID = "configID"
