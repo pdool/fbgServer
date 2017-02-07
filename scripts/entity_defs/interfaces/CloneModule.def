@@ -1,0 +1,32 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+        <cloneID>
+			<Type> UINT32 </Type>
+			<Flags> CELL_PRIVATE </Flags>
+		</cloneID>
+
+	</Properties>
+
+	<BaseMethods>
+        <onClientReqEnterClone>
+            <Exposed/>
+           <Arg> UINT32 </Arg>
+        </onClientReqEnterClone>
+
+	</BaseMethods>
+
+	<CellMethods>
+
+
+	</CellMethods>
+
+	<ClientMethods>
+
+
+
+	</ClientMethods>
+</root>
+

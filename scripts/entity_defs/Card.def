@@ -121,6 +121,11 @@
                 <Persistent>		true				</Persistent>
 			</inTeam>
 
+            <baseProp>
+				<Type> PYTHON </Type>
+                 <Flags>			CELL_PUBLIC </Flags>
+			</baseProp>
+
 
 
     </Properties>

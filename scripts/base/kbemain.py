@@ -24,6 +24,8 @@ def onBaseAppReady(isBootstrap):
         KBEngine.createBaseLocally("Mails", {})
 
         KBEngine.globalData["Onlines"] = set()
+
+        KBEngine.createBaseLocally("CloneMgr", {})
         pass
 
 def onBaseAppShutDown(state):

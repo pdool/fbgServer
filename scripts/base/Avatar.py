@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
+import util
 
 from KBEDebug import *
+from part.BagModule import BagModule
+from part.BodyPowerModule import BodyPowerModule
+from part.CardMgrModule import CardMgrModule
+from part.ChatModule import ChatModule
+from part.FriendModule import FriendModule,FriendInfoKey,FriendOnlineState
+from part.LotteryModule import LotteryModule
+from part.MailsModule import MailsModule
+from part.PropMgrModule import PropMgrModule
+from part.ShopModule import ShopModule
+from part.footballTeam.DiamondModule import DiamondModule
 from part.footballTeam.EquipsModule import EquipsModule
 from part.footballTeam.GiftModule import GiftModule
 from part.footballTeam.MaterialModule import MaterialModule
-from part.footballTeam.UseModule import UseModule
 from part.footballTeam.PiecesModule import PiecesModule
-from part.footballTeam.DiamondModule import DiamondModule
-from part.LotteryModule import LotteryModule
-from part.MailsModule import MailsModule
-from part.ShopModule import ShopModule
-from part.BodyPowerModule import BodyPowerModule
-from part.FriendModule import FriendModule,FriendInfoKey,FriendOnlineState
-from part.BagModule import BagModule
-from part.ChatModule import ChatModule
-from part.CardMgrModule import CardMgrModule
-from part.PropMgrModule import PropMgrModule
-import util
+from part.footballTeam.UseModule import UseModule
+from part.CloneModule import CloneModule
 
 #使用技巧 先放在根级目录。，调好之后拖走，编辑器自动组织引用
 class Avatar(KBEngine.Proxy,
@@ -35,6 +36,8 @@ class Avatar(KBEngine.Proxy,
              PiecesModule,
              UseModule,
              PropMgrModule,
+             CloneModule,
+
              ):
     """
     角色实体

@@ -19,10 +19,13 @@ class PlayerInfoSelfStatus:
 class CardMgrModule:
 
     def __init__(self):
+        self.cardIDList = []  # 玩家拥有的卡牌对象内存ID
+        self.inTeamcardIDList = []  # 玩家拥有的卡牌对象内存ID
         pass
 
     def onEntitiesEnabled(self):
-        self.cardIDList = []  # 玩家拥有的卡牌对象内存ID
+
+
 
         for cardDBID in self.cardDBIDList:
             KBEngine.createBaseFromDBID("Card", cardDBID, self.loadCardCB)
@@ -45,8 +48,11 @@ class CardMgrModule:
         if card is None:
             ERROR_MSG("player create fail")
             return
-        if card.isSelf == 1:
+        if card.isSelf == PlayerInfoSelfStatus.isSelf:
             self.cardID = card.id
+
+        if card.inTeam == 1:
+            self.inTeamcardIDList.append(card.id)
         self.cardIDList.append(card.id)
 
 

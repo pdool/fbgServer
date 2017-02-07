@@ -9,6 +9,11 @@
 			<Persistent> true </Persistent>
         </cardID>
 
+       <baseProp>
+            <Type> PYTHON </Type>
+			<Flags> CELL_PUBLIC </Flags>
+        </baseProp>
+
        <cardDBIDList>
             <Type> ARRAY <of> UINT64 </of> </Type>
 			<Flags> BASE </Flags>

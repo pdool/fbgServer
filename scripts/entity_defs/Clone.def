@@ -1,0 +1,20 @@
+<root>
+	<Properties>
+        <spaceKey>
+            <Type> UINT32 </Type>
+            <Flags> BASE </Flags>
+        </spaceKey>
+        <!--副本ID-->
+        <cloneID>
+            <Type> UINT32 </Type>
+			<Flags> CELL_PRIVATE </Flags>
+        </cloneID>
+    </Properties>
+
+	<CellMethods>
+        <initMonster>
+
+        </initMonster>
+	</CellMethods>
+
+</root>

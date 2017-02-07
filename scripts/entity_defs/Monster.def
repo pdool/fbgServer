@@ -1,0 +1,89 @@
+<root>
+	<Properties>
+
+            <baseProp>
+				<Type> PYTHON </Type>
+                 <Flags>			CELL_PUBLIC </Flags>
+			</baseProp>
+
+
+       <!--&lt;!&ndash; 配置ID &ndash;&gt;-->
+        <!--<configID>-->
+            <!--<Type> UINT32 </Type>-->
+             <!--<Flags>			CELL_PUBLIC			</Flags>-->
+            <!--<Default> 0    </Default>-->
+        <!--</configID>-->
+
+        <!--&lt;!&ndash;等级&ndash;&gt;-->
+            <!--<level>-->
+				<!--<Type> UINT32 </Type>-->
+                <!--<Flags>			CELL_PUBLIC			</Flags>-->
+                 <!--<Default> 1    </Default>-->
+			<!--</level>-->
+
+        <!--&lt;!&ndash; 射门 &ndash;&gt;-->
+			<!--<shoot>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</shoot>-->
+       <!--&lt;!&ndash; 防守 &ndash;&gt;-->
+			<!--<defend>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</defend>-->
+       <!--&lt;!&ndash; 传球 &ndash;&gt;-->
+			<!--<passBall>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</passBall>-->
+       <!--&lt;!&ndash; 拦截 &ndash;&gt;-->
+			<!--<trick>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</trick>-->
+       <!--&lt;!&ndash; 盘带 &ndash;&gt;-->
+			<!--<reel>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</reel>-->
+       <!--&lt;!&ndash; 抢断 &ndash;&gt;-->
+			<!--<steal>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</steal>-->
+       <!--&lt;!&ndash; 控球 &ndash;&gt;-->
+			<!--<controll>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</controll>-->
+       <!--&lt;!&ndash; 守门 &ndash;&gt;-->
+			<!--<keep>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</keep>-->
+
+       <!--&lt;!&ndash; 技术 &ndash;&gt;-->
+			<!--<tech>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</tech>-->
+
+       <!--&lt;!&ndash; 身体 &ndash;&gt;-->
+			<!--<health>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</health>-->
+           <!--&lt;!&ndash; 位置 &ndash;&gt;-->
+			<!--<pos>-->
+				<!--<Type> UINT32 </Type>-->
+                 <!--<Flags>			CELL_PUBLIC			</Flags>-->
+			<!--</pos>-->
+
+
+    </Properties>
+
+	<BaseMethods>
+
+	</BaseMethods>
+
+</root>

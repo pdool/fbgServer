@@ -9,6 +9,8 @@
         <Interface>	BagModule		        </Interface>
         <Interface>	CardMgrModule		    </Interface>
         <Interface>	PiecesModule		    </Interface>
+
+        <Interface>	CloneModule		    </Interface>
 	</Implements>
 
 	<Properties>

@@ -16,4 +16,9 @@
     <ItemEquips/>
     <ItemUses/>
     <ItemMaterial/>
+
+
+    <CloneMgr/>
+    <Clone/>
+    <Monster hasClient="true"/>
 </root>
