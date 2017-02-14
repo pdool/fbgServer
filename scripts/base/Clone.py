@@ -24,6 +24,7 @@ class Clone(KBEngine.Base):
         entity的cell部分实体丢失
         """
         self.Debug("Base::Room.onLoseCell")
+        self.destroy()
 
     def onGetCell(self):
         """
@@ -56,3 +57,5 @@ class Clone(KBEngine.Base):
 
     def destroyClone(self):
         self.destroyCellEntity()
+
+        # self.destroy()

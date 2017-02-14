@@ -10,6 +10,11 @@
 			<Flags> CELL_PRIVATE </Flags>
         </cloneID>
     </Properties>
+    <BaseMethods>
+        <destroyClone>
+
+        </destroyClone>
+    </BaseMethods>
 
 	<CellMethods>
         <initMonster>

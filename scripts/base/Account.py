@@ -2,6 +2,8 @@
 import time
 import socket
 import struct
+
+import initCardConfig
 import util
 from KBEDebug import *
 
@@ -29,7 +31,7 @@ class Account(KBEngine.Proxy):
         # # 调用客户端方法
         # self.client.onReqAvatarList(roleListDic)
 
-    def reqCreateAvatar(self, rolePosition, name):
+    def reqCreateAvatar(self, job, name):
         """
         exposed.
         客户端请求创建一个角色
@@ -51,11 +53,23 @@ class Account(KBEngine.Proxy):
                 self.client.onCreateAvatarFail()
                 return
 
-            avatar = KBEngine.createBaseLocally("Avatar", {})
+            otherConfig = initCardConfig.OtherConfig[1]
+            bagSize = otherConfig["bagSize"]
+
+            cardConfig = initCardConfig.InitCardConfig[job]
+            initFomation = cardConfig["initFomation"]
+
+            param = {
+                "name"          : name,
+                "job"           : job,
+                "bagSize"       : bagSize,
+                "formation"     : initFomation
+            }
+            avatar = KBEngine.createBaseLocally("Avatar", param)
             if avatar is not None:
-                avatar.name = name
-                avatar.rolePosition = rolePosition
-                avatar.bagSize = 200
+                # avatar.name = name
+                # avatar.job = job
+                # avatar.bagSize = 200
                 avatar.writeToDB(self._onAvatarSaved)
 
         KBEngine.executeRawDatabaseCommand(sql, queryResult)
@@ -178,6 +192,20 @@ class Account(KBEngine.Proxy):
             avatar.accountEntity = self
             self.giveClientTo(self.activeAvatar)
 
-            avatar.addCard(1001,1)
+            cardConfig = initCardConfig.InitCardConfig[avatar.job]
+
+            initRoleCardId = cardConfig["initRoleCardId"]
+            initRoleCardIdPos = cardConfig["initRoleCardIdPos"]
+
+            avatar.addCard(initRoleCardId,initRoleCardIdPos,1, 1)
+
+            initCardIdList = cardConfig["initCardIdList"]
+            initCardPosList = cardConfig["initCardPosList"]
+            for index in range(len(initCardIdList)):
+                cardId = initCardIdList[index]
+                pos = initCardPosList[index]
+                avatar.addCard(cardId,pos, 1,0)
+
+
         else:
             self.client.onCreateAvatarFail()

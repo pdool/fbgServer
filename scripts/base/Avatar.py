@@ -18,6 +18,7 @@ from part.footballTeam.MaterialModule import MaterialModule
 from part.footballTeam.PiecesModule import PiecesModule
 from part.footballTeam.UseModule import UseModule
 from part.CloneModule import CloneModule
+import TimerDefine
 
 #使用技巧 先放在根级目录。，调好之后拖走，编辑器自动组织引用
 class Avatar(KBEngine.Proxy,
@@ -43,13 +44,13 @@ class Avatar(KBEngine.Proxy,
     角色实体
     """
     def __init__(self):
-
+        KBEngine.Proxy.__init__(self)
         cls = Avatar.__bases__
         for c in cls:
             if hasattr(c, '__init__'):
                 c.__init__(self)
 
-        # KBEngine.Proxy.__init__(self)
+
         # MailsModule.__init__(self)
         # ShopModule.__init__(self)
 
@@ -91,6 +92,8 @@ class Avatar(KBEngine.Proxy,
         playerInfo[FriendInfoKey.vipLevel] = self.vipLevel
         playerInfo[FriendInfoKey.onlineState] = FriendOnlineState.online
         KBEngine.globalData["PlayerMgr"].playerLogin(self,self.databaseID,playerInfo)
+
+        self.addTimer(5, 5, TimerDefine.Time_destroy_avatar)
         # --------------------------------------------------------------------------------------------
         #                              属性列表
         # --------------------------------------------------------------------------------------------
@@ -103,6 +106,9 @@ class Avatar(KBEngine.Proxy,
         if self.client is not None:
             return
 
+        if self.cell is not None:
+            self.destroyCellEntity()
+            return
 
         # 如果帐号ENTITY存在 则也通知销毁它
         if self.accountEntity != None:
@@ -139,9 +145,9 @@ class Avatar(KBEngine.Proxy,
         引擎回调timer触发
         """
         #DEBUG_MSG("%s::onTimer: %i, tid:%i, arg:%i" % (self.getScriptName(), self.id, tid, userArg))
-        # if SCDefine.TIMER_TYPE_DESTROY == userArg:
-        #     self.onDestroyTimer()
-        #
+        if TimerDefine.Time_destroy_avatar == userArg:
+            self.destroySelf()
+
         # GameObject.onTimer(self, tid, userArg)
         # 调用子类的onTimer函数
         cls = Avatar.__bases__
@@ -177,12 +183,15 @@ class Avatar(KBEngine.Proxy,
 
         KBEngine.globalData["PlayerMgr"].playerOffline(self.databaseID,playerInfo)
 
+
         for id in self.cardIDList:
             card = KBEngine.entities.get(id)
             if card is None:
                 continue
-            card.destroy()
+            card.destroyCard()
 
+        if self.spaceMb is not None:
+            self.spaceMb.destroyClone()
         self.destroySelf()
 
 

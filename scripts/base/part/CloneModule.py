@@ -27,20 +27,33 @@ class CloneModule:
         spaceMB = argDict["spaceMb"]
 
         # spaceMB.cell.initMonster()
-
-        baseProp = {"cardID": self.cardID}
-        baseProp["cardDBIDList"] = self.inTeamcardIDList
+        # 自己的主卡
+        baseProp = {"cardID": self.cardID,"CloneID":spaceMB.id}
+        # 自己持有的卡
+        baseProp["inTeamcardIDList"] = self.inTeamcardIDList
 
         self.cellData["baseProp"] = baseProp
 
         # 把自己传送进去
         self.createCellEntity(spaceMB.cell)
 
+        self.spaceMb = spaceMB
+
         for inTeamCardId in self.inTeamcardIDList:
             # 把上阵的卡牌传送进去
             card = KBEngine.entities.get(inTeamCardId)
 
-            baseProp = {"shoot": card.shoot, "defend": card.defend}
+            baseProp = {"shoot"     : card.shoot,
+                        "defend"    : card.defend,
+                        "passBall"  : card.passBall,
+                        "trick"      : card.trick,
+                        "reel"       : card.reel,
+                        "steal"      : card.steal,
+                        "controll"   : card.controll,
+                        "keep"        : card.keep,
+                        "tech"        : card.tech,
+                        "health"      : card.health
+                        }
 
             card.cellData["baseProp"] = baseProp
 

@@ -15,3 +15,5 @@ Timer_body_power_reset_buy_times = 3
 
 # N分钟体力恢复1点
 Timer_body_power_recover = 4
+
+Time_destroy_avatar = 5

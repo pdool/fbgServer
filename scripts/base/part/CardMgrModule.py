@@ -16,6 +16,10 @@ class PlayerInfoSelfStatus:
     notSelf = 0
     isSelf = 1
 
+class PlayerInfoTeamStatus:
+    notInTeam = 0
+    inTeam = 1
+
 class CardMgrModule:
 
     def __init__(self):
@@ -162,7 +166,7 @@ class CardMgrModule:
     #                              工具函数调用函数
     # --------------------------------------------------------------------------------------------
 
-    def addCard(self,configID,isSelf = PlayerInfoSelfStatus.notSelf):
+    def addCard(self,configID,pos = -1,inTeam = PlayerInfoTeamStatus.notInTeam,isSelf = PlayerInfoSelfStatus.notSelf):
 
         # 1、判断是否存在
 
@@ -179,16 +183,25 @@ class CardMgrModule:
         if card is not None:
             card.roleID = self.databaseID
             card.configID = config["id"]
-            card.isSelf =isSelf
+            card.isSelf = isSelf
             card.level = 1
             card.shoot = config["shoot"]
             card.defend =  config["defend"]
             card.passBall = config["pass"]
             card.trick = config["trick"]
             card.reel = config["reel"]
+            card.steal = config["steal"]
             card.controll = config["controll"]
             card.keep = config["keep"]
-            card.inTeam = PlayerInfoTeamStatus.notInTeam
+            card.tech = config["tech"]
+            card.health = config["health"]
+            card.inTeam = inTeam
+
+            if inTeam == PlayerInfoTeamStatus.inTeam and card.id not in self.inTeamcardIDList:
+                self.inTeamcardIDList.append(card.id)
+
+            if pos != -1:
+                card.pos = pos
 
             card.writeToDB(self.__onCardSaved)
         else:
@@ -221,8 +234,4 @@ class PlayerInfoKeys:
     inTeam = "inTeam"
 
 
-
-class PlayerInfoTeamStatus:
-    notInTeam = 0
-    inTeam = 1
 

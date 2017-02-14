@@ -13,9 +13,11 @@ class Card(KBEngine.Entity):
         KBEngine.Entity.__init__(self)
         print("Cell::Card.__init__")
 
-        DEBUG_MSG(str(type(self.baseProp)))
-        for k,v in self.baseProp.items():
-            DEBUG_MSG("k  " + str(k) + "       v  " + str(v))
+        # DEBUG_MSG(str(type(self.baseProp)))
+        for k, v in self.baseProp.items():
+            DEBUG_MSG("card   k  " + str(k) + "       v  " + str(v))
+
+            self.__setattr__(k, v)
 
     def onTimer(self, tid, userArg):
         """

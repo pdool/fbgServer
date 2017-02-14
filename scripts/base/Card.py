@@ -38,9 +38,18 @@ class Card(KBEngine.Base):
     def __initProp__(self,configId):
         pass
 
-    def destroySelf( self ):
+    def destroyCard( self ):
+        if self.cell is not None:
+        # 销毁cell实体
+            self.destroyCellEntity()
+            return
         self.destroy()
-
+    def onLoseCell(self):
+        """
+        KBEngine method.
+        entity的cell部分实体丢失
+        """
+        self.destroy()
 class EquipPos:
 
     head = "head"

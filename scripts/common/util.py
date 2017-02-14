@@ -8,9 +8,16 @@ import KBEDebug
 def getCurrentTime():
     timestamp = time.time()#返回浮点数
     return int(timestamp)
-
+# （0,1 ]
+def randFunc():
+    seed = random.random()
+    if seed == 0.0:
+        seed = 1.0
+    return seed
 
     # 字符串操作
+
+
 
 
 def splitParam(origin, flag=','):

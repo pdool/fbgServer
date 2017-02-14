@@ -12,6 +12,13 @@ class Avatar(KBEngine.Entity):
 
         KBEngine.Entity.__init__(self)
 
+
         for k, v in self.baseProp.items():
             DEBUG_MSG("Avatar   k  " + str(k) + "       v  " + str(v))
 
+            self.__setattr__(k, v)
+
+
+    def onEnteredAoI( self, entity ):
+
+        ERROR_MSG("onEnteredAoI--------------" + str(type(entity)))
