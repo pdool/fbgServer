@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from random import Random
 
 __author__ = 'chongxin'
 __createTime__  = '2017年1月5日'
@@ -35,6 +36,8 @@ class UseModule:
                 useItem[UseItemKeys.itemType] = ItemTypeEnum.Use
                 self.useContainer[ useItem[UseItemKeys.uuid]] = useItem
 
+                if useItem[UseItemKeys.uuid] not in self.bagUUIDList:
+                    self.bagUUIDList.append(useItem[UseItemKeys.uuid])
 
         KBEngine.executeRawDatabaseCommand(sql,cb)
         pass
@@ -47,8 +50,9 @@ class UseModule:
         if useConfig["togetherCount"] != 0:
             togetherCount = useConfig["togetherCount"]
 
-        if togetherCount == 1:
-            self.__insertUse(configID, count)
+        if togetherCount <= 1:
+            for i in range(count):
+                self.__insertUse(configID, count)
         else:
             self.__updateUse(configID, count)
 
@@ -179,3 +183,12 @@ class UseItemKeys:
     itemType = "itemType"
 
     addPropName = "addPropName"
+
+if __name__ == "__main__":
+
+    x = 0.002 * util.randFunc()*7000
+
+    y = (0.001 + x)
+
+    print(x)
+    print(y)

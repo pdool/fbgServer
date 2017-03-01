@@ -1,0 +1,19 @@
+<root>
+	<BaseMethods>
+        <!--球员进阶-->
+        <onClientUpStar>
+            <Exposed/>
+			<Arg>	UINT32	</Arg>	<!-- cardID -->
+        </onClientUpStar>
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+
+	<ClientMethods>
+
+	</ClientMethods>
+</root>
+

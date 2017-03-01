@@ -1,0 +1,44 @@
+<root>
+	<BaseMethods>
+        <!--球员意识提升-->
+        <onClientUpMentality>
+            <Exposed/>
+			<Arg>	UINT32	</Arg>	<!-- cardID -->
+			<Arg>	UINT32	</Arg>	<!-- 低级或高级材料 0--低级 1--高级 -->
+        </onClientUpMentality>
+
+         <!--确定提升-->
+        <UpDateMentalityInfo>
+            <Exposed/>
+			<Arg>	UINT32	</Arg>	<!-- cardID -->
+        </UpDateMentalityInfo>
+
+        <!--选择属性提升-->
+        <ChooseUpMentalityInfo>
+            <Exposed/>
+            <Arg>	UINT32	</Arg>	<!-- cardID -->
+			<Arg>	Index_Info_LIST     </Arg>
+        </ChooseUpMentalityInfo>
+
+        <!--球员意识提升十次-->
+        <onClientUpTenMentality>
+            <Exposed/>
+			<Arg>	UINT32	</Arg>	<!-- cardID -->
+			<Arg>	UINT32	</Arg>	<!-- 低级或高级材料 0--低级 1--高级 -->
+        </onClientUpTenMentality>
+	</BaseMethods>
+
+
+	<ClientMethods>
+        <!--球员球员意识提升增加-->
+        <onMentalityUP>
+            <Arg> ARRAY <of> BallerProperty_Random </of> </Arg>
+        </onMentalityUP>
+
+         <!--球员球员意识提升回调 十次-->
+        <onMentalityTenUP>
+            <Arg> ARRAY <of> BallerProperty_Random </of> </Arg>
+        </onMentalityTenUP>
+	</ClientMethods>
+</root>
+

@@ -48,6 +48,10 @@
             <Arg> ARRAY <of> Card_Info </of> </Arg>
         </onGetAllCardInfo>
 
+        <!--球员操作回调-->
+        <onBallerCallBack>
+            <Arg> UINT32 </Arg>
+        </onBallerCallBack>
 	</ClientMethods>
 </root>
 

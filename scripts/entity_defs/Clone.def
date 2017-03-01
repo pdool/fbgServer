@@ -17,9 +17,12 @@
     </BaseMethods>
 
 	<CellMethods>
-        <initMonster>
-
-        </initMonster>
+        <!--<setAvatarID>-->
+            <!--<Arg>UINT32</Arg>-->
+        <!--</setAvatarID>-->
 	</CellMethods>
+
+
+
 
 </root>

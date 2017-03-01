@@ -11,7 +11,7 @@ from itemsDiamond import itemsDiamondConfig
 from itemsConfig import itemsIndex
 from part.BagModule import ItemTypeEnum
 """
-装备模块
+宝石模块
 """
 class DiamondModule:
 
@@ -30,12 +30,16 @@ class DiamondModule:
 
             for i in range(len(result)):
                 pieceItem = {}
-                pieceItem[DiamondItemKeys.uuid] = int(result[i][0])
+                uuid = int(result[i][0])
+                pieceItem[DiamondItemKeys.uuid] = uuid
                 pieceItem[DiamondItemKeys.itemID] = int(result[i][1])
                 pieceItem[DiamondItemKeys.amount] = int(result[i][2])
                 pieceItem[DiamondItemKeys.itemType] = ItemTypeEnum.Diamond
 
                 self.diamondsContainer[pieceItem[DiamondItemKeys.uuid]] = pieceItem
+
+                if uuid not in self.bagUUIDList:
+                    self.bagUUIDList.append(uuid)
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -55,8 +59,9 @@ class DiamondModule:
         if diamondConfig["togetherCount"] != 0:
             togetherCount = diamondConfig["togetherCount"]
 
-        if togetherCount == 1:
-            self.__insertEquip(configID, count)
+        if togetherCount <= 1 :
+            for i in range(count):
+                self.__insertEquip(configID, count)
         else:
             self.__updateDiamonds(configID, count)
     # 减少宝石

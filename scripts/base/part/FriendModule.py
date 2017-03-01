@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-import TimerDefine
-import util
+
 from ErrorCode import FriendError
 from KBEDebug import *
 import friendConfig
@@ -31,7 +30,7 @@ class FriendModule:
     # 获得好友列表
     def onClientGetFriendList(self):
         palyeMgr = KBEngine.globalData["PlayerMgr"]
-        self.friendInfoList =[]
+        self.friendInfoList = []
         self.friendRetFlagSet = set(self.friendDBIDList)
 
         if len(self.friendDBIDList) == 0:

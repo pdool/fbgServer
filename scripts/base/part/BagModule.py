@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from itemsConfig import itemsIndex
-
+from KBEDebug import *
 __author__ = 'chongxin'
 __createTime__  = '2016年12月26日'
 """
@@ -44,7 +44,7 @@ class BagModule:
         self.client.onGetItemList(retItems)
 
 
-
+    # 批量出售
     def onClientSellBatch(self,uuidList):
 
         for uuid in uuidList:
@@ -56,7 +56,7 @@ class BagModule:
                 self.onClientSellOne(uuid,amount)
 
 
-
+    # 出售一个
     def onClientSellOne(self,uuid,num):
 
         itemType,item = self.getItemByUUID(uuid)
@@ -77,17 +77,17 @@ class BagModule:
 
         result = False
         if itemType == ItemTypeEnum.Diamond:
-            result = self.decDiamond(self,uuid,num)
+            result = self.decDiamond(uuid,num)
         elif itemType == ItemTypeEnum.Equips:
-            result = self.decEquips(self,uuid,num)
+            result = self.decEquip(uuid,num)
         elif itemType == ItemTypeEnum.Gift:
-            result = self.decGift(self,uuid,num)
+            result = self.decGift(uuid,num)
         elif itemType == ItemTypeEnum.Use:
-            result = self.decUse(self,uuid,num)
+            result = self.decUse(uuid,num)
         elif itemType == ItemTypeEnum.Pieces:
-            result = self.decPieces(self,uuid,num)
+            result = self.decPieces(uuid,num)
         elif itemType == ItemTypeEnum.Material:
-            result = self.decMaterial(self,uuid,num)
+            result = self.decMaterial(uuid,num)
 
         if result is True:
             self.gold = sellMoney
@@ -134,7 +134,7 @@ class BagModule:
         itemType = itemIndex["itemsType"]
 
         if itemType == ItemTypeEnum.Equips:
-            self.addEquip(itemID,num)
+            self.addEquipByItemID(itemID,num)
         elif itemType == ItemTypeEnum.Use:
             self.addUse(itemID,num)
         elif itemType == ItemTypeEnum.Material:
@@ -145,6 +145,44 @@ class BagModule:
             self.addPieces(itemID,num)
         elif itemType == ItemTypeEnum.Gift:
             self.addGift(itemID,num)
+
+    # 根据id获得数量
+    def getItemNumByItemID(self,itemID):
+
+        for uuid in self.bagUUIDList:
+            _, item = self.getItemByUUID(uuid)
+            if item is None:
+                continue
+            DEBUG_MSG("                   " + str(item["itemID"]) +"   " +str(type(item["itemID"])))
+            if item["itemID"] == itemID:
+                return item["amount"]
+        return 0
+
+    # 删除物品
+    def decItem(self,itemID,num):
+        for uuid in self.bagUUIDList:
+            itemType, item = self.getItemByUUID(uuid)
+            if item is None:
+                return False
+
+            result = False
+            if itemType == ItemTypeEnum.Diamond:
+                result = self.decDiamond(uuid,num)
+            elif itemType == ItemTypeEnum.Equips:
+                result = self.decEquip(uuid,num)
+            elif itemType == ItemTypeEnum.Gift:
+                result = self.decGift(uuid,num)
+            elif itemType == ItemTypeEnum.Use:
+                result = self.decUse(uuid,num)
+            elif itemType == ItemTypeEnum.Pieces:
+                result = self.decPieces(uuid,num)
+            elif itemType == ItemTypeEnum.Material:
+                result = self.decMaterial(uuid,num)
+
+            return  result
+
+        return False
+
 
 
 class ItemOrderBy:

@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 import KBEngine
-
 __author__ = 'chongxin'
-from KBEDebug import DEBUG_MSG
-
 
 """
 单张卡牌
@@ -42,6 +39,7 @@ class Card(KBEngine.Base):
         if self.cell is not None:
         # 销毁cell实体
             self.destroyCellEntity()
+            self.cellLoseReason = "clientDeath"
             return
         self.destroy()
     def onLoseCell(self):
@@ -49,7 +47,13 @@ class Card(KBEngine.Base):
         KBEngine method.
         entity的cell部分实体丢失
         """
-        self.destroy()
+        if hasattr(self,"cellLoseReason") and self.cellLoseReason == "clientDeath":
+            self.destroy()
+    def destroyCardCell( self ):
+        if self.cell is not None:
+        # 销毁cell实体
+            self.destroyCellEntity()
+
 class EquipPos:
 
     head = "head"

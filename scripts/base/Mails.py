@@ -48,6 +48,8 @@ class Mails(KBEngine.Base):
         pass
 
         # 查询语句
+
+    # noinspection PyInterpreter
     def readMail(self,mailId):
         pass
 #     更新状态

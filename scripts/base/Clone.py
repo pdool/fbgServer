@@ -23,7 +23,7 @@ class Clone(KBEngine.Base):
         KBEngine method.
         entity的cell部分实体丢失
         """
-        self.Debug("Base::Room.onLoseCell")
+        ERROR_MSG("--------------Base::Room.onLoseCell-------------------------")
         self.destroy()
 
     def onGetCell(self):
@@ -32,6 +32,7 @@ class Clone(KBEngine.Base):
         entity的cell部分实体被创建成功
         """
         self.Debug("Base::Room.onGetCell")
+
         KBEngine.globalData["CloneMgr"].onCloneGetCell(self.spaceKey,self)
 
     def onTimer(self, id, userArg):
@@ -56,6 +57,8 @@ class Clone(KBEngine.Base):
         avatar.createCell(self)
 
     def destroyClone(self):
-        self.destroyCellEntity()
+        ERROR_MSG("--------------destroyClone-------------------------")
+        if self is not None and self.cell is not None:
+            self.destroyCellEntity()
 
         # self.destroy()

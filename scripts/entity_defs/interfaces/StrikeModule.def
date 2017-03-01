@@ -1,0 +1,29 @@
+<root>
+	<BaseMethods>
+        <!--球员突破-->
+        <StrikeBaller>
+            <Exposed/>
+			<Arg>	UINT32	</Arg>	<!-- cardID -->
+			<Arg>	UNICODE	</Arg>	<!-- itemID -->
+        </StrikeBaller>
+
+        <!--转换碎片-->
+        <SwitchPiece>
+            <Exposed/>
+			<Arg>	STRING	</Arg>	<!-- itemID -->
+			<Arg>	STRING	</Arg>	<!-- pieceID-->
+			<Arg>	UINT32	</Arg>	<!-- number -->
+			<Arg>	UINT32	</Arg>	<!-- money -->
+        </SwitchPiece>
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+
+	<ClientMethods>
+
+	</ClientMethods>
+</root>
+

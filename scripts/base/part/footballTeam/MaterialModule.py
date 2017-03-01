@@ -36,6 +36,9 @@ class MaterialModule:
                 item[MaterialItemKeys.itemType] = ItemTypeEnum.Material
                 self.materialContainer[item[MaterialItemKeys.uuid]] = item
 
+                if item[MaterialItemKeys.uuid] not in self.bagUUIDList:
+                    self.bagUUIDList.append(item[MaterialItemKeys.uuid])
+
         KBEngine.executeRawDatabaseCommand(sql, cb)
         pass
 
@@ -47,8 +50,9 @@ class MaterialModule:
         if materialConfig["togetherCount"] != 0:
             togetherCount = materialConfig["togetherCount"]
 
-        if togetherCount == 1:
-            self.__insertUse(configID, count)
+        if togetherCount <= 1 :
+            for i in range(count):
+                self.__insertUse(configID, count)
         else:
             self.__updateUse(configID, count)
 

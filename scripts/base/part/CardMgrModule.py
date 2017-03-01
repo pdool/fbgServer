@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cardsConfig import cardsConfig
+import strikeConfig
 from ErrorCode import CardMgrModuleError
 from part.BagModule import  ItemTypeEnum
 from cardLevelUpgradeConfig import cardLevelUpgradeConfig
@@ -69,19 +70,27 @@ class CardMgrModule:
         playerInfos = []
         for id in self.cardIDList:
             player = KBEngine.entities.get(id)
-
             playerInfo = {}
-            playerInfo["DBID"] = player.databaseID
+            playerInfo["id"] = id
             playerInfo["configID"] = player.configID
             playerInfo["level"] = player.level
             playerInfo["star"] = player.star
             playerInfo["exp"] = player.exp
             playerInfo["inTeam"] = player.inTeam
             playerInfo["isSelf"] = player.isSelf
-
+            playerInfo["brokenLayer"] = player.brokenLayer
+            playerInfo["fightValue"] = player.fightValue
+            playerInfo["shoot"] = player.shoot
+            playerInfo["defend"] = player.defend
+            playerInfo["pass"] = player.passBall
+            playerInfo["trick"] = player.trick
+            playerInfo["reel"] = player.reel
+            playerInfo["steal"] = player.steal
+            playerInfo["controll"] = player.controll
+            playerInfo["keep"] = player.keep
+            playerInfo["tech"] = player.tech
+            playerInfo["health"] = player.health
             playerInfos.append(playerInfo)
-
-
         self.client.onGetAllCardInfo(playerInfos)
 
     # 球员升级
@@ -94,7 +103,7 @@ class CardMgrModule:
         # 6、增加属性
         # 7、保存
         if cardID not in self.cardIDList:
-            self.onCardError(CardMgrModuleError.Card_not_exist)
+            self.client.onCardError(CardMgrModuleError.Card_not_exist)
             return
 
         card = KBEngine.entities.get(cardID)
@@ -102,11 +111,11 @@ class CardMgrModule:
         itemType,item = self.getItemByUUID(uuid)
 
         if itemType != ItemTypeEnum.Use:
-            self.onCardError(CardMgrModuleError.Card_not_exp_use)
+            self.client.onCardError(CardMgrModuleError.Card_not_exp_use)
             return
 
         if item["amount"] < num:
-            self.onCardError(CardMgrModuleError.Card_not_enough_use)
+            self.client.onCardError(CardMgrModuleError.Card_not_enough_use)
             return
         # 当前等级，经验
         level = card.level
@@ -118,7 +127,7 @@ class CardMgrModule:
         maxLevel = levelConfig["maxLevel"]
 
         if level >= maxLevel:
-            self.onCardError(CardMgrModuleError.Card_is_max_level)
+            self.client.onCardError(CardMgrModuleError.Card_is_max_level)
             return
 
 
@@ -127,10 +136,11 @@ class CardMgrModule:
         addPropName = itemsUseConfig[itemID]["addPropName"]
 
         if addPropName != "exp":
-            self.onCardError(CardMgrModuleError.Card_not_exp_use)
+            self.client.onCardError(CardMgrModuleError.Card_not_exp_use)
             return
         addValueF = itemsUseConfig[itemID]["addValue"]
         resultExp = eval(str(exp) + addValueF)
+        
 
         # 升级配置
         levelUpgradeConfig = cardLevelUpgradeConfig[level + 1]
@@ -184,17 +194,21 @@ class CardMgrModule:
             card.roleID = self.databaseID
             card.configID = config["id"]
             card.isSelf = isSelf
+            card.star = config["initStar"]
+            card.brokenLayer = 1
             card.level = 1
-            card.shoot = config["shoot"]
-            card.defend =  config["defend"]
-            card.passBall = config["pass"]
-            card.trick = config["trick"]
-            card.reel = config["reel"]
-            card.steal = config["steal"]
-            card.controll = config["controll"]
-            card.keep = config["keep"]
-            card.tech = config["tech"]
-            card.health = config["health"]
+            card.fightValue = 100
+            strikeID = card.star * 100 + card.brokenLayer
+            card.shoot = config["shoot"] + strikeConfig.StrikeConfig[strikeID]["shoot"]
+            card.defend = config["defend"] + strikeConfig.StrikeConfig[strikeID]["defend"]
+            card.passBall = config["pass"] + strikeConfig.StrikeConfig[strikeID]["pass"]
+            card.trick = config["trick"] + strikeConfig.StrikeConfig[strikeID]["trick"]
+            card.reel = config["reel"] + strikeConfig.StrikeConfig[strikeID]["reel"]
+            card.steal = config["steal"] + strikeConfig.StrikeConfig[strikeID]["steal"]
+            card.controll = config["controll"] + strikeConfig.StrikeConfig[strikeID]["controll"]
+            card.keep = config["keep"] + strikeConfig.StrikeConfig[strikeID]["keep"]
+            card.tech = config["tech"] + strikeConfig.StrikeConfig[strikeID]["tech"]
+            card.health = config["health"] + strikeConfig.StrikeConfig[strikeID]["health"]
             card.inTeam = inTeam
 
             if inTeam == PlayerInfoTeamStatus.inTeam and card.id not in self.inTeamcardIDList:
@@ -213,7 +227,7 @@ class CardMgrModule:
             if card is not None:
                 card.destroy(True)
 
-        DEBUG_MSG("----------------------------------------")
+        DEBUG_MSG("-------------__onCardSaved succ  ---------------------------")
         self.cardDBIDList.append(card.databaseID)
         self.writeToDB()
         self.cardIDList.append(card.id)

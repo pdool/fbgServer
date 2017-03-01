@@ -171,29 +171,6 @@
         </Properties>
     </Item_Info>
 
-    <Player_Info>  FIXED_DICT
-        <Properties>
-            <playerID>          <Type> UINT64   </Type>     </playerID><!--配置ID-->
-            <level>              <Type> UINT32   </Type>     </level><!--配置ID-->
-            <exp>                <Type> UINT64   </Type>     </exp><!--配置ID-->
-            <star>               <Type> UINT32  </Type>     </star><!--突破-->
-            <brokenLayer>       <Type> UINT32  </Type>     </brokenLayer><!--突破-->
-            <fightValue>        <Type> UINT64   </Type>     </fightValue><!--configID-->
-            <shoot>              <Type> UINT32  </Type>     </shoot><!--射门-->
-            <defend>             <Type> UINT32  </Type>     </defend><!--防守-->
-            <pass>               <Type> UINT32  </Type>     </pass><!--传球-->
-            <trick>              <Type> UINT32  </Type>     </trick><!--拦截-->
-            <reel>               <Type> UINT32  </Type>     </reel><!--盘带-->
-            <steal>              <Type> UINT32  </Type>     </steal><!--抢断-->
-            <controll>           <Type> UINT32  </Type>     </controll><!--控球-->
-            <keep>               <Type> UINT32  </Type>     </keep><!--守门-->
-            <tech>               <Type> UINT32  </Type>     </tech><!--技术-->
-            <health>             <Type> UINT32  </Type>     </health><!--身体-->
-
-        </Properties>
-    </Player_Info>
-
-
     <Gift_Info>  FIXED_DICT
         <Properties>
             <giftId>              <Type> UINT64   </Type>     </giftId><!--礼包ID-->
@@ -203,14 +180,58 @@
 
     <Card_Info>  FIXED_DICT
         <Properties>
-            <DBID>              <Type> UINT64   </Type>     </DBID>
+            <id>              <Type> UINT64   </Type>     </id>
             <configID>         <Type> UINT64   </Type>     </configID>
             <level>            <Type> UINT32   </Type>     </level>
             <star>             <Type> UINT32   </Type>     </star>
             <exp>             <Type> UINT64   </Type>     </exp>
             <inTeam>          <Type> UINT8   </Type>     </inTeam>
             <isSelf>          <Type> UINT8   </Type>     </isSelf>
+			<brokenLayer>       <Type> UINT32  </Type>     </brokenLayer><!--突破-->
+            <fightValue>        <Type> UINT64   </Type>     </fightValue><!--configID-->
+			<shoot>              <Type> UINT32  </Type>     </shoot><!--射门-->
+            <defend>             <Type> UINT32  </Type>     </defend><!--防守-->
+            <pass>               <Type> UINT32  </Type>     </pass><!--传球-->
+            <trick>              <Type> UINT32  </Type>     </trick><!--拦截-->
+            <reel>               <Type> UINT32  </Type>     </reel><!--盘带-->
+            <steal>              <Type> UINT32  </Type>     </steal><!--抢断-->
+            <controll>           <Type> UINT32  </Type>     </controll><!--控球-->
+            <keep>               <Type> UINT32  </Type>     </keep><!--守门-->
+            <tech>               <Type> UINT32  </Type>     </tech><!--技术-->
+            <health>             <Type> UINT32  </Type>     </health><!--身体-->
         </Properties>
     </Card_Info>
+
+
+    <Equip_Info>  FIXED_DICT
+        <Properties>
+            <configID>              <Type> UINT64   </Type>     </configID>
+            <star>         <Type> UINT64   </Type>     </star>
+            <strongLevel>            <Type> UINT32   </Type>     </strongLevel>
+        </Properties>
+    </Equip_Info>
+
+	<BallerProperty_Random>  FIXED_DICT
+        <Properties>
+            <name>           <Type> STRING   </Type>     </name>
+            <number>         <Type> INT64    </Type>     </number>
+        </Properties>
+    </BallerProperty_Random>
+
+	<Index_Info>  FIXED_DICT
+        <Properties>
+            <index>         <Type> INT64    </Type>     </index>
+        </Properties>
+    </Index_Info>
+
+	<Index_Info_LIST>     FIXED_DICT
+		<Properties>
+			<values>
+				<Type>   	ARRAY <of> Index_Info </of>   </Type>
+			</values>
+		</Properties>
+	</Index_Info_LIST>
+
+
 
 </root>

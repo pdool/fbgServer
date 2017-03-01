@@ -30,52 +30,17 @@
 
 <!--以上是通用背包属性，必须有-->
 
-        <shoot>
+          <star>
             <Type> UINT32 </Type>
             <Flags>			BASE			</Flags>
             <Persistent>		true				</Persistent>
-        </shoot>
+        </star>
 
-        <pass>
+        <strongLevel>
             <Type> UINT32 </Type>
             <Flags>			BASE			</Flags>
             <Persistent>		true				</Persistent>
-        </pass>
-
-        <reel>
-            <Type> UINT32 </Type>
-            <Flags>			BASE			</Flags>
-            <Persistent>		true				</Persistent>
-        </reel>
-
-        <defend>
-            <Type> UINT32 </Type>
-            <Flags>			BASE			</Flags>
-            <Persistent>		true				</Persistent>
-        </defend>
-
-        <trick>
-            <Type> UINT32 </Type>
-            <Flags>			BASE			</Flags>
-            <Persistent>		true				</Persistent>
-        </trick>
-
-        <steal>
-            <Type> UINT32 </Type>
-            <Flags>			BASE			</Flags>
-            <Persistent>		true				</Persistent>
-        </steal>
-
-        <controll>
-            <Type> UINT32 </Type>
-            <Flags>			BASE			</Flags>
-            <Persistent>		true				</Persistent>
-        </controll>
-        <keep>
-            <Type> UINT32 </Type>
-            <Flags>			BASE			</Flags>
-            <Persistent>		true				</Persistent>
-        </keep>
+        </strongLevel>
 
 		</Properties>
 

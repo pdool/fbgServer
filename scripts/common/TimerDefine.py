@@ -17,3 +17,6 @@ Timer_body_power_reset_buy_times = 3
 Timer_body_power_recover = 4
 
 Time_destroy_avatar = 5
+
+# 定时离开副本
+Timer_leave_clone = 6

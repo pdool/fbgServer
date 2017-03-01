@@ -1,4 +1,7 @@
 <root>
+    <Implements>
+        <Interface>	CardEquipModule	 </Interface>
+	</Implements>
     <Properties>
         <roleID>
             <Type>DBID</Type>
@@ -8,7 +11,7 @@
         <!-- 是否是本身所代表的的卡牌 -->
         <isSelf>
             <Type>UINT8</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
             <Default>0</Default>
         </isSelf>
@@ -16,7 +19,7 @@
         <!-- 配置ID -->
         <configID>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
             <Default>0</Default>
         </configID>
@@ -24,21 +27,21 @@
         <!--等级-->
         <level>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
             <Default>1</Default>
         </level>
         <!--经验-->
         <exp>
             <Type>UINT64</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
             <Default>0</Default>
         </exp>
         <!--星级-->
         <star>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
             <Default>0</Default>
         </star>
@@ -46,80 +49,93 @@
         <!--突破层数-->
         <brokenLayer>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
             <Default>0</Default>
         </brokenLayer>
 
+         <!--战斗力-->
+        <fightValue>
+            <Type>UINT32</Type>
+            <Flags>BASE</Flags>
+            <Persistent>true</Persistent>
+            <Default>0</Default>
+        </fightValue>
         <!-- 射门 -->
         <shoot>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </shoot>
         <!-- 防守 -->
         <defend>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </defend>
         <!-- 传球 -->
         <passBall>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </passBall>
         <!-- 拦截 -->
         <trick>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </trick>
         <!-- 盘带 -->
         <reel>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </reel>
         <!-- 抢断 -->
         <steal>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </steal>
         <!-- 控球 -->
         <controll>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </controll>
         <!-- 守门 -->
         <keep>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </keep>
 
         <!-- 技术 -->
         <tech>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </tech>
 
         <!-- 身体 -->
         <health>
             <Type>UINT32</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </health>
 
         <!-- 是否上阵 -->
         <inTeam>
             <Type>UINT8</Type>
-            <Flags>BASE</Flags>
+            <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </inTeam>
+
+
+        <equips>
+            <Type>ARRAY <of> Equip_Info</of>></Type>
+            <Flags>BASE</Flags>
+        </equips>
 
         <baseProp>
             <Type>PYTHON</Type>
@@ -131,10 +147,31 @@
             <Flags>ALL_CLIENTS</Flags>
         </coordinate>
 
+        <!--配置ID-->
+        <configID_B>
+            <Type>UINT32</Type>
+            <Flags>ALL_CLIENTS</Flags>
+        </configID_B>
+
+
+
+
+
+
+
+
 
     </Properties>
 
     <BaseMethods>
     </BaseMethods>
 
+
+
+	<CellMethods>
+        <!--传送数据到cell-->
+        <onSetBaseProp>
+            <Arg> PYTHON </Arg>  <!--方法名-->
+        </onSetBaseProp>
+	</CellMethods>
 </root>

@@ -40,6 +40,8 @@ class PiecesModule:
                 pieceItem[PieceItemKeys.amount] = int(result[i][2])
                 self.piecesContainer[ pieceItem[PieceItemKeys.uuid]] = pieceItem
 
+                if  pieceItem[PieceItemKeys.uuid] not in self.bagUUIDList:
+                    self.bagUUIDList.append( pieceItem[PieceItemKeys.uuid])
 
         KBEngine.executeRawDatabaseCommand(sql,cb)
         pass
@@ -53,8 +55,9 @@ class PiecesModule:
         if pieceConfig["togetherCount"] != 0:
             togetherCount = pieceConfig["togetherCount"]
 
-        if togetherCount == 1:
-            self.__insertPieces(configID, count)
+        if togetherCount <= 1:
+            for i in range(count):
+                self.__insertPieces(configID, count)
         else:
             self.__updatePieces(configID, count)
     # 减少碎片

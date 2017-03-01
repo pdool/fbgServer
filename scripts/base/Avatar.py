@@ -2,6 +2,7 @@
 import util
 
 from KBEDebug import *
+from part.SlevelModule import SlevelModule
 from part.BagModule import BagModule
 from part.BodyPowerModule import BodyPowerModule
 from part.CardMgrModule import CardMgrModule
@@ -18,6 +19,9 @@ from part.footballTeam.MaterialModule import MaterialModule
 from part.footballTeam.PiecesModule import PiecesModule
 from part.footballTeam.UseModule import UseModule
 from part.CloneModule import CloneModule
+from part.EquipModule import EquipModule
+from part.MentalityModule import MentalityModule
+from part.StrikeModule import StrikeModule
 import TimerDefine
 
 #使用技巧 先放在根级目录。，调好之后拖走，编辑器自动组织引用
@@ -38,7 +42,10 @@ class Avatar(KBEngine.Proxy,
              UseModule,
              PropMgrModule,
              CloneModule,
-
+             EquipModule,
+             SlevelModule,
+             MentalityModule,
+             StrikeModule,
              ):
     """
     角色实体
@@ -190,7 +197,8 @@ class Avatar(KBEngine.Proxy,
                 continue
             card.destroyCard()
 
-        if self.spaceMb is not None:
+
+        if hasattr(self,"spaceMb") and self.spaceMb is not None:
             self.spaceMb.destroyClone()
         self.destroySelf()
 

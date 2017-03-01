@@ -9,8 +9,11 @@
         <Interface>	BagModule		        </Interface>
         <Interface>	CardMgrModule		    </Interface>
         <Interface>	PiecesModule		    </Interface>
-
+        <Interface>	SlevelModule		    </Interface>
+        <Interface>	EquipModule		    </Interface>
         <Interface>	CloneModule		    </Interface>
+        <Interface>	MentalityModule		    </Interface>
+        <Interface>	StrikeModule		    </Interface>
 	</Implements>
 
 	<Properties>
@@ -153,5 +156,7 @@
             <Arg> STRING </Arg>  <!--方法名-->
         </onOperateSuc>
 	</ClientMethods>
+
+
 </root>
 

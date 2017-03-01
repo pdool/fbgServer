@@ -11,7 +11,7 @@ class Monster(KBEngine.Entity):
     """
     def __init__(self):
         KBEngine.Entity.__init__(self)
-        print("Cell::Monster.__init__")
+        # print("Cell::Monster.__init__")
 
     def onTimer(self, tid, userArg):
         """

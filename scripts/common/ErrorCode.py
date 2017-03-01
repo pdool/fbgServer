@@ -91,6 +91,20 @@ class CardMgrModuleError:
     Card_not_enough_use = 3
     # 已经最高等级
     Card_is_max_level = 4
+    # 材料数量不足
+    Material_not_enough = 5
+    # 突破成功
+    Strike_sucess = 6
+    # 突破最大级
+    Strike_is_max = 7
+    # 碎片转换成功
+    Switch_is_sucess = 8
+    # 金钱不足
+    Money_not_enough = 9
+    # 进阶成功
+    Slevel_sucess = 10
+
+
 
 
 

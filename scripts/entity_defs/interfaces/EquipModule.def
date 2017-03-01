@@ -1,0 +1,29 @@
+<root>
+	<Implements>
+
+	</Implements>
+
+	<Properties>
+
+	</Properties>
+
+	<BaseMethods>
+       <!-- 客户端请求制作装备-->
+        <onClientMakeEquip>
+            <Exposed/>
+            <Arg>UINT32</Arg>
+        </onClientMakeEquip>
+
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+       <!-- 通知客户端制作装备成功-->
+        <makeEquipSucc>
+        </makeEquipSucc>
+	</ClientMethods>
+</root>
+

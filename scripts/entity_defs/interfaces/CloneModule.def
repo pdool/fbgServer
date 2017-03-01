@@ -16,14 +16,70 @@
            <Arg> UINT32 </Arg>
         </onClientReqEnterClone>
 
+        <!--离开副本-->
+        <onClientLeaveClone>
+            <Exposed/>
+        </onClientLeaveClone>
+
+
 	</BaseMethods>
 
 	<CellMethods>
+         <!--客户端调用 告诉服务器开始战斗-->
+        <onClientBeginFight>
+            <Exposed/>
+        </onClientBeginFight>
 
+       <!--客户端调用 告诉服务器动画播放完毕-->
+        <onClientPlayAnimFinish>
+             <Exposed/>
+        </onClientPlayAnimFinish>
+
+        <!--客户端调用 选择传球还是射门-->
+        <onClientSelectOp>
+            <Exposed/>
+             <Arg>ARRAY <of> UINT32 </of></Arg>
+             <Arg>ARRAY <of> UINT32 </of></Arg>
+        </onClientSelectOp>
 
 	</CellMethods>
 
-	<ClientMethods>
+   <ClientMethods>
+       <!--通知客户端进攻者和防守者的id-->
+        <onAtkAndDefID>
+
+             <Arg>ARRAY <of> UINT64 </of></Arg>
+             <Arg>ARRAY <of> UINT64 </of></Arg>
+             <Arg>ARRAY <of> UINT64 </of></Arg>
+             <Arg>ARRAY <of> UINT64 </of></Arg>
+             <Arg> UINT32 </Arg>
+        </onAtkAndDefID>
+
+
+        <!--通知客户端准备好了-->
+        <onReady>
+        </onReady>
+
+         <!--通知当前回合-->
+        <onCurAttackIndex>
+             <Arg>UINT8</Arg>
+        </onCurAttackIndex>
+
+       <onOprateResult>
+            <Arg>UINT8</Arg>
+            <Arg>UINT8</Arg>
+       </onOprateResult>
+
+       <!--通知客户端本轮结束-->
+       <onRoundEnd>
+       </onRoundEnd>
+        <!--比赛结束-->
+       <onGameOver>
+       </onGameOver>
+
+       <onTotalAttackTimes>
+           <Arg>UINT8</Arg>
+       </onTotalAttackTimes>
 
 
 

@@ -2,6 +2,7 @@
 import time
 import datetime
 import KBEDebug
+import random
 
 
 # 获取当前时间 秒级时间戳
@@ -10,7 +11,7 @@ def getCurrentTime():
     return int(timestamp)
 # （0,1 ]
 def randFunc():
-    seed = random.random()
+    seed = random.Random().random()
     if seed == 0.0:
         seed = 1.0
     return seed

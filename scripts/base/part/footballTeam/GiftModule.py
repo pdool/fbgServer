@@ -61,6 +61,9 @@ class GiftModule:
                 giftItem[GiftKeys.itemType] = ItemTypeEnum.Gift
                 self.giftContainer[giftItem[GiftKeys.uuid]] = giftItem
 
+                if giftItem[GiftKeys.uuid] not in self.bagUUIDList:
+                    self.bagUUIDList.append(giftItem[GiftKeys.uuid])
+
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
     # 增加礼包
@@ -71,8 +74,9 @@ class GiftModule:
         if giftConfig["togetherCount"] != 0:
             togetherCount = giftConfig["togetherCount"]
 
-        if togetherCount == 1:
-            self.__insertGift(configID, count)
+        if togetherCount <= 1 :
+            for i in range(count):
+                self.__insertGift(configID, count)
         else:
             self.__updateGifts(configID, count)
 
