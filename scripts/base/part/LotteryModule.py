@@ -7,10 +7,12 @@ import lotteryConfig
 
 __author__ = 'chongxin'
 
-Lottery_Type_Gold = 1
+Lottery_Type_Euro = 1
 Lottery_Type_Diamond = 2
 Lottery_Type_Ten = 3
-
+"""
+抽卡模块
+"""
 class LotteryModule:
     def __init__(self):
         pass
@@ -31,8 +33,8 @@ class LotteryModule:
             return
 
         lonfig = lotteryConfig.lottery[lotteryType]
-        if lotteryType == Lottery_Type_Gold:
-            result = self.goldLottery(lonfig)
+        if lotteryType == Lottery_Type_Euro:
+            result = self.euroLottery(lonfig)
         elif lotteryType == Lottery_Type_Diamond:
             result = self.diamondLottery(lonfig)
         elif lotteryType == Lottery_Type_Ten:
@@ -45,40 +47,39 @@ class LotteryModule:
     #                              工具函数调用函数
     # --------------------------------------------------------------------------------------------
     # 钞票抽
-    def goldLottery(self,configDict):
+    def euroLottery(self, configDict):
         result =""
         op = ErrorCode.LotteryError.Success
         # 检查冷却时间
         # 检查免费次数
         #
-
         cdTime = configDict["cdTime"]
         moneyCount = configDict["moneyCount"]
         dropIds = configDict["dropIds"]
 
-        lastTime = self.goldLastTime
+        lastTime = self.euroLastTime
         nowTime = util.getCurrentTime()
         period = nowTime - lastTime
 
 
-        isUseGold = True
-        if period >= cdTime and  self.goldFreeTimes >0:
-            isUseGold = False
+        isUseEuro = True
+        if period >= cdTime and  self.euroFreeTimes >0:
+            isUseEuro = False
 
-        if isUseGold :
-            if self.gold >= moneyCount:
-                self.gold = self.gold - moneyCount
+        if isUseEuro :
+            if self.euro >= moneyCount:
+                self.euro = self.euro - moneyCount
             else:
                 return (ErrorCode.LotteryError.Money_not_enough,"")
         else:
-            self.goldFreeTimes = self.goldFreeTimes - 1
+            self.euroFreeTimes = self.euroFreeTimes - 1
 
-        self.goldLastTime = nowTime
+        self.euroLastTime = nowTime
 
         for key in dropIds:
             result += str(key) + ","
 
-        DEBUG_MSG("goldLottery----------" + result)
+        DEBUG_MSG("euroLottery----------" + result)
         return (op,result)
 
     # 钻石抽卡
@@ -152,9 +153,9 @@ class LotteryModule:
         if userArg != TimerDefine.Timer_reset_lottery_free_times:
             return
 
-        config = lotteryConfig.lottery[Lottery_Type_Gold]
+        config = lotteryConfig.lottery[Lottery_Type_Euro]
 
-        self.goldFreeTimes = config["freeTime"]
+        self.euroFreeTimes = config["freeTime"]
 
         config = lotteryConfig.lottery[Lottery_Type_Diamond]
 

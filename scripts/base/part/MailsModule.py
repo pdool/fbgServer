@@ -8,7 +8,9 @@ from KBEDebug import DEBUG_MSG
 from PlayerMgr import PlayerMgr
 import sys
 __author__ = 'chongxin'
-
+"""
+意识模块
+"""
 class MailsModule:
     def __init__(self):
         self.mails = []

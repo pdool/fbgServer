@@ -103,6 +103,18 @@ class CardMgrModuleError:
     Money_not_enough = 9
     # 进阶成功
     Slevel_sucess = 10
+    # 球员传承不能是本人
+    InHerit_is_not_self = 11
+    # 球员传承不能是主角
+    InHerit_is_not_main = 12
+    # 传承者等级必须比被传承者大
+    InHerit_level_is_enough = 13
+    # 球员已达到最大级
+    Baller_level_is_max = 14
+    # 当前属性已满级
+    Property_is_max = 15
+    # 能力提升成功
+    Ability_is_sucess = 16
 
 
 

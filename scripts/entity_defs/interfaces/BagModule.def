@@ -49,13 +49,10 @@
             <Arg>  UINT32 </Arg>
         </onClientSellOne>
 
-
-
-
-
-
-
-
+        <onClientBuyBagSize>
+            <Exposed/>
+            <Arg>  UINT32 </Arg>
+        </onClientBuyBagSize>
 
 
 

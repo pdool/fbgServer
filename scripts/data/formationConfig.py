@@ -24,3 +24,7 @@ FormationConfig = {35201: {'teamTuple': (1, 3, 4, 5, 12, 13, 14, 15, 16, 22, 24)
 allDatas = {
     '阵容配置表': FormationConfig,
 }
+
+if __name__ == "__main__":
+    for part in range(3):
+        print(part)

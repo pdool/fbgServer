@@ -58,7 +58,11 @@ class Clone(KBEngine.Base):
 
     def destroyClone(self):
         ERROR_MSG("--------------destroyClone-------------------------")
-        if self is not None and self.cell is not None:
+        if self.isDestroyed is not True and self is not None and self.cell is not None:
             self.destroyCellEntity()
 
         # self.destroy()
+
+if __name__ == "__main__":
+    for  i  in reversed(range(10)):
+        print(i)

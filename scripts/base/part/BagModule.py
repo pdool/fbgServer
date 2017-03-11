@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from BagConfig import BagConfig
 from itemsConfig import itemsIndex
 from KBEDebug import *
 __author__ = 'chongxin'
@@ -29,7 +30,6 @@ class BagModule:
     # --------------------------------------------------------------------------------------------
     # 客户端请求背包列表
     def onClientGetItemList(self):
-
         retItems = []
         for uuid in self.bagUUIDList:
             _,item = self.getItemByUUID(uuid)
@@ -41,6 +41,7 @@ class BagModule:
             value["amount"] = item["amount"]
             retItems.append(value)
 
+        ERROR_MSG("onClientGetItemList")
         self.client.onGetItemList(retItems)
 
 
@@ -73,7 +74,7 @@ class BagModule:
         # 获得单价
         price = itemsIndex[itemId]["price"]
 
-        sellMoney = self.gold + num * price
+        sellMoney = self.euro + num * price
 
         result = False
         if itemType == ItemTypeEnum.Diamond:
@@ -90,7 +91,19 @@ class BagModule:
             result = self.decMaterial(uuid,num)
 
         if result is True:
-            self.gold = sellMoney
+            self.euro = sellMoney
+
+    # 扩容
+    def onClientBuyBagSize(self,count):
+        needDiamond = count * BagConfig[1]["bagPrice"]
+
+        if  self.diamond >= needDiamond:
+            self.diamond = self.diamond - needDiamond
+            self.bagSize = self.bagSize + count
+
+
+
+
 
 
     # --------------------------------------------------------------------------------------------

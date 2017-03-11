@@ -12,7 +12,7 @@ from ErrorCode import UseModuleError
 from itemsUse import itemsUseConfig
 
 """
-消耗品模块
+消耗品容器
 """
 class UseModule:
 

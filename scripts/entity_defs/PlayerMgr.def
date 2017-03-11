@@ -61,6 +61,11 @@
             <Arg> PY_DICT </Arg>
         </sendPrivateChat>
 
+        <onReqAddFriend>
+            <Arg> UINT64 </Arg>
+            <Arg> STRING </Arg>
+            <Arg> UINT64 </Arg>
+        </onReqAddFriend>
 	</BaseMethods>
 
 </root>

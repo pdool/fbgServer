@@ -190,24 +190,47 @@
 			<brokenLayer>       <Type> UINT32  </Type>     </brokenLayer><!--突破-->
             <fightValue>        <Type> UINT64   </Type>     </fightValue><!--configID-->
 			<shoot>              <Type> UINT32  </Type>     </shoot><!--射门-->
+			<shootM>              <Type> UINT32  </Type>     </shootM><!--射门-->
+			<shootExp>              <Type> UINT32  </Type>     </shootExp><!--射门-->
             <defend>             <Type> UINT32  </Type>     </defend><!--防守-->
+			<defendM>             <Type> UINT32  </Type>     </defendM><!--防守-->
+			<defendExp>             <Type> UINT32  </Type>     </defendExp><!--防守-->
             <pass>               <Type> UINT32  </Type>     </pass><!--传球-->
+			<passBallM>          <Type> UINT32  </Type>     </passBallM><!--传球-->
+			<passBallExp>               <Type> UINT32  </Type>     </passBallExp><!--传球-->
             <trick>              <Type> UINT32  </Type>     </trick><!--拦截-->
+			<trickM>              <Type> UINT32  </Type>     </trickM><!--拦截-->
+			<trickExp>              <Type> UINT32  </Type>     </trickExp><!--拦截-->
             <reel>               <Type> UINT32  </Type>     </reel><!--盘带-->
+			<reelM>               <Type> UINT32  </Type>     </reelM><!--盘带-->
+			<reelExp>               <Type> UINT32  </Type>     </reelExp><!--盘带-->
             <steal>              <Type> UINT32  </Type>     </steal><!--抢断-->
+			<stealM>              <Type> UINT32  </Type>     </stealM><!--抢断-->
+			<stealExp>              <Type> UINT32  </Type>     </stealExp><!--抢断-->
             <controll>           <Type> UINT32  </Type>     </controll><!--控球-->
+			<controllM>           <Type> UINT32  </Type>     </controllM><!--控球-->
+			<controllExp>           <Type> UINT32  </Type>     </controllExp><!--控球-->
             <keep>               <Type> UINT32  </Type>     </keep><!--守门-->
+			<keepM>               <Type> UINT32  </Type>     </keepM><!--守门-->
+			<keepExp>               <Type> UINT32  </Type>     </keepExp><!--守门-->
             <tech>               <Type> UINT32  </Type>     </tech><!--技术-->
             <health>             <Type> UINT32  </Type>     </health><!--身体-->
+			<strikeNeedCost>     <Type> UINT32  </Type>     </strikeNeedCost><!--花费碎片数量-->
         </Properties>
     </Card_Info>
 
 
     <Equip_Info>  FIXED_DICT
         <Properties>
-            <configID>              <Type> UINT64   </Type>     </configID>
-            <star>         <Type> UINT64   </Type>     </star>
-            <strongLevel>            <Type> UINT32   </Type>     </strongLevel>
+		    <UUID>              <Type> UINT64  </Type>     </UUID>
+            <itemID>            <Type> UINT32   </Type>     </itemID>
+			<amount>            <Type> UINT32   </Type>     </amount>
+            <star>         		<Type> UINT32   </Type>     </star>
+            <strongLevel>     <Type> UINT32   </Type>     </strongLevel>
+			<gem1>            <Type> UINT32   </Type>     </gem1>
+			<gem2>            <Type> UINT32   </Type>     </gem2>
+			<gem3>            <Type> UINT32   </Type>     </gem3>
+
         </Properties>
     </Equip_Info>
 
@@ -232,6 +255,29 @@
 		</Properties>
 	</Index_Info_LIST>
 
+    <!--一键强化结果信息-->
+    <OneKeyStrongUp_Info>  FIXED_DICT
+        <Properties>
+            <preStrong>              <Type> UINT32   </Type>     </preStrong><!--强化前等级-->
+            <nextStrong>            <Type> UINT32   </Type>     </nextStrong><!--强化后等级-->
+			<cost>                  <Type> UINT32   </Type>     </cost><!--花费-->
+        </Properties>
+    </OneKeyStrongUp_Info>
 
+	<Ability_Piece>  FIXED_DICT
+        <Properties>
+            <itemID>         <Type> STRING   </Type>     </itemID>
+            <number>         <Type> INT32    </Type>     </number>
+        </Properties>
+    </Ability_Piece>
+
+
+	<Ability_Piece_LIST>     FIXED_DICT
+		<Properties>
+			<values>
+				<Type>   	ARRAY <of> Ability_Piece </of>   </Type>
+			</values>
+		</Properties>
+	</Ability_Piece_LIST>
 
 </root>

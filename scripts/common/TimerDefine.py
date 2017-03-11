@@ -20,3 +20,6 @@ Time_destroy_avatar = 5
 
 # 定时离开副本
 Timer_leave_clone = 6
+
+# 重置每日购买欧元次数
+Timer_reset_buy_euro = 7

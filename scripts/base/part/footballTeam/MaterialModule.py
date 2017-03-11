@@ -11,7 +11,7 @@ from ErrorCode import MaterialModuleError
 
 
 """
-材料模块
+材料容器
 """
 class MaterialModule:
 
@@ -52,9 +52,9 @@ class MaterialModule:
 
         if togetherCount <= 1 :
             for i in range(count):
-                self.__insertUse(configID, count)
+                self.__insertMaterial(configID, count)
         else:
-            self.__updateUse(configID, count)
+            self.__updateMaterial(configID, count)
 
     # 减少材料
     def decMaterial(self, uuid, count):

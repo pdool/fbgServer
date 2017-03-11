@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import TimerDefine
 import util
+import vipConfig
 from KBEDebug import *
 
 import shopConfig
@@ -13,6 +14,8 @@ Shop_type_common = 2
 
 Shop_month_id = 1
 Shop_season_id = 2
+
+# 商城
 
 class ShopModule:
 
@@ -27,6 +30,7 @@ class ShopModule:
     # --------------------------------------------------------------------------------------------
     #                              客户端调用函数
     # --------------------------------------------------------------------------------------------
+
     def onClientCharge(self,cardId):
 
         config = shopConfig.cardConfig[cardId]
@@ -38,7 +42,15 @@ class ShopModule:
         elif cardType == Shop_type_common:
             self.getCommonCard(config)
 
+    # 领取vip礼包
+    def onClientGetVipGift(self):
 
+
+
+
+
+
+        pass
     # --------------------------------------------------------------------------------------------
     #                              工具函数调用函数
     # --------------------------------------------------------------------------------------------
@@ -49,7 +61,7 @@ class ShopModule:
         rebateTimes = config["rebateTimes"]
 
         self.diamond = self.diamondCount + diamondCount + giveDiamond
-        self.rmb = self.rmb + rmbPrice
+        self.addRmb(rmbPrice)
         self.monthRebateTimes = self.monthRebateTimes + rebateTimes
 
 
@@ -62,7 +74,7 @@ class ShopModule:
         rebateTimes = config["rebateTimes"]
 
         self.diamond = self.diamond + diamondCount + giveDiamond
-        self.rmb = self.rmb + rmbPrice
+        self.addRmb(rmbPrice)
         self.seasonRebateTimes = self.seasonRebateTimes + rebateTimes
 
     def getCommonCard(self, config):
@@ -74,7 +86,7 @@ class ShopModule:
 
         firstBuySet = set(self.firstBuyInfo)
 
-        self.rmb = self.rmb + rmbPrice
+        self.addRmb(rmbPrice)
         self.diamond = self.diamond + diamondCount + giveDiamond
 
         if cardId not in firstBuySet:
@@ -103,7 +115,29 @@ class ShopModule:
 
 
 
+    def addRmb(self,num):
+        self.rmb = self.rmb + num
+        vip = self.vipLevel
+        for i in range(self.vipLevel + 1,16):
+            config = vipConfig.VipConfig[i]
+            needRmb= config["rmbNum"]
+            if self.rmb >= needRmb:
+                vip = i
+            else:
+                break
+        if vip != self.vipLevel:
+            self.vipLevel = vip
 
+
+if __name__ == "__main__":
+
+    s = ShopModule()
+    s.rmb = 0
+    s.vipLevel = 0
+    s.addRmb(1000)
+    print(s.vipLevel)
+    s.addRmb(1000)
+    print(s.vipLevel)
 
 
 

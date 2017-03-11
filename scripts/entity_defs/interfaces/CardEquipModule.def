@@ -3,12 +3,7 @@
 	</Implements>
 
 	<Properties>
-	   <equip>
-         <Type>			ARRAY <of> Equip_Info </of>                 </Type>
-		 <Flags>			BASE		  </Flags>
-		 <Default>						          </Default>
-		 <Persistent>		true		          </Persistent>
-	    </equip>
+
 	</Properties>
 
 	<BaseMethods>

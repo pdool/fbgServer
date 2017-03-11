@@ -49,12 +49,15 @@ class FriendModule:
             friends = {}
             friends["values"] = []
             self.client.onGetApplyInfo(friends)
+            ERROR_MSG("-------------------------  onClientGetApplyList   len is o  -------------------------------")
             return
 
         self.ApplyRetFlagSet = set(self.applyDBIDList)
         self.applyFriendInfoList = []
         for dbid in self.applyDBIDList:
             palyeMgr.queryPlayerInfo(dbid, "onCmdQueryMyInfo", self, "onCmdRetApplyFriendInfo")
+
+        ERROR_MSG("-------------------------  onClientGetApplyList  -------------------------------")
         pass
 
     # 获得黑名单列表
@@ -101,8 +104,8 @@ class FriendModule:
             return
 
         args = {"applyDBID":self.databaseID}
-        KBEngine.globalData["PlayerMgr"].onCmdByDBID(dbid, "onCmdRecvFriendApply", args)
-
+        # KBEngine.globalData["PlayerMgr"].onCmdByDBID(dbid, "onCmdRecvFriendApply", args)
+        KBEngine.globalData["PlayerMgr"].onReqAddFriend(dbid, "onCmdRecvFriendApply", self.databaseID)
         pass
     # 同意加好友
     def onClientAgreeAddFriend(self,dbid):

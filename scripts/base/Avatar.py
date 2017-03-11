@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import importlib
+
 import util
+from GMConfig import GMConfig
 
 from KBEDebug import *
 from part.SlevelModule import SlevelModule
@@ -22,6 +25,9 @@ from part.CloneModule import CloneModule
 from part.EquipModule import EquipModule
 from part.MentalityModule import MentalityModule
 from part.StrikeModule import StrikeModule
+from part.InheritModule import InheritModule
+from part.AbilityModule import AbilityModule
+
 import TimerDefine
 
 #使用技巧 先放在根级目录。，调好之后拖走，编辑器自动组织引用
@@ -46,6 +52,8 @@ class Avatar(KBEngine.Proxy,
              SlevelModule,
              MentalityModule,
              StrikeModule,
+             InheritModule,
+             AbilityModule,
              ):
     """
     角色实体
@@ -198,7 +206,7 @@ class Avatar(KBEngine.Proxy,
             card.destroyCard()
 
 
-        if hasattr(self,"spaceMb") and self.spaceMb is not None:
+        if hasattr(self,"spaceMb") and self.spaceMb is not None and self.spaceMb.isDestroyed is not True:
             self.spaceMb.destroyClone()
         self.destroySelf()
 
@@ -238,4 +246,17 @@ class Avatar(KBEngine.Proxy,
             setattr(self,gmList[0],value)
         else:
             DEBUG_MSG("avatar don't have the " + gmList[0])
+
+    def reloadc(module):
+        importlib.reload(module)
+        KBEngine.reloadScript()
+
+    def onClientGmAddAll(self):
+
+        self.diamond = 9999999999
+        self.addRmb(99999999)
+        self.euro = 999999999
+        for k ,v in GMConfig.items():
+            self.putItemInBag(k,v["itemCountCount"])
+
 

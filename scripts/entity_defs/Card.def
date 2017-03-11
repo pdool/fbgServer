@@ -24,6 +24,14 @@
             <Default>0</Default>
         </configID>
 
+        <!--突破花费碎片数量-->
+        <strikeNeedCost>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+            <Default>0</Default>
+        </strikeNeedCost>
+
         <!--等级-->
         <level>
             <Type>UINT32</Type>
@@ -67,74 +75,166 @@
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </shoot>
+        <!-- 射门经验 -->
+        <shootExp>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </shootExp>
+        <!-- 意识射门加成 -->
+        <shootM>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </shootM>
         <!-- 防守 -->
         <defend>
             <Type>UINT32</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </defend>
+         <!-- 防守经验 -->
+        <defendExp>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </defendExp>
+        <!-- 意识防守加成 -->
+        <defendM>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </defendM>
         <!-- 传球 -->
         <passBall>
             <Type>UINT32</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </passBall>
+        <!-- 传球经验 -->
+        <passBallExp>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </passBallExp>
+        <!-- 意识传球加成 -->
+        <passBallM>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </passBallM>
         <!-- 拦截 -->
         <trick>
             <Type>UINT32</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </trick>
+        <!-- 拦截经验 -->
+        <trickExp>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </trickExp>
+        <!-- 意识拦截加成 -->
+        <trickM>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </trickM>
         <!-- 盘带 -->
         <reel>
             <Type>UINT32</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </reel>
+        <!-- 盘带经验 -->
+        <reelExp>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </reelExp>
+        <!-- 意识盘带加成 -->
+        <reelM>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </reelM>
         <!-- 抢断 -->
         <steal>
             <Type>UINT32</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </steal>
+        <!-- 抢断经验 -->
+        <stealExp>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </stealExp>
+        <!-- 意识抢断加成 -->
+        <stealM>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </stealM>
         <!-- 控球 -->
         <controll>
             <Type>UINT32</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </controll>
+        <!-- 控球经验 -->
+        <controllExp>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </controllExp>
+        <!-- 意识控球加成 -->
+        <controllM>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </controllM>
         <!-- 守门 -->
         <keep>
             <Type>UINT32</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </keep>
-
+        <!-- 守门经验 -->
+        <keepExp>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </keepExp>
+        <!-- 意识守门加成 -->
+        <keepM>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </keepM>
         <!-- 技术 -->
         <tech>
             <Type>UINT32</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </tech>
-
         <!-- 身体 -->
         <health>
             <Type>UINT32</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </health>
-
         <!-- 是否上阵 -->
         <inTeam>
             <Type>UINT8</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </inTeam>
-
-
         <equips>
             <Type>ARRAY <of> Equip_Info</of>></Type>
             <Flags>BASE</Flags>
+            <Persistent>true</Persistent>
         </equips>
 
         <baseProp>
@@ -152,11 +252,6 @@
             <Type>UINT32</Type>
             <Flags>ALL_CLIENTS</Flags>
         </configID_B>
-
-
-
-
-
 
 
 

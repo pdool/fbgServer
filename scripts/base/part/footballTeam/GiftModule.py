@@ -34,7 +34,7 @@ class GiftTypeEnum:
 
 
 """
-礼包模块
+礼包容器
 """
 class GiftModule:
 

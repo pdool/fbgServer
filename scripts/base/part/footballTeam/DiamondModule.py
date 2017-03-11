@@ -11,7 +11,7 @@ from itemsDiamond import itemsDiamondConfig
 from itemsConfig import itemsIndex
 from part.BagModule import ItemTypeEnum
 """
-宝石模块
+宝石容器
 """
 class DiamondModule:
 

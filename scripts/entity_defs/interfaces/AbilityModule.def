@@ -1,0 +1,23 @@
+<root>
+	<BaseMethods>
+	    <!--球员能力提升-->
+        <onClientUpAbilityInfo>
+            <Exposed/>
+            <Arg>	UINT32	</Arg>	<!-- cardID -->
+            <Arg>	STRING	</Arg>	<!-- chooseName -->
+			<Arg>	Ability_Piece_LIST     </Arg>
+        </onClientUpAbilityInfo>
+
+
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+
+	<ClientMethods>
+
+	</ClientMethods>
+</root>
+

@@ -241,7 +241,7 @@ class Clone(KBEngine.Entity):
 	4.14 根据参与进攻的球员随机一个球员判定为【进攻发起者】Atk1Player
 
     """
-    def __GetAttackerID(self):
+    def __GetAttackerID(self,part):
         controllerObj = KBEngine.entities.get(self.controllerID)
 
         # 所有已经参与过进攻的参与者
@@ -251,6 +251,7 @@ class Clone(KBEngine.Entity):
         sumAttack = 0.0
         stepList = []
         rangeId = []
+        canAttackPos = "can   Attack  Pos  "
         for id in controllerObj.inTeamcardIDList:
             if id == controllerObj.preAttackId:
                 continue
@@ -258,18 +259,20 @@ class Clone(KBEngine.Entity):
             if positionConfig.PositionConfig[obj.pos]["attackEnable"] != 1:
                 continue
 
+            canAttackPos = canAttackPos+"  "  + str(obj.pos)
             c1 = self.__calcObjAttckValue(obj)
             sumAttack = sumAttack + c1
 
             stepList.append(sumAttack)
             rangeId.append(id)
 
+        # ERROR_MSG(canAttackPos)
         seed = random.uniform(0.0,sumAttack)
 
-        # keyStr = "-----------  seed :" + str(seed) + "   "
-        # for i in range(len(stepList)):
-        #     keyStr = keyStr + "id :" + str(rangeId[i-1]) + " step: " + str(stepList[i])
-        #
+        keyStr = "-----------  seed :" + str(seed) + "   "
+        for i in range(len(stepList)):
+            keyStr = keyStr + "  id :" + str(rangeId[i-1]) + " step: " + str(stepList[i])
+
         # ERROR_MSG(keyStr)
         for i in range(len(stepList)):
             if seed <= stepList[i]:
@@ -277,9 +280,10 @@ class Clone(KBEngine.Entity):
                 if i >= 0:
                     i = i-1
                 controllerObj.atkList.append(rangeId[i])
+
                 controllerObj.preAttackId = rangeId[i]
 
-                # ERROR_MSG(" select atkId =====" + str( rangeId[i-1]))
+                ERROR_MSG(" select atkId =====" + str( rangeId[i]) +"  pos" + str(KBEngine.entities.get(rangeId[i]).pos))
                 break
 
 
@@ -293,7 +297,12 @@ class Clone(KBEngine.Entity):
 	4.24 若可参与防守球员数量<=S，则所有可参与防守的球员都判定为该轮防守者Def1Player1、Def1Player2
 	4.25 若没有可参与防守的球员，则该轮无防守球员
     """
-    def __getDefPlayerID(self):
+    def __getDefPlayerID(self,part):
+
+        if self.controllerID == self.id:
+            ERROR_MSG("current atk controller is clone         ")
+        else:
+            ERROR_MSG("current atk controller is avatar         ")
 
         defObj = KBEngine.entities.get(self.defenderID)
         controllerObj = KBEngine.entities.get(self.controllerID)
@@ -311,7 +320,7 @@ class Clone(KBEngine.Entity):
             defCount = 2
 
 
-        curAttackCardObj = KBEngine.entities.get(self.__getCurRoundAtkId())
+        curAttackCardObj = KBEngine.entities.get(self.__getCurRoundAtkId(part))
 
         pos = curAttackCardObj.pos
 
@@ -327,7 +336,9 @@ class Clone(KBEngine.Entity):
         for l in adaptDefList:
             skkk = skkk + "  "+ str(l)
 
-        DEBUG_MSG(skkk)
+        ERROR_MSG(skkk)
+
+        sss = " rest card pos"
 
         canDefList =[]
         for id in defObj.inTeamcardIDList:
@@ -335,9 +346,18 @@ class Clone(KBEngine.Entity):
                 continue
 
             card = KBEngine.entities.get(id)
-
+            sss = sss + "  " + str(card.pos)
             if card.pos in adaptDefList:
               canDefList.append(id)
+
+
+        ERROR_MSG(sss)
+
+        skkk = "canDefList ------------"
+        for l in canDefList:
+            skkk = skkk + "  " + str(l) + "  "+ str(KBEngine.entities[l].pos)
+
+        ERROR_MSG(skkk)
 
         defCount = min(defCount, len(canDefList))
 
@@ -345,7 +365,7 @@ class Clone(KBEngine.Entity):
 
         defObj.defList.append(defIdList)
 
-        defObj.preDefIds = defIdList
+        defObj.preDefIds.extend(defIdList)
 
 
 
@@ -363,13 +383,13 @@ class Clone(KBEngine.Entity):
     """
     def __canSteal(self):
 
-        attackID = self.__getCurRoundAtkId()
+        attackID = self.__getCurRoundAtkId(self.curPart)
 
         attackObj = KBEngine.entities.get(attackID)
 
         if attackObj is None:
             ERROR_MSG(" ====================================== attackID   is None")
-        defList = self.__getCurRoundDefList()
+        defList = self.__getCurRoundDefList(self.curPart)
 
         # keyStr = "====================== __canSteal  curPart |  " + str(self.curPart)
         # keyStr = keyStr + "| attackObj.reel | " + str(attackObj.reel)
@@ -388,7 +408,7 @@ class Clone(KBEngine.Entity):
 
             seed = util.randFunc()
 
-            DEBUG_MSG("__canSteal  curPart |  " + str(self.curPart) + "| defPlayer | " + str(defPlayer.steal) + "  | defPlayer.health |  " + str(defPlayer.health) + " | p     |  " + str(p) + "  |     seed|  " + str(seed))
+            # DEBUG_MSG("__canSteal  curPart |  " + str(self.curPart) + "| defPlayer | " + str(defPlayer.steal) + "  | defPlayer.health |  " + str(defPlayer.health) + " | p     |  " + str(p) + "  |     seed|  " + str(seed))
             if  seed <= p:
                 result = True
                 break
@@ -406,9 +426,9 @@ class Clone(KBEngine.Entity):
 
         controllerObj = KBEngine.entities.get(self.controllerID)
 
-        attackObj = KBEngine.entities.get(self.__getCurRoundAtkId())
+        attackObj = KBEngine.entities.get(self.__getCurRoundAtkId(self.curPart))
 
-        defList = self.__getCurRoundDefList()
+        defList = self.__getCurRoundDefList(self.curPart)
 
         defCount = len(defList)
         # 防守者拦截值 防守者身体值
@@ -455,11 +475,11 @@ class Clone(KBEngine.Entity):
         controllerObj = KBEngine.entities.get(self.controllerID)
 
 
-        attackObj = KBEngine.entities.get(self.__getCurRoundAtkId())
+        attackObj = KBEngine.entities.get(self.__getCurRoundAtkId(self.curPart))
         # 门将
         keeperObj = KBEngine.entities.get(controllerObj.keeperID)
 
-        defList = self.__getCurRoundDefList()
+        defList = self.__getCurRoundDefList(self.curPart)
 
         defCount = len(defList) + 1  # +1 为门将
 
@@ -505,14 +525,13 @@ class Clone(KBEngine.Entity):
     step 4.7 判定Atk1Player、Atk2Player、Atk3Player的进攻位置；根据进攻队员位置判定Def1Player1、Def1Player2、Def2Player1、Def2Player2、Def3Player1、Def3Player2的防守位置
 	4.71 根据【射门位置及系数sheet】中逻辑，将4.1~4.6所获得的球员随机到相应进攻/防守位置上
     """
-    def __getAtkCoordinate(self,i):
+    def __getAtkCoordinate(self,part):
 
         controller = KBEngine.entities.get(self.controllerID)
-        attackObj = KBEngine.entities.get(controller.atkList[i])
+        attackObj = KBEngine.entities.get(controller.atkList[part - 1])
 
         pos = attackObj.pos
-
-        curRound = "round" + str(i + 1)
+        curRound = "round" + str(part)
         # 候选的攻击点
         candidateList = playerAtkPosition.PlayerAtkPosition[pos][curRound]
 
@@ -531,6 +550,9 @@ class Clone(KBEngine.Entity):
         # ERROR_MSG(keyStr)
 
         attackObj.coordinate = coordinate
+
+        ERROR_MSG("attackObj id  " + str(attackObj.id) +"   pos  " + str(attackObj.pos) + "   coordinate  " + str(coordinate))
+
 
     # 开始战斗
     def onCmdBeginFight(self):
@@ -564,7 +586,7 @@ class Clone(KBEngine.Entity):
     def onCmdSelectSkill(self, leftSkillIdList, rightSkillIdList):
         #
         skillId = leftSkillIdList[0]
-        ERROR_MSG( "--------------------------------onCmdSelectSkill--- part ---------" + str(self.curPart) +"       skillId   "+ str(skillId))
+        # ERROR_MSG( "--------------------------------onCmdSelectSkill--- part ---------" + str(self.curPart) +"       skillId   "+ str(skillId))
         if self.curPart == 1:
             if skillId == PlayerOp.passball:
                 self.onCmdPass()
@@ -587,7 +609,7 @@ class Clone(KBEngine.Entity):
         if self.curAttackIndex >= self.totalAttackTimes:
             # 通知客户端统计结果 TODO：
             # self.addTimer(0, 10, TimerDefine.Timer_leave_clone)
-            ERROR_MSG("---------------------- onGameOver  --------------------------------------------------------------")
+            # ERROR_MSG("---------------------- onGameOver  --------------------------------------------------------------")
             # game over
             avatar.client.onGameOver()
             return
@@ -607,22 +629,53 @@ class Clone(KBEngine.Entity):
 
         controllerObj.atkList = []
         defObj.defList = []
-        for i in range(3):
-            self.__GetAttackerID()
-            self.__getDefPlayerID()
+        defObj.preDefIds = []
+        for part in range(3):
+            self.__GetAttackerID(part + 1)
+            self.__getDefPlayerID(part + 1)
 
             controllerObj = KBEngine.entities.get(self.controllerID)
             defObj = KBEngine.entities.get(self.defenderID)
 
-            ERROR_MSG( str(i) +" - round  atk    " + str(controllerObj.atkList[i]) )
-            ERROR_MSG( str(i) + " - round  defend   " + str(defObj.defList[i]))
+            ERROR_MSG( str(part) +" - round  atk    " + str(controllerObj.atkList[part]) )
+            ERROR_MSG( str(part) + " - round  defend   " + str(defObj.defList[part]))
 
-            self.__getAtkCoordinate(i)
+            self.__getAtkCoordinate(part + 1)
 
         atkList = controllerObj.atkList
         firstDefList = defObj.defList[0]
         secondDefList = defObj.defList[1]
         thirdDefList = defObj.defList[2]
+
+        atkIDStr = "atkID      "
+        for id in controllerObj.atkList:
+            atkIDStr = atkIDStr + "  id  " + str(id) +" pos " +str(KBEngine.entities[id].pos)
+
+        ERROR_MSG(atkIDStr)
+
+        firstDefListStr = "firstDefList      "
+        for id in firstDefList:
+            firstDefListStr = firstDefListStr + "  id  " + str(id) + " pos " + str(KBEngine.entities[id].pos)
+
+        ERROR_MSG(firstDefListStr)
+
+        secondDefListStr = "secondDefList      "
+        for id in secondDefList:
+            secondDefListStr = secondDefListStr + "  id  " + str(id) + " pos " + str(KBEngine.entities[id].pos)
+
+        ERROR_MSG(secondDefListStr)
+
+        thirdDefListStr = "thirdDefList      "
+        for id in thirdDefList:
+            thirdDefListStr = thirdDefListStr + "  id  " + str(id) + " pos " + str(KBEngine.entities[id].pos)
+
+        ERROR_MSG(thirdDefListStr)
+
+
+
+
+
+
 
         # ERROR_MSG("-----------------------------defObj.keeperID -------------------  " + str(defObj.keeperID) + "   objID   "+ str(defObj.id))
         avatar.client.onAtkAndDefID(atkList, firstDefList,secondDefList,thirdDefList,defObj.keeperID)
@@ -638,7 +691,7 @@ class Clone(KBEngine.Entity):
             self.onCmdPass()
         else:
             avatar = KBEngine.entities.get(self.avatarID)
-            ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
+            # ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
             avatar.client.onOprateResult(self.curPart, ClientResult.select)
             pass
 
@@ -675,7 +728,7 @@ class Clone(KBEngine.Entity):
             self.onCloneSelectOp()
         else:
             avatar = KBEngine.entities.get(self.avatarID)
-            ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
+            # ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
             avatar.client.onOprateResult(self.curPart, ClientResult.select)
 
     # 第三步
@@ -686,7 +739,7 @@ class Clone(KBEngine.Entity):
             self.onCmdShoot()
         else:
             avatar = KBEngine.entities.get(self.avatarID)
-            ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
+            # ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
             avatar.client.onOprateResult(self.curPart, ClientResult.select)
             pass
 
@@ -738,25 +791,27 @@ class Clone(KBEngine.Entity):
 
 
     # 获得当前轮的攻击者ID
-    def __getCurRoundAtkId(self):
+    def __getCurRoundAtkId(self,part):
 
         controllerObj = KBEngine.entities.get(self.controllerID)
 
-        # DEBUG_MSG("------------------------self.curPart - 1 -------------" +str(self.curPart - 1))
+
         attackId = -1
         try:
-            attackId = controllerObj.atkList[self.curPart - 1]
+            attackId = controllerObj.atkList[part -1]
+
+            ERROR_MSG("------------------------self.curPart - 1    "+str(part-1 )+"   attackID-------------" +str(attackId))
         except:
-            ERROR_MSG("========= list index out of range  self.curPart  =========  " + str(self.curPart) +"   atklist len   " + str(len(controllerObj.atkList)))
+            ERROR_MSG("========= list index out of range  self.curPart  =========  " + str(part-1) +"   atklist len   " + str(len(controllerObj.atkList)))
 
         return attackId
 
     # 获得当前轮的防守者ID List
-    def __getCurRoundDefList(self):
+    def __getCurRoundDefList(self,part):
 
         defObj  = KBEngine.entities.get(self.defenderID)
 
-        defList = defObj.defList[self.curPart - 1]
+        defList = defObj.defList[part - 1]
 
         return defList
 
@@ -765,7 +820,7 @@ class Clone(KBEngine.Entity):
         # 计算射门值
         p = self.__getShootValue()
 
-        ERROR_MSG("              =========  onCloneSelectOp         ====================  p     "  + str(p))
+        # ERROR_MSG("              =========  onCloneSelectOp         ====================  p     "  + str(p))
         if p >= 0.4:
             # 射门
             self.onCmdShoot()

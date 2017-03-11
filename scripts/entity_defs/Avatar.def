@@ -14,6 +14,8 @@
         <Interface>	CloneModule		    </Interface>
         <Interface>	MentalityModule		    </Interface>
         <Interface>	StrikeModule		    </Interface>
+        <Interface>	InheritModule		    </Interface>
+        <Interface>	AbilityModule		    </Interface>
 	</Implements>
 
 	<Properties>
@@ -89,13 +91,13 @@
 
 
 
-        <!--玩家金币-->
-		<gold>
+        <!--欧元（游戏中送）-->
+		<euro>
 			<Type> UINT32 </Type>
 			<Flags> BASE_AND_CLIENT </Flags>
 			<Persistent> true </Persistent>
 			<Default> 0 </Default>
-		</gold>
+		</euro>
 
 		<!--玩家钻石-->
 		<diamond>
@@ -105,7 +107,7 @@
 			<Default> 0 </Default>
 		</diamond>
 
-        <!--玩家充值RMB-->
+        <!--玩家充值RMB（主要用来计算vip,现实人民币）-->
 		<rmb>
 			<Type> UINT32 </Type>
 			<Flags> BASE_AND_CLIENT </Flags>
@@ -141,6 +143,11 @@
             <Exposed/>
             <Arg> STRING </Arg>
     </onClientGM>
+
+
+    <onClientGmAddAll>
+        <Exposed/>
+    </onClientGmAddAll>
 	</BaseMethods>
 
 	<CellMethods>

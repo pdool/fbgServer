@@ -10,7 +10,7 @@ from itemsConfig import itemsIndex
 from ErrorCode import EquipModuleError
 from itemsEquip import itemsEquipConfig
 """
-装备模块
+装备容器
 """
 class EquipsModule:
 
@@ -56,8 +56,8 @@ class EquipsModule:
         rowValueMap = {}
         rowValueMap[EquipItemKeys.roleID] = self.databaseID
         rowValueMap[EquipItemKeys.uuid] = KBEngine.genUUID64()
-        rowValueMap["configID"] = itemID
-        rowValueMap["count"] = num
+        rowValueMap["itemID"] = itemID
+        rowValueMap["amount"] = num
         rowValueMap["star"] = 1
         rowValueMap["strongLevel"] = 1
 
@@ -68,13 +68,13 @@ class EquipsModule:
     def addEquipByMap(self, paramMap):
         # 1、是否可以合并
         togetherCount = 1
-        equipConfig = itemsIndex[paramMap["configID"]]
+        equipConfig = itemsIndex[paramMap["itemID"]]
         if equipConfig["togetherCount"] != 0:
             togetherCount = equipConfig["togetherCount"]
 
         if togetherCount <= 1 :
-            count = paramMap["count"]
-            paramMap["count"] = 1
+            count = paramMap["amount"]
+            paramMap["amount"] = 1
             for i in range(count):
                 self.__insertEquips(paramMap)
         else:
@@ -122,8 +122,8 @@ class EquipsModule:
         rowValueMap[EquipItemKeys.roleID] = self.databaseID
         uuid =  KBEngine.genUUID64()
         rowValueMap[EquipItemKeys.uuid] = uuid
-        rowValueMap[EquipItemKeys.itemID] = paramMap["configID"]
-        rowValueMap[EquipItemKeys.amount] = paramMap["count"]
+        rowValueMap[EquipItemKeys.itemID] = paramMap["itemID"]
+        rowValueMap[EquipItemKeys.amount] = paramMap["amount"]
         rowValueMap[EquipItemKeys.star] = paramMap["star"]
         rowValueMap[EquipItemKeys.strongLevel] = paramMap["strongLevel"]
 
@@ -148,17 +148,17 @@ class EquipsModule:
         # 1、是否存在
         isFind = False
         for item in self.equipsContainer.values():
-            if item["itemID"] != paramMap["configID"]:
+            if item["itemID"] != paramMap["itemID"]:
                 continue
             isFind = True
             curCount = item["amount"]
 
-            setMap = {"amount": curCount + paramMap["count"]}
+            setMap = {"amount": curCount + paramMap["amount"]}
             filterMap = {"roleID": self.databaseID, "UUID": item["UUID"]}
             sql = util.getUpdateSql("tbl_ItemEquips", setMap, filterMap)
 
             def cb(result, rownum, error):
-                self.equipsContainer[item["UUID"]]["amount"] = curCount + paramMap["count"]
+                self.equipsContainer[item["UUID"]]["amount"] = curCount + paramMap["amount"]
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -186,8 +186,8 @@ class EquipsModule:
 
     def takeOffEquip(self,equipInfo):
         paramMap = {}
-        paramMap[EquipItemKeys.itemID] = equipInfo["configID"]
-        paramMap[EquipItemKeys.amount] = equipInfo["count"]
+        paramMap[EquipItemKeys.itemID] = equipInfo["itemID"]
+        paramMap[EquipItemKeys.amount] = equipInfo["amount"]
         paramMap[EquipItemKeys.star] = equipInfo["star"]
         paramMap[EquipItemKeys.strongLevel] = equipInfo["strongLevel"]
         paramMap["count"]  = 1

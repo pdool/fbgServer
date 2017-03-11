@@ -19,6 +19,13 @@
         <Default> 0 </Default>
     </bodyPowerBuyTimes>
 
+    <!--钞票每日可购买次数-->
+    <euroBuyTimes>
+        <Type> UINT32 </Type>
+        <Flags> BASE_AND_CLIENT </Flags>
+        <Persistent> true </Persistent>
+        <Default> 0 </Default>
+    </euroBuyTimes>
 
 
 	</Properties>
@@ -27,6 +34,7 @@
            <!--购买体力-->
         <onClientBuyPower>
             <Exposed/>
+            <Arg> UINT32</Arg>
             <Arg> UINT32</Arg>
         </onClientBuyPower>
 

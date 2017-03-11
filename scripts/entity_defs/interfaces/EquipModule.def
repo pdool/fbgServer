@@ -14,6 +14,57 @@
             <Arg>UINT32</Arg>
         </onClientMakeEquip>
 
+        <!--客户端请求背包装备星级-->
+        <onClientGetEquipStar>
+          <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT64</Arg>
+        </onClientGetEquipStar>
+
+         <!--返回球员装备列表-->
+        <onClientGetEquipList>
+            <Exposed/>
+            <Arg>UINT64</Arg>
+        </onClientGetEquipList>
+
+         <!--获得背包装备列表-->
+        <onClientGetBagEquipList>
+            <Exposed/>
+        </onClientGetBagEquipList>
+
+         <!--客户端请求背包装备升星-->
+        <onClientBagEquipUpStar>
+          <Exposed/>
+            <Arg>UINT64</Arg>
+        </onClientBagEquipUpStar>
+
+         <!--客户端请求装备升级-->
+        <onClientEquipUpStrongLv>
+          <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT64</Arg>
+        </onClientEquipUpStrongLv>
+
+         !--客户端请求装备一键升级-->
+        <onClientEquipOneKeyUPStrong>
+          <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT64</Arg>
+        </onClientEquipOneKeyUPStrong>
+
+         !--客户端请求穿戴装备-->
+        <onClientPutOnEquip>
+          <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT64</Arg>
+        </onClientPutOnEquip>
+
+       !--客户端请求脱掉装备-->
+        <onClientTakeOffEquip>
+          <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT32</Arg>
+        </onClientTakeOffEquip>
 	</BaseMethods>
 
 	<CellMethods>
@@ -23,7 +74,54 @@
 	<ClientMethods>
        <!-- 通知客户端制作装备成功-->
         <makeEquipSucc>
+          <Arg>UINT32</Arg>
         </makeEquipSucc>
+
+         <!--返回装备列表-->
+        <getEquipList>
+           <Arg>UINT32</Arg>
+           <Arg>  ARRAY <of> Equip_Info </of> </Arg>
+        </getEquipList>
+
+        <!-- 通知客户端装备升星成功-->
+        <starUpEquipSucc>
+          <Arg>UINT32</Arg>
+          <Arg>UINT32</Arg>
+        </starUpEquipSucc>
+
+        <!-- 通知客户端装备强化成功-->
+        <strongUpEquipSucc>
+          <Arg>UINT32</Arg>
+          <Arg>UINT32</Arg>
+        </strongUpEquipSucc>
+
+         <!-- 通知客户端装备星级和强化等级-->
+         <getStarAndStrongLv>
+             <Arg>UINT32</Arg>
+             <Arg>UINT32</Arg>
+        </getStarAndStrongLv>
+
+         <!--返回装备一键强化结果列表-->
+        <getOneKeyUpStrongResult>
+           <Arg>UINT32</Arg>
+           <Arg>UINT32</Arg>
+           <Arg>  ARRAY <of> OneKeyStrongUp_Info </of> </Arg>
+        </getOneKeyUpStrongResult>
+
+         <!-- 通知客户端穿戴装备成功-->
+         <putOnEquipSucc>
+             <Arg>UINT32</Arg>
+        </putOnEquipSucc>
+       <!-- 通知客户端穿戴脱掉成功-->
+         <takeOffEquipSucc>
+             <Arg>UINT32</Arg>
+        </takeOffEquipSucc>
+
+        <!--返回装备错误信息-->
+        <returnEquipErrorInfo>
+            <Exposed/>
+            <Arg>UINT32</Arg>
+        </returnEquipErrorInfo>
 	</ClientMethods>
 </root>
 

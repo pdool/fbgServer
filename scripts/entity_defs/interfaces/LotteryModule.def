@@ -5,18 +5,18 @@
 	<Properties>
 
         <!--钞票抽免费次数-->
-        <goldFreeTimes>
+        <euroFreeTimes>
 			<Type>			INT8			</Type>
 			<Flags>			BASE_AND_CLIENT				</Flags>
             <Persistent> true </Persistent>
 			<Default> 0 </Default>
-		</goldFreeTimes>
-        <goldLastTime>
+		</euroFreeTimes>
+        <euroLastTime>
 			<Type>			INT32			</Type>
 			<Flags>			BASE_AND_CLIENT				</Flags>
             <Persistent> true </Persistent>
 			<Default> 0 </Default>
-		</goldLastTime>
+		</euroLastTime>
 
 
 <!--钻石抽免费次数-->

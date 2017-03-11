@@ -15,7 +15,7 @@ if __name__ == "__main__":
     pass
 
 """
-碎片合成模块
+碎片容器
 """
 class PiecesModule:
 

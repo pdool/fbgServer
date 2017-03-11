@@ -5,7 +5,7 @@ itemsEquipConfig = {
              'position': 4, 'defend': 55, 'keep': 0, 'maxStar': 5, 'shoot': 0, 'trick': 0, 'pass': 0, 'controll': 0},
     101505: {'suit': 3, 'star': 1, 'steal': 0, 'reel': 0, 'maxstronglevel': 50, 'stronglevel': 1, 'id': 101505,
              'position': 5, 'defend': 0, 'keep': 165, 'maxStar': 5, 'shoot': 0, 'trick': 0, 'pass': 0, 'controll': 132},
-    101001: {'suit': 0, 'star': 1, 'steal': 0, 'reel': 0, 'maxstronglevel': 50, 'stronglevel': 1, 'id': 101001,
+    101001: {'suit': 0, 'star': 1, 'steal': 0, 'reel': 0, 'maxstronglevel': 10, 'stronglevel': 1, 'id': 101001,
              'position': 1, 'defend': 0, 'keep': 0, 'maxStar': 5, 'shoot': 44, 'trick': 0, 'pass': 35, 'controll': 0},
     101002: {'suit': 0, 'star': 1, 'steal': 0, 'reel': 0, 'maxstronglevel': 50, 'stronglevel': 1, 'id': 101002,
              'position': 2, 'defend': 22, 'keep': 0, 'maxStar': 5, 'shoot': 0, 'trick': 35, 'pass': 0, 'controll': 0},

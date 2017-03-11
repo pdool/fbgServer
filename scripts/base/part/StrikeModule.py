@@ -13,14 +13,14 @@ if __name__ == "__main__":
     useStr={102019: 15,102020: 3}
     print(useStr.split(','))
     pass
-
+# 突破模块
 class StrikeModule:
     def __init__(self):
         pass
 
-        # --------------------------------------------------------------------------------------------
-        #                              客户端调用函数
-        # --------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------
+    #                              客户端调用函数
+    # --------------------------------------------------------------------------------------------
 
     def StrikeBaller(self, cardId, ItemId):
         if cardId not in self.cardIDList:
@@ -34,22 +34,24 @@ class StrikeModule:
         strikeID = card.star * 100 + card.brokenLayer + 1
         Config = strikeConfig.StrikeConfig[strikeID]
         itemCount = self.getItemNumByItemID(ItemId)
-        # if itemCount < Config["needCount"]:
-        # self.client.onBallerError(CardMgrModuleError.Material_not_enough)
-        # return
-        self.client.onBallerCallBack(CardMgrModuleError.Strike_sucess)
-        card.brokenLayer = card.brokenLayer + 1
-        card.shoot = card.shoot + Config["shoot"]
-        card.defend = card.defend + Config["defend"]
-        card.passBall = card.passBall + Config["pass"]
-        card.trick = card.trick + Config["trick"]
-        card.reel = card.reel + Config["reel"]
-        card.steal = card.steal + Config["steal"]
-        card.controll = card.controll + Config["controll"]
-        card.keep = card.keep + Config["keep"]
-        card.tech = card.tech + Config["tech"]
-        card.health = card.health + Config["health"]
-        # self.decItem(ItemId, itemCount)
+        if itemCount < Config["needCount"]:
+            self.client.onBallerCallBack(CardMgrModuleError.Material_not_enough)
+            return
+        if self.decItem(ItemId, itemCount) is True:
+            self.client.onBallerCallBack(CardMgrModuleError.Strike_sucess)
+            card.brokenLayer = card.brokenLayer + 1
+            card.shoot = card.shoot + Config["shoot"]
+            card.defend = card.defend + Config["defend"]
+            card.passBall = card.passBall + Config["pass"]
+            card.trick = card.trick + Config["trick"]
+            card.reel = card.reel + Config["reel"]
+            card.steal = card.steal + Config["steal"]
+            card.controll = card.controll + Config["controll"]
+            card.keep = card.keep + Config["keep"]
+            card.tech = card.tech + Config["tech"]
+            card.health = card.health + Config["health"]
+            card.strikeNeedCost = card.strikeNeedCost + Config["needCount"]
+
 
     def SwitchPiece(self, ItemId, pieceId, number, cardID):
         if cardID not in self.cardIDList:
@@ -62,8 +64,8 @@ class StrikeModule:
         card = KBEngine.entities.get(cardID)
         config = CardByColor.UsePieces[card.star]
         money = config["money"]
-        if self.rmb >= money * number:
-            self.rmb = self.rmb - money * number
+        if self.euro >= money * number:
+            self.euro = self.euro - money * number
             self.decItem(pieceId, number)
             self.putItemInBag(ItemId, number)
             self.client.onBallerCallBack(CardMgrModuleError.Switch_is_sucess)

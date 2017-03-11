@@ -25,6 +25,7 @@ class PlayerMgr(KBEngine.Base):
         self.allPlayerInfo = []
         # 初始化离线数据
         self.initOfflineData()
+        pass
 
     @staticmethod
     def getPlayerMgr():
@@ -57,11 +58,18 @@ class PlayerMgr(KBEngine.Base):
         if dbID in self.dbidToMailBox:
             del self.dbidToMailBox[dbID]
         self.dbidToOfflinePlayerInfo[dbID] = playerInfo
+        if playerInfo not in self.allPlayerInfo:
+            for item in self.allPlayerInfo:
+                if item[FriendInfoKey.DBID] == playerInfo[FriendInfoKey.DBID]:
+                    self.allPlayerInfo.remove(item)
+                    break
+            self.allPlayerInfo.append(playerInfo)
+            self.allPlayerInfo.sort(key=lambda x: (x[FriendInfoKey.onlineState], x[FriendInfoKey.level]))
 
     def onCmdByDBID(self,otherDBId,funcName,argDict):
         # 如果在线
         DEBUG_MSG("----------onCmdByDBID---------------- " + funcName)
-        if self.dbidToMailBox[otherDBId] is not None:
+        if otherDBId in self.dbidToMailBox and self.dbidToMailBox[otherDBId] is not None:
 
             mb = self.dbidToMailBox[otherDBId]
             mb.onPlayerMgrCmd(funcName,argDict)
@@ -89,7 +97,7 @@ class PlayerMgr(KBEngine.Base):
                 self.dbidToOfflinePlayerInfo[playerInfo[FriendInfoKey.DBID]] = playerInfo
 
                 self.allPlayerInfo.append(playerInfo)
-                self.allPlayerInfo.sort(key =lambda x:(x[FriendInfoKey.onlineState],x[FriendInfoKey.level]))
+            self.allPlayerInfo.sort(key =lambda x:(x[FriendInfoKey.onlineState],x[FriendInfoKey.level]))
 
         KBEngine.executeRawDatabaseCommand(sql, queryResult)
     # 查询玩家信息
@@ -125,25 +133,35 @@ class PlayerMgr(KBEngine.Base):
         recommendList = []
         minLevel = int(level / 10) * 10 + 1
         maxLevel = int(level / 10 + 1) * 10
-
-        maxIndex = -1
-        minIndex = -1
         # 总共玩家数量
         playerCount = len(self.allPlayerInfo)
+
+        maxIndex = 0
+        minIndex = playerCount -1
+        ERROR_MSG("playerCount   " + str(playerCount) +"  maxLevel  "+ str(maxLevel) +"  minLevel "+ str(minLevel) )
         # 1、先找到区间
+
         for i in range(playerCount):
-            if self.allPlayerInfo[i][FriendInfoKey.level] <= maxLevel and maxIndex == -1:
+            ERROR_MSG("  i level " + str(self.allPlayerInfo[i][FriendInfoKey.level]) +" dbid  "+ str(self.allPlayerInfo[i][FriendInfoKey.DBID]) )
+
+
+        for i in range(playerCount):
+            ERROR_MSG("  i level   " + str(self.allPlayerInfo[i][FriendInfoKey.level]))
+            if self.allPlayerInfo[i][FriendInfoKey.level] <= maxLevel:
                 maxIndex = i
+                break
 
-            if self.allPlayerInfo[i][FriendInfoKey.level] <= minLevel and minIndex == -1:
+        for i in reversed(range(playerCount)):
+            if self.allPlayerInfo[i][FriendInfoKey.level] >= minLevel:
                 minIndex = i
-
-            if minIndex !=-1 and maxIndex != -1:
                 break
 
         excludeSet = set(excludeList)
-        canSelectList = list(range(maxIndex,minIndex))
-        #2、去除在好友列表和申请列表的
+        canSelectList = list(range(maxIndex,minIndex+1))
+
+        ERROR_MSG("max  " + str(maxIndex) +"  min "+ str(minIndex))
+
+        #2、去除在好友列表和申请列表的以及自己
         for index in canSelectList:
             if self.allPlayerInfo[index][FriendInfoKey.DBID] in excludeSet:
                 canSelectList.remove(index)
@@ -160,26 +178,30 @@ class PlayerMgr(KBEngine.Base):
 
             while(needCount >=0 ):
                 # 加上部分的
-                if maxIndex -1 >=0:
+                if maxIndex -1 >= 0:
                     maxIndex = maxIndex -1
                     if self.allPlayerInfo[maxIndex][FriendInfoKey.DBID] not in excludeSet:
                         resultIndexList.append(maxIndex)
                         needCount = needCount -1
                 # 加下部分的
-                if minIndex + 1 <= playerCount -1 and needCount >=0:
+                if minIndex + 1 <= playerCount -1:
                     minIndex = minIndex + 1
                     if self.allPlayerInfo[minIndex][FriendInfoKey.DBID] not in excludeSet:
                         resultIndexList.append(minIndex)
                         needCount = needCount -1
                 # 两头都到了，退出来
-                if maxIndex < 0 and minIndex >= playerCount:
+
+                if maxIndex <= 0 and minIndex >= playerCount-1:
                     break
 
 
         for index in set(resultIndexList):
-            recommendList.append(self.allPlayerInfo[index])
+            if self.allPlayerInfo[index][FriendInfoKey.DBID] not in excludeSet:
+                recommendList.append(self.allPlayerInfo[index])
 
         args = {"recommendList": recommendList}
+
+        # return args
         retMb.onPlayerMgrCmd(retMethod, args)
     # 查询玩家信息
     def onQueryFriendInfo(self,toDBID,toMethod,retMb,retMethod):
@@ -199,6 +221,24 @@ class PlayerMgr(KBEngine.Base):
 
             retMb.onPlayerMgrCmd(retMethod, {})
 
+    # 申请加为好友
+    def onReqAddFriend(self,toDBID,toMethod,applyDBID):
+        # 在线
+        if toDBID in self.dbidToMailBox:
+            mb = self.dbidToMailBox[toDBID]
+            args = {"applyDBID": self.databaseID}
+            mb.onPlayerMgrCmd(toMethod, args)
+
+        # 离线
+        elif toDBID in self.dbidToOfflinePlayerInfo:
+            # 直接插入数据库
+            rowValueMap = {}
+            rowValueMap["parentID"] = toDBID
+            rowValueMap["sm_value"] = applyDBID
+            sql = util.getInsertSql("tbl_Avatar_applyDBIDList", rowValueMap,False)
+
+            KBEngine.executeRawDatabaseCommand(sql)
+
 
     def onAcceptAddFriend(self,selfDBID,toDBID,toMethod):
         # 在线
@@ -214,6 +254,7 @@ class PlayerMgr(KBEngine.Base):
             sql = util.getInsertSql("tbl_Avatar_friendDBIDList",rowValueMap,False)
 
             KBEngine.executeRawDatabaseCommand(sql,None )
+
 
     def onDelYouFriend(self,selfDBID,toDBID,toMethod):
         # 在线
@@ -248,3 +289,24 @@ class PlayerMgr(KBEngine.Base):
             if senderDbid in self.dbidToMailBox:
                 mb = self.dbidToMailBox[senderDbid]
                 mb.client.onChatError(ChatError.Chat_player_offline)
+
+if __name__ == "__main__":
+    canSelectList = list(range(0, 2))
+    for i in canSelectList:
+        print(i)
+
+
+    p = PlayerMgr()
+
+    p.allPlayerInfo =[]
+
+    p.allPlayerInfo.append({"level": 1, "dbid": 1})
+    p.allPlayerInfo.append({"level" : 1,"dbid" : 2})
+
+    excludeList = [12]
+
+
+    l = p.getRecommendList(excludeList,1,None,None)
+
+    for x in l:
+        print(x)

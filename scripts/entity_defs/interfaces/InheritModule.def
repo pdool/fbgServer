@@ -1,0 +1,25 @@
+<root>
+	<BaseMethods>
+        <!--球员传承-->
+        <OnClientInherit>
+            <Exposed/>
+			<Arg>	UINT64	</Arg>	<!-- cardID -->
+			<Arg>	UINT64	</Arg>	<!-- inHeriterID -->
+			<Arg>	UINT64	</Arg>	<!-- pieceID -->
+			<Arg>	UINT32	</Arg>	<!-- costID -->
+        </OnClientInherit>
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+
+	<ClientMethods>
+	<!--传承成功-->
+        <onInheritSucess>
+            <Arg> Card_Info </Arg>
+        </onInheritSucess>
+	</ClientMethods>
+</root>
+
