@@ -144,6 +144,10 @@
             <Arg> STRING </Arg>
     </onClientGM>
 
+    <onClientChangeSolgan>
+            <Exposed/>
+            <Arg> UNICODE </Arg>
+    </onClientChangeSolgan>
 
     <onClientGmAddAll>
         <Exposed/>
@@ -162,7 +166,13 @@
         <onOperateSuc>
             <Arg> STRING </Arg>  <!--方法名-->
         </onOperateSuc>
+
+	    <onGiftError>
+	         <Arg>UINT32</Arg>
+	    </onGiftError>
 	</ClientMethods>
+
+
 
 
 </root>

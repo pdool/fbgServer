@@ -27,7 +27,7 @@ from part.MentalityModule import MentalityModule
 from part.StrikeModule import StrikeModule
 from part.InheritModule import InheritModule
 from part.AbilityModule import AbilityModule
-
+from badWords import badWords
 import TimerDefine
 
 #使用技巧 先放在根级目录。，调好之后拖走，编辑器自动组织引用
@@ -253,10 +253,23 @@ class Avatar(KBEngine.Proxy,
 
     def onClientGmAddAll(self):
 
-        self.diamond = 9999999999
+        self.diamond = 99999999
         self.addRmb(99999999)
-        self.euro = 999999999
+        self.euro = 9999999
+        self.level = 22
         for k ,v in GMConfig.items():
             self.putItemInBag(k,v["itemCountCount"])
 
+    def onClientChangeSolgan(self,slogan):
+        if self.checkHasBadWords(slogan):
+            return
 
+        self.slogan = slogan
+
+
+    # 是否有脏话
+    def checkHasBadWords(self, message):
+        for word in badWords:
+            if message.find(word) != -1:
+                return True
+        return False

@@ -24,9 +24,9 @@ class EquipsModule:
 
         def cb(result, rownum, error):
             DEBUG_MSG("EquipModule  loadEquips")
+
             if result is None:
                 return
-
             for i in range(len(result)):
                 equipItem = {}
                 equipItem[EquipItemKeys.itemType] = ItemTypeEnum.Equips
@@ -97,9 +97,8 @@ class EquipsModule:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getUpdateSql("tbl_ItemEquips", setMap, filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return
                 self.equipsContainer[uuid]["amount"] = curCount - count
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -107,9 +106,8 @@ class EquipsModule:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getDelSql("tbl_ItemEquips", filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return
                 del self.equipsContainer[uuid]
                 self.bagUUIDList.remove(uuid)
                 return
@@ -129,15 +127,13 @@ class EquipsModule:
 
         sql = util.getInsertSql("tbl_ItemEquips", rowValueMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
-            if rownum != 1:
-                self.client.onPieceError(1)
-                return
-            else:
-                self.equipsContainer[uuid] = rowValueMap
-                self.bagUUIDList.append(uuid)
-                self.writeToDB()
-                return
+            del rowValueMap["roleID"]
+            self.equipsContainer[uuid] = rowValueMap
+            self.bagUUIDList.append(uuid)
+            self.writeToDB()
+            return
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -157,6 +153,7 @@ class EquipsModule:
             filterMap = {"roleID": self.databaseID, "UUID": item["UUID"]}
             sql = util.getUpdateSql("tbl_ItemEquips", setMap, filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
                 self.equipsContainer[item["UUID"]]["amount"] = curCount + paramMap["amount"]
 
@@ -167,14 +164,13 @@ class EquipsModule:
         return self.__insertEquip(paramMap )
 
 
-    def __updateEquipProps(self,uuid,setMap):
+    def updateEquipProps(self,uuid,setMap):
 
         filterMap = {"roleID": self.databaseID, "UUID": uuid}
         sql = util.getUpdateSql("tbl_ItemEquips", setMap, filterMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
-            if error is not None:
-                return False
             item = self.equipsContainer[uuid]
 
             for k,v in setMap.items():

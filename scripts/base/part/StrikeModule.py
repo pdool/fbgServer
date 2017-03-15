@@ -32,25 +32,45 @@ class StrikeModule:
             self.client.onBallerCallBack(CardMgrModuleError.Strike_is_max)
             return
         strikeID = card.star * 100 + card.brokenLayer + 1
+
+
         Config = strikeConfig.StrikeConfig[strikeID]
+
+        ERROR_MSG("strikeID  " + str(strikeID) + "  needCount " + str(Config["needCount"]))
         itemCount = self.getItemNumByItemID(ItemId)
+        ERROR_MSG(" ===========StrikeBaller====ItemId  " + str(ItemId)  + "   count  "+ str(itemCount))
         if itemCount < Config["needCount"]:
             self.client.onBallerCallBack(CardMgrModuleError.Material_not_enough)
             return
-        if self.decItem(ItemId, itemCount) is True:
-            self.client.onBallerCallBack(CardMgrModuleError.Strike_sucess)
-            card.brokenLayer = card.brokenLayer + 1
-            card.shoot = card.shoot + Config["shoot"]
-            card.defend = card.defend + Config["defend"]
-            card.passBall = card.passBall + Config["pass"]
-            card.trick = card.trick + Config["trick"]
-            card.reel = card.reel + Config["reel"]
-            card.steal = card.steal + Config["steal"]
-            card.controll = card.controll + Config["controll"]
-            card.keep = card.keep + Config["keep"]
-            card.tech = card.tech + Config["tech"]
-            card.health = card.health + Config["health"]
-            card.strikeNeedCost = card.strikeNeedCost + Config["needCount"]
+
+        self.decItem(ItemId, Config["needCount"])
+        self.client.onBallerCallBack(CardMgrModuleError.Strike_sucess)
+        card.brokenLayer = card.brokenLayer + 1
+        card.shoot = card.shoot + Config["shoot"]
+        card.defend = card.defend + Config["defend"]
+        card.passBall = card.passBall + Config["pass"]
+        card.trick = card.trick + Config["trick"]
+        card.reel = card.reel + Config["reel"]
+        card.steal = card.steal + Config["steal"]
+        card.controll = card.controll + Config["controll"]
+        card.keep = card.keep + Config["keep"]
+        card.tech = card.tech + Config["tech"]
+        card.health = card.health + Config["health"]
+        card.strikeNeedCost = card.strikeNeedCost + Config["needCount"]
+        # if self.decItem(ItemId, itemCount) is True:
+        #     self.client.onBallerCallBack(CardMgrModuleError.Strike_sucess)
+        #     card.brokenLayer = card.brokenLayer + 1
+        #     card.shoot = card.shoot + Config["shoot"]
+        #     card.defend = card.defend + Config["defend"]
+        #     card.passBall = card.passBall + Config["pass"]
+        #     card.trick = card.trick + Config["trick"]
+        #     card.reel = card.reel + Config["reel"]
+        #     card.steal = card.steal + Config["steal"]
+        #     card.controll = card.controll + Config["controll"]
+        #     card.keep = card.keep + Config["keep"]
+        #     card.tech = card.tech + Config["tech"]
+        #     card.health = card.health + Config["health"]
+        #     card.strikeNeedCost = card.strikeNeedCost + Config["needCount"]
 
 
     def SwitchPiece(self, ItemId, pieceId, number, cardID):

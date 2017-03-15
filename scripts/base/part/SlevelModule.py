@@ -2,6 +2,7 @@
 import KBEngine
 from ErrorCode import CardMgrModuleError
 import upStar
+import cardsConfig
 # 不需要使用def,继承就可以使用，def可以用来生成数据库的表
 # 如何使用回调
 import sys
@@ -23,7 +24,10 @@ class SlevelModule:
             return
 
         card = KBEngine.entities.get(cardId)
-        if card.star == 1 or card.star == 5:
+
+        maxStar = cardsConfig.cardsConfig[card.configID]["maxStar"]
+
+        if card.star == maxStar:
             self.client.onBallerCallBack(CardMgrModuleError.Card_is_max_level)
             return
 
@@ -36,21 +40,21 @@ class SlevelModule:
                 return
 
         for itemId, num in cost_info.items():
-            if self.decItem(itemId, num) is False:
-                return
+            self.decItem(itemId, num)
+            # if self.decItem(itemId, num) is False:
+            #     return
 
         card.star = card.star + 1
-        Config = upStar.UpStarConfig[card.star]
-        card.shoot = card.shoot + Config["shoot"]
-        card.defend = card.defend + Config["defend"]
-        card.passBall = card.passBall + Config["pass"]
-        card.trick = card.trick + Config["trick"]
-        card.reel = card.reel + Config["reel"]
-        card.steal = card.steal + Config["steal"]
-        card.controll = card.controll + Config["controll"]
-        card.keep = card.keep + Config["keep"]
-        card.health = card.health + Config["health"]
-        card.tech = card.tech + Config["tech"]
+        card.shoot = card.shoot + config["shoot"]
+        card.defend = card.defend + config["defend"]
+        card.passBall = card.passBall + config["pass"]
+        card.trick = card.trick + config["trick"]
+        card.reel = card.reel + config["reel"]
+        card.steal = card.steal + config["steal"]
+        card.controll = card.controll + config["controll"]
+        card.keep = card.keep + config["keep"]
+        card.health = card.health + config["health"]
+        card.tech = card.tech + config["tech"]
 
         self.client.onBallerCallBack(CardMgrModuleError.Slevel_sucess)
 

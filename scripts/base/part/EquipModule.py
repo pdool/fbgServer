@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+import random
+
 import equipMake
-import itemsEquip
 import equipStarConfig
 import equipStrongConfig
-import random
 import equipStrongCritConfig
+import itemsEquip
+from ErrorCode import EquipModuleError
 from KBEDebug import *
 
 __author__ = 'wangl'
@@ -102,15 +104,12 @@ class EquipModule:
     def onClientPutOnEquip(self,cardId,equipUUId):
         #  判断球员是否存在
         if cardId not in self.cardIDList:
-            ERROR_MSG("Card_not_exist-----" + str(cardId))
-            self.client.returnEquipErrorInfo(2)
             return
         # 判断背包装备是否存在
         card = KBEngine.entities.get(cardId)
 
         if equipUUId not in self.equipsContainer:
-            ERROR_MSG("Equip_not_exist-----" +str(equipUUId))
-            self.client.returnEquipErrorInfo(1)
+            self.client.onEquipError(EquipModuleError.Equip_not_exist)
             return
         euqip_data = self.equipsContainer[equipUUId]
 
@@ -122,7 +121,6 @@ class EquipModule:
             if item_info["position"] == put_on_equip["position"]:
                 self.takeOffEquip(equip_info)
                 card.equips.remove(equip_info)
-                INFO_MSG("------------TakeOffEquip-----------"+str(equip_info["itemID"]))
 
         paramMap = {}
         paramMap["UUID"] = euqip_data["UUID"]
@@ -147,37 +145,45 @@ class EquipModule:
     def onClientMakeEquip(self,equip_id):
 
         if equip_id not in equipMake.EquipMakeConfig:
-            ERROR_MSG("equip_id not exist")
+            ERROR_MSG(str(equip_id) + "  is not in  equipMake config ")
             return
+
+
         equip_make = equipMake.EquipMakeConfig[equip_id]
         equip_cost_info = equip_make["cost"]
+
+        make_cost = equip_make["money"]
+        if self.euro < make_cost:
+            self.client.onEquipError(EquipModuleError.Equip_not_euro_enough)
+        return
 
         for itemId,num in equip_cost_info.items():
             have = self.getItemNumByItemID(itemId)
             if have < num :
-                ERROR_MSG("--------- num bu zu------- have   " + str(have) + "   need  "+ str(num))
+                ERROR_MSG("--------- num bu zu------- have   " + str(have) + "   need  "+ str(num) + "   " + str(itemId))
+                self.client.onEquipError(EquipModuleError.Equip_make_material_not_enough)
                 return
 
         for itemId, num in equip_cost_info.items():
-           if self.decItem(itemId,num) == False:
-               ERROR_MSG("dec fail")
-               return
-
+            self.decItem(itemId, num)
 
         self.putItemInBag(equip_id,1)
         self.writeToDB()
 
         self.client.makeEquipSucc(equip_id)
 
-    # 背包装备升星
+    # 装备升星
 
-    def onClientBagEquipUpStar(self, uuid):
+    def onClientEquipUpStar(self, player_id,equip_id):
 
-        if uuid not in self.equipsContainer:
-            # self.onEquipError(EquipModuleError.Equip_not_exist)
-            return
+        if player_id == 0:
+            euqip_data = self.equipsContainer[equip_id]
+        else:
+            card = KBEngine.entities.get(player_id)
+            for equip_info in card.equips:  # 第一个实例
+                if equip_info["itemID"] == equip_id:
+                    euqip_data = equip_info
 
-        euqip_data = self.equipsContainer[uuid]
         item_id = euqip_data["itemID"]
         equip_next_star = euqip_data["star"] + 1
 
@@ -196,17 +202,19 @@ class EquipModule:
             have = self.getItemNumByItemID(itemId)
             if have < num:
                 ERROR_MSG("--------- num bu zu------- have   " + str(have) + "   need  " + str(num))
+                self.client.onEquipError(EquipModuleError.Equip_make_material_not_enough)
                 return
 
         for itemId, num in equip_cost_info.items():
             INFO_MSG("--------------itemId-------------" + str(itemId))
-            if self.decItem(itemId, num) == False:
-                ERROR_MSG("dec fail")
-                return
+            self.decItem(itemId, num)
+            # if self.decItem(itemId, num) == False:
+            #     ERROR_MSG(m"dec fail")
+            #     return
 
         euqip_data["star"] = euqip_data["star"]+1
 
-        self.client.starUpEquipSucc(equip_next_star,0)
+        self.client.starUpEquipSucc(equip_next_star,player_id)
         self.writeToDB()
         pass
 
@@ -219,27 +227,32 @@ class EquipModule:
         else:
             card = KBEngine.entities.get(player_id)
             for equip_info in card.equips:  # 第一个实例
-                if equip_info.itemID == equip_id:
+                if equip_info["itemID"] == equip_id:
                     euqip_data = equip_info
 
         item_id = euqip_data["itemID"]
         equip_info = itemsEquip.itemsEquipConfig[item_id]
         equip_strong_key = str(item_id) + "_" + str(euqip_data["strongLevel"])
+
+        if equip_strong_key not in equipStrongConfig.EquipStrongConfig:
+            ERROR_MSG(equip_strong_key + "  is not exist")
+            self.client.onEquipError(EquipModuleError.Equip_not_exist)
+            return
+
         equip_star_up_info = equipStrongConfig.EquipStrongConfig[equip_strong_key]
         if euqip_data["strongLevel"] > equip_info["maxstronglevel"]:
            ERROR_MSG("---------strong>=maxstronglevel------- ")
-           self.client.returnEquipErrorInfo(4)
 
            return
 
         if euqip_data["strongLevel"] >= self.level:
            ERROR_MSG("---------strong>self.level------- ")
-           self.client.returnEquipErrorInfo(5)
            return
 
         strong_cost = equip_star_up_info["cost"]
         if self.euro < strong_cost:
             ERROR_MSG("euro isnot enough-----"+str(strong_cost)+"-----self.euro has----"+str(self.euro))
+            self.client.onEquipError(EquipModuleError.Equip_not_euro_enough)
             return
 
         if(self.vipLevel == 0):
@@ -266,12 +279,14 @@ class EquipModule:
 
     def onClientEquipOneKeyUPStrong(self,player_id,equip_id):
 
+        ERROR_MSG(" equip_id       " + str(equip_id))
+
         if player_id == 0:
             euqip_data = self.equipsContainer[equip_id]
         else:
             card = KBEngine.entities.get(player_id)
             for equip_info in card.equips:  # 第一个实例
-                if equip_info.itemID == equip_id:
+                if equip_info["itemID"] == equip_id:
                     euqip_data = equip_info
 
         item_id = euqip_data["itemID"]
@@ -283,10 +298,15 @@ class EquipModule:
 
         while self.euro>0:
             equip_strong_key = str(item_id) + "_" + str(equip_next_strong)
+
+            if equip_strong_key not in equipStrongConfig.EquipStrongConfig:
+                ERROR_MSG("-----------onClientEquipOneKeyUPStrong -----not exist key ----------------  " + equip_strong_key)
+                break
+
             equip_star_up_info = equipStrongConfig.EquipStrongConfig[equip_strong_key]
             strong_cost = equip_star_up_info["cost"]
             if self.euro < strong_cost:
-                ERROR_MSG("euro isnot enough-----" + str(strong_cost) + "-----self.euro has----" + str(self.euro))
+                self.client.onEquipError(EquipModuleError.Equip_not_euro_enough)
                 break
 
             if equip_cur_strong>= self.level:
@@ -322,6 +342,15 @@ class EquipModule:
 
             equip_cur_strong = equip_next_strong
 
+        euqip_data["strongLevel"] = equip_cur_strong
+
+        if player_id != 0:
+            card = KBEngine.entities.get(player_id)
+            card.writeToDB()
+        else:
+        #     写数据库
+            setMap= {"strongLevel":equip_cur_strong}
+            self.updateEquipProps(equip_id,setMap)
         self.client.getOneKeyUpStrongResult(player_id,equip_cur_strong,retItems)
         self.writeToDB()
 

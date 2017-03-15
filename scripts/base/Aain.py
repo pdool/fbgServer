@@ -40,8 +40,8 @@ def te():
           +extern_info + \
           "' from dual where exists (select * from tbl_Avatar where id = " + str(to_dbid) +")"
     print(sql)
+from array import array
 if __name__ == "__main__":
-    colTupe = ("sm_UUID", "sm_itemID,sm_amount,sm_color")
-    filterMap = {"sm_roleID": 2}
-    sql = util.getSelectSql("tbl_ItemPieces", colTupe, filterMap)
-    print(sql)
+    l = [1,2,3,3]
+    a =array(l)
+    print(type(a))

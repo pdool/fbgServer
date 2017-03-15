@@ -33,10 +33,11 @@
         </onClientGetBagEquipList>
 
          <!--客户端请求背包装备升星-->
-        <onClientBagEquipUpStar>
+        <onClientEquipUpStar>
           <Exposed/>
+            <Arg>UINT32</Arg>
             <Arg>UINT64</Arg>
-        </onClientBagEquipUpStar>
+        </onClientEquipUpStar>
 
          <!--客户端请求装备升级-->
         <onClientEquipUpStrongLv>
@@ -118,10 +119,10 @@
         </takeOffEquipSucc>
 
         <!--返回装备错误信息-->
-        <returnEquipErrorInfo>
+        <onEquipError>
             <Exposed/>
             <Arg>UINT32</Arg>
-        </returnEquipErrorInfo>
+        </onEquipError>
 	</ClientMethods>
 </root>
 

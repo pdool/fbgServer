@@ -240,3 +240,13 @@ def getSelectSql(tableName,colTuple=None,filterValueMap=None):
     print("now run select sql  " + sql)
 
     return sql
+
+
+def dbDeco(func):
+    def __deco(result,rowNum,error):
+        if error is not None:
+            KBEDebug.ERROR_MSG(str(func) + "     error is  " + error)
+        # 调用原方法，不打断流程
+        func(result,rowNum,error)
+
+    return __deco

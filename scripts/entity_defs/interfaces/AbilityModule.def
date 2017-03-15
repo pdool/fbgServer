@@ -5,7 +5,7 @@
             <Exposed/>
             <Arg>	UINT32	</Arg>	<!-- cardID -->
             <Arg>	STRING	</Arg>	<!-- chooseName -->
-			<Arg>	Ability_Piece_LIST     </Arg>
+			<Arg>	ARRAY <of> Ability_Piece</of>     </Arg>
         </onClientUpAbilityInfo>
 
 

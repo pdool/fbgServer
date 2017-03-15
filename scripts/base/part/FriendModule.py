@@ -38,6 +38,7 @@ class FriendModule:
             friends["values"] = []
             self.client.onGetFriendInfo(friends)
             return
+        ERROR_MSG("     onClientGetFriendList    ")
         for dbid in self.friendDBIDList:
             palyeMgr.queryPlayerInfo(dbid,"onCmdQueryMyInfo",self,"onCmdRetFriendInfo")
 
@@ -89,7 +90,7 @@ class FriendModule:
     # 申请加为好友
     def onClientApplyAddFriend(self,dbid):
 
-        DEBUG_MSG("---------------------onClientApplyAddFriend------------------------------------------------------")
+        DEBUG_MSG("---------------------onClientApplyAddFriend------------------------------------------------------" + str(dbid))
         if dbid in self.friendDBIDList:
         #     已经是好友了
             self.client.onFriendError(FriendError.Friend_already_is_friend,"")
@@ -131,6 +132,7 @@ class FriendModule:
 
         if dbid not in self.friendDBIDList:
             self.friendDBIDList.append(dbid)
+            self.writeToDB()
 
         self.onClientGetFriendList()
         palyeMgr = KBEngine.globalData["PlayerMgr"]
@@ -238,13 +240,15 @@ class FriendModule:
         playerInfo  = args["playerInfo"]
         dbid = playerInfo[FriendInfoKey.DBID]
 
-        # DEBUG_MSG("-----onCmdRetFriendInfo-------------get the playerInfo--------------------" + str(dbid) + "-----------" + str(len(self.friendInfoList)))
+        ERROR_MSG("-----onCmdRetFriendInfo-------------get the playerInfo--------------------" + str(playerInfo["name"]) + "-----------" + str(len(self.friendInfoList)))
 
         if dbid in self.friendRetFlagSet:
             if len(self.friendRetFlagSet) == 1:
                 self.friendInfoList.append(playerInfo)
+                ERROR_MSG("   -------------friendRetFlagSet---------------      "+ str(playerInfo["name"]))
                 friends = {}
                 friends["values"] = self.friendInfoList
+
                 self.client.onGetFriendInfo(friends)
                 return
             self.friendRetFlagSet.remove(dbid)
@@ -265,6 +269,8 @@ class FriendModule:
                 self.ApplyRetFlagSet.remove(dbid)
                 friends = {}
                 friends["values"] = self.applyFriendInfoList
+
+                ERROR_MSG("get the playerInf   " + str(len(self.applyFriendInfoList)))
                 self.client.onGetApplyInfo(friends)
                 return
             self.ApplyRetFlagSet.remove(dbid)
@@ -304,6 +310,8 @@ class FriendModule:
 
             DEBUG_MSG("-------onCmdRetQueryFriendInfo----------exist-------------------         ")
             playerInfo = args["playerInfo"]
+
+            ERROR_MSG("onCmdRetQueryFriendInfo   name  "+ str(playerInfo["name"]))
             self.client.onGetQueryInfo(playerInfo)
         else:
             DEBUG_MSG("-------onCmdRetQueryFriendInfo-----------not exist------------------         ")

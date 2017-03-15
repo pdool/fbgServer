@@ -266,18 +266,10 @@
 
 	<Ability_Piece>  FIXED_DICT
         <Properties>
-            <itemID>         <Type> STRING   </Type>     </itemID>
+            <itemID>         <Type> UINT32   </Type>     </itemID>
             <number>         <Type> INT32    </Type>     </number>
         </Properties>
     </Ability_Piece>
 
-
-	<Ability_Piece_LIST>     FIXED_DICT
-		<Properties>
-			<values>
-				<Type>   	ARRAY <of> Ability_Piece </of>   </Type>
-			</values>
-		</Properties>
-	</Ability_Piece_LIST>
 
 </root>

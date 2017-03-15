@@ -12,11 +12,11 @@ import shopConfig
 __author__ = 'yanghao'
 
 if __name__ == "__main__":
-
     pass
 """
 能力模块
 """
+
 
 class AbilityModule:
     def __init__(self):
@@ -29,14 +29,16 @@ class AbilityModule:
         # --------------------------------------------------------------------------------------------
 
     def onClientUpAbilityInfo(self, cardId, property, selectList):
+
+        ERROR_MSG("onClientUpAbilityInfo " + str(cardId) + "    " + property)
         if cardId not in self.cardIDList:
             self.client.onBallerCallBack(CardMgrModuleError.Card_not_exist)
             return
         self.pieceAddExp = 0
 
-        for i in range(len(selectList["values"])):
-            itemID = selectList["values"][i]["itemID"]
-            amount = selectList["values"][i]["number"]
+        for i in range(len(selectList)):
+            itemID = selectList[i]["itemID"]
+            amount = selectList[i]["number"]
             # 判断碎片数量
             itemCount = self.getItemNumByItemID(itemID)
             if itemCount < amount:
@@ -50,7 +52,6 @@ class AbilityModule:
             exp = CardByColor.UsePieces[cardStar]["exp"] * amount
             # 总经验 叠加
             self.pieceAddExp = self.pieceAddExp + exp
-
         # 获取球员该属性当前经验值
         baller = KBEngine.entities.get(cardId)
         ballerPropertyExp = getattr(baller, property)
@@ -73,6 +74,13 @@ class AbilityModule:
                 break
 
         setattr(baller, property, allExp)
+        # for i in range(len(selectList)):
+        #     itemID = selectList[i]["itemID"]
+        #     amount = selectList[i]["number"]
+        #     self.decItem(itemID, amount)
+        #     self.client.onBallerCallBack(CardMgrModuleError.Material_not_enough)
+        #     return
+
         # 经验增加不足以升一级
         changeLevel = self.currentLevel
         if allExp < PowerConfig.PowerConfig[changeLevel]["exp"]:
@@ -80,7 +88,7 @@ class AbilityModule:
             return
 
         # 根据经验值重置等级 增加对应属性值
-        while(changeLevel < len(PowerConfig.PowerConfig)):
+        while (changeLevel < len(PowerConfig.PowerConfig)):
             config = PowerConfig.PowerConfig[changeLevel]
             needExp = config["exp"]
             if allExp >= needExp:
@@ -88,15 +96,16 @@ class AbilityModule:
                 config = PowerConfig.PowerConfig[changeLevel]
                 # 截取从头开始到倒数第三个字符之前
                 Name = property[:-3]
-                self.SetObjectValue(cardId,Name, getattr(baller, Name) + config[Name])
-
-        self.client.onBallerCallBack(CardMgrModuleError.Ability_is_sucess)
-
-
-
-            # --------------------------------------------------------------------------------------------
-            #                              工具函数调用函数
-            # --------------------------------------------------------------------------------------------
+                self.SetObjectValue(cardId, Name, getattr(baller, Name) + config[Name])
+            else:
+                self.client.onBallerCallBack(CardMgrModuleError.Ability_is_sucess)
+                break
 
 
 
+
+
+
+                # --------------------------------------------------------------------------------------------
+                #                              工具函数调用函数
+                # --------------------------------------------------------------------------------------------

@@ -19,7 +19,30 @@ class MailsModule:
 
         filterMap = {"sm_to_dbid": self.databaseID}
         sql = util.getSelectSql("tbl_Mails", filterValueMap=filterMap)
-        KBEngine.executeRawDatabaseCommand(sql, self.onMailsLoadCB)
+
+        @util.dbDeco
+        def onMailsLoadCB( result, rownum, error):
+            """
+            加载邮件
+            """
+            if result is None:
+                return
+
+            for i in range(len(result)):
+                mail = {}
+                mail["mail_type"] = int(result[i][3])
+                mail["title"] = result[i][4].decode('utf-8')
+                mail["from_name"] = result[i][5].decode('utf-8')
+                mail["text"] = result[i][6].decode('utf-8')
+                mail["time"] = int(result[i][7])
+                mail["attachment"] = result[i][8].decode('utf-8')
+                mail["state"] = int(result[i][9])
+                mail["extern_info"] = result[i][10].decode('utf-8')
+
+                self.mails.insert(i, mail)
+
+            DEBUG_MSG("mails load complete!")
+        KBEngine.executeRawDatabaseCommand(sql, onMailsLoadCB)
 
     # --------------------------------------------------------------------------------------------
     #                              客户端调用函数
@@ -50,6 +73,8 @@ class MailsModule:
           "' from dual where exists (select * from tbl_Avatar where id = " + str(to_dbid) +")"
 
         DEBUG_MSG("sendMail             " + sql)
+
+        @util.dbDeco
         def onMailsSaveCB(result, rownum, error):
 
             if rownum == 1:
@@ -84,6 +109,8 @@ class MailsModule:
         mailsCount = len(self.mails)
 
         state = Mails.Mail_State_read
+
+        @util.dbDeco
         def updateSucCB(result, rownum, error):
             if findKey != -1:
                 self.mails[findKey]["state"] = state
@@ -109,6 +136,7 @@ class MailsModule:
                 break
 
     def delAllMailByType(self, mailType):
+        @util.dbDeco
         def delSucCB(result, rownum, error):
             for i in range(len(self.mails) - 1, -1, -1):
                 if self.mails[i]["state"] == Mails.Mail_State_read:
@@ -120,6 +148,7 @@ class MailsModule:
         KBEngine.executeRawDatabaseCommand(sql, delSucCB)
 
     def delMail(self, mailTime):
+        @util.dbDeco
         def delSucCB(result, rownum, error):
             for i in range(len(self.mails)):
                 if self.mails[i]["time"] == mailTime:
@@ -162,27 +191,6 @@ class MailsModule:
     #                              回调函数调用函数
     # --------------------------------------------------------------------------------------------
 
-    def onMailsLoadCB(self, result, rownum, error):
-        """
-        加载邮件
-        """
-        if result is None:
-            return
-
-        for i in range(len(result)):
-            mail = {}
-            mail["mail_type"] = int(result[i][3])
-            mail["title"] = result[i][4].decode('utf-8')
-            mail["from_name"] = result[i][5].decode('utf-8')
-            mail["text"] = result[i][6].decode('utf-8')
-            mail["time"] = int(result[i][7])
-            mail["attachment"] = result[i][8].decode('utf-8')
-            mail["state"] = int(result[i][9])
-            mail["extern_info"] = result[i][10].decode('utf-8')
-
-            self.mails.insert(i, mail)
-
-        DEBUG_MSG("mails load complete!")
 
     # --------------------------------------------------------------------------------------------
     #                              工具函数调用函数

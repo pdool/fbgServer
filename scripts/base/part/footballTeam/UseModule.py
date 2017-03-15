@@ -24,8 +24,12 @@ class UseModule:
         filterMap = {"sm_roleID":self.databaseID}
         sql = util.getSelectSql("tbl_ItemUses",colTupe,filterMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
             DEBUG_MSG("UseModule  loadUseItem")
+            if error is not None:
+                ERROR_MSG("UseModule      " + error)
+                return
             if result is None:
                 return
             for i in range(len(result)):
@@ -60,37 +64,36 @@ class UseModule:
     def decUses(self, uuid, count):
         if uuid not in self.useContainer:
             self.onUseError(UseModuleError.Use_not_exist)
-            return False
+            return
 
         curCount = self.useContainer[uuid]["amount"]
 
         if curCount < count:
             self.onUseError(UseModuleError.Use_not_enough)
-            return False
+            return
 
         if curCount > count:
             setMap = {"amount": curCount - count}
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getUpdateSql("tbl_ItemUses", setMap, filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return False
                 self.useContainer[uuid]["amount"] = curCount - count
-                return True
+                return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
         elif curCount == count:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getDelSql("tbl_ItemUses", filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return False
+
                 del self.useContainer[uuid]
                 self.bagUUIDList.remove(uuid)
                 self.writeToDB()
-                return True
+                return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -104,15 +107,13 @@ class UseModule:
 
         sql = util.getInsertSql("tbl_ItemUses", rowValueMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
-            if rownum != 1:
-                self.client.onUseError(1)
-                return False
-            else:
-                self.useContainer[rowValueMap["UUID"]] = rowValueMap
-                self.bagUUIDList.append(rowValueMap["UUID"])
-                self.writeToDB()
-                return True
+            del rowValueMap["roleID"]
+            self.useContainer[rowValueMap["UUID"]] = rowValueMap
+            self.bagUUIDList.append(rowValueMap["UUID"])
+            self.writeToDB()
+            return True
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -131,6 +132,7 @@ class UseModule:
             filterMap = {"roleID": self.databaseID, "UUID": item["UUID"]}
             sql = util.getUpdateSql("tbl_ItemUses", setMap, filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
                 self.useContainer[item["UUID"]]["amount"] = curCount + addCount
 

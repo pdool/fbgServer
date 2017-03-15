@@ -132,6 +132,7 @@ class CardMgrModule:
 
         itemType,item = self.getItemByUUID(uuid)
 
+        ERROR_MSG("--------uuid ------" + str(uuid) +"  itemType   " + str(itemType))
         if itemType != ItemTypeEnum.Use:
             self.client.onBallerCallBack(CardMgrModuleError.Card_not_exp_use)
             return
@@ -191,14 +192,14 @@ class CardMgrModule:
             upExp = levelUpgradeConfig["maxExp"]
 
         card.exp = resultExp
-
+        self.client.onBallerCallBack(CardMgrModuleError.Level_is_sucess)
         card.writeToDB()
 
     # --------------------------------------------------------------------------------------------
     #                              工具函数调用函数
     # --------------------------------------------------------------------------------------------
 
-    def addCard(self,configID,pos = -1,inTeam = PlayerInfoTeamStatus.notInTeam,isSelf = PlayerInfoSelfStatus.notSelf):
+    def addCard(self,configID,pos = -1,inTeam = PlayerInfoTeamStatus.notInTeam,isSelf = PlayerInfoSelfStatus.notSelf,cb=None):
         # 1、判断是否存在
 
         if configID not in cardsConfig:
@@ -265,6 +266,8 @@ class CardMgrModule:
                 card.pos = pos
 
             card.writeToDB(self.__onCardSaved)
+            if cb!= None:
+                cb(card)
         else:
             DEBUG_MSG("card is not None")
 

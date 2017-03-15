@@ -82,6 +82,7 @@ class PlayerMgr(KBEngine.Base):
         colTuple = ("id", "sm_name", "sm_photoIndex", "sm_level", "sm_club", "sm_fightValue", "sm_vipLevel","sm_logoutTime")
         sql = util.getSelectSql("tbl_Avatar", colTuple)
 
+        @util.dbDeco
         def queryResult(result, rownum, error):
             for item in result:
                 playerInfo = {}
@@ -226,7 +227,7 @@ class PlayerMgr(KBEngine.Base):
         # 在线
         if toDBID in self.dbidToMailBox:
             mb = self.dbidToMailBox[toDBID]
-            args = {"applyDBID": self.databaseID}
+            args = {"applyDBID": applyDBID}
             mb.onPlayerMgrCmd(toMethod, args)
 
         # 离线
@@ -278,6 +279,7 @@ class PlayerMgr(KBEngine.Base):
 
     def sendAdChat(self,messageInfo):
         for mb in self.dbidToMailBox.values():
+            ERROR_MSG("--------------   ad  ------------------")
             mb.client.onAdChat(messageInfo)
 
     def sendPrivateChat(self,toDbid,senderDbid,messageInfo):

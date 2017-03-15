@@ -7,7 +7,6 @@ __createTime__  = '2017年1月5日'
 import util
 from KBEDebug import *
 from ErrorCode import DiamondModuleError
-from itemsDiamond import itemsDiamondConfig
 from itemsConfig import itemsIndex
 from part.BagModule import ItemTypeEnum
 """
@@ -22,12 +21,11 @@ class DiamondModule:
         colTupe = ("sm_UUID", "sm_itemID","sm_amount")
         filterMap = {"sm_roleID": self.databaseID}
         sql = util.getSelectSql("tbl_ItemDiamonds", colTupe, filterMap)
-
+        @util.dbDeco
         def cb(result, rownum, error):
             DEBUG_MSG("DiamondModule  loadDiamonds")
             if result is None:
                 return
-
             for i in range(len(result)):
                 pieceItem = {}
                 uuid = int(result[i][0])
@@ -55,13 +53,13 @@ class DiamondModule:
     def addDiamond(self,configID,count):
         # 1、是否可以合并
         togetherCount = 1
-        diamondConfig = itemsIndex[configID]
+        diamondConfig = itemsIndex[int(configID)]
         if diamondConfig["togetherCount"] != 0:
             togetherCount = diamondConfig["togetherCount"]
 
         if togetherCount <= 1 :
             for i in range(count):
-                self.__insertEquip(configID, count)
+                self.__insertDiamonds(configID, count)
         else:
             self.__updateDiamonds(configID, count)
     # 减少宝石
@@ -81,10 +79,12 @@ class DiamondModule:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getUpdateSql("tbl_ItemDiamonds", setMap, filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return
+
                 self.diamondsContainer[uuid]["amount"] = curCount - count
+                self.bagUUIDList[uuid]["amount"] = curCount - count
+                self.writeToDB()
                 return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -92,9 +92,8 @@ class DiamondModule:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getDelSql("tbl_ItemDiamonds",filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return
                 del self.diamondsContainer[uuid]
                 self.bagUUIDList.remove(uuid)
                 return
@@ -102,7 +101,7 @@ class DiamondModule:
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
 
-    def __insertEquip(self, configID, count = 1):
+    def __insertDiamonds(self, configID, count = 1):
         # 自己写数据库
         rowValueMap = {}
         rowValueMap["roleID"] = self.databaseID
@@ -112,18 +111,17 @@ class DiamondModule:
 
         sql = util.getInsertSql("tbl_ItemDiamonds",rowValueMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
-            if rownum != 1:
-                self.client.onPieceError(1)
-            else:
-                self.diamondsContainer[rowValueMap["UUID"]] = rowValueMap
-                self.bagUUIDList.append(rowValueMap["UUID"])
-                self.writeToDB()
+            del rowValueMap["roleID"]
+            self.diamondsContainer[rowValueMap["UUID"]] = rowValueMap
+            self.bagUUIDList.append(rowValueMap["UUID"])
+            self.writeToDB()
 
 
         KBEngine.executeRawDatabaseCommand(sql,cb)
 
-    def __updatePieces(self, configID, addCount):
+    def __updateDiamonds(self, configID, addCount):
 
         # 1、是否存在
         for item in self.diamondsContainer.values():
@@ -136,12 +134,13 @@ class DiamondModule:
             filterMap = {"roleID":self.databaseID,"UUID":item["UUID"]}
             sql = util.getUpdateSql("tbl_ItemDiamonds",setMap,filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
                 self.diamondsContainer[item["UUID"]]["amount"] = curCount + addCount
 
             KBEngine.executeRawDatabaseCommand(sql,cb)
 
-        return self.__insertEquip(configID, addCount)
+        return self.__insertDiamonds(configID, addCount)
 class DiamondItemKeys:
     uuid = "UUID"
     itemID = "itemID"

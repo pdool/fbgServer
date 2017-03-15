@@ -47,12 +47,13 @@ class BagModule:
 
     # 批量出售
     def onClientSellBatch(self,uuidList):
-
         for uuid in uuidList:
             # 获得装备
+            ERROR_MSG("-------------------uuid is ---------" +str(uuid))
             _,item = self.getItemByUUID(uuid)
             if item != None:
                 # 获得数量
+                ERROR_MSG("------------UUID ----------------" + str(uuid) + "  price   " + str( itemsIndex[item["itemID"]]["price"]))
                 amount = item["amount"]
                 self.onClientSellOne(uuid,amount)
 
@@ -78,20 +79,21 @@ class BagModule:
 
         result = False
         if itemType == ItemTypeEnum.Diamond:
-            result = self.decDiamond(uuid,num)
+            self.decDiamond(uuid,num)
         elif itemType == ItemTypeEnum.Equips:
-            result = self.decEquip(uuid,num)
+            self.decEquip(uuid,num)
         elif itemType == ItemTypeEnum.Gift:
-            result = self.decGift(uuid,num)
+            self.decGift(uuid,num)
         elif itemType == ItemTypeEnum.Use:
-            result = self.decUse(uuid,num)
+            self.decUse(uuid,num)
         elif itemType == ItemTypeEnum.Pieces:
-            result = self.decPieces(uuid,num)
+            self.decPieces(uuid,num)
         elif itemType == ItemTypeEnum.Material:
-            result = self.decMaterial(uuid,num)
+            self.decMaterial(uuid,num)
 
-        if result is True:
-            self.euro = sellMoney
+        # if result is True:
+        self.euro = sellMoney
+        ERROR_MSG("------------itemID ----------------" + str(itemId) + "  price   "+ str(price))
 
     # 扩容
     def onClientBuyBagSize(self,count):
@@ -140,10 +142,10 @@ class BagModule:
 
     # 加一个道具到背包，并分发到各个容器
     def putItemInBag(self,itemID,num):
-        if itemID not in itemsIndex:
+        if int(itemID) not in itemsIndex:
             return
 
-        itemIndex = itemsIndex[itemID]
+        itemIndex = itemsIndex[int(itemID)]
         itemType = itemIndex["itemsType"]
 
         if itemType == ItemTypeEnum.Equips:
@@ -159,44 +161,49 @@ class BagModule:
         elif itemType == ItemTypeEnum.Gift:
             self.addGift(itemID,num)
 
-    # 根据id获得数量
+    # 根据itemID获得数量
     def getItemNumByItemID(self,itemID):
 
         for uuid in self.bagUUIDList:
             _, item = self.getItemByUUID(uuid)
             if item is None:
                 continue
-            DEBUG_MSG("                   " + str(item["itemID"]) +"   " +str(type(item["itemID"])))
-            if item["itemID"] == itemID:
+            if item["itemID"] == int(itemID):
                 return item["amount"]
         return 0
 
     # 删除物品
     def decItem(self,itemID,num):
+        itemIndex = itemsIndex[int(itemID)]
+        itemType = itemIndex["itemsType"]
+        ERROR_MSG(" decItem  itemID " + str(itemID) +"     itemType   " + str(itemType))
         for uuid in self.bagUUIDList:
-            itemType, item = self.getItemByUUID(uuid)
+            _, item = self.getItemByUUID(uuid)
             if item is None:
-                return False
+                continue
+            if item["itemID"] == int(itemID):
+                result = False
 
-            result = False
-            if itemType == ItemTypeEnum.Diamond:
-                result = self.decDiamond(uuid,num)
-            elif itemType == ItemTypeEnum.Equips:
-                result = self.decEquip(uuid,num)
-            elif itemType == ItemTypeEnum.Gift:
-                result = self.decGift(uuid,num)
-            elif itemType == ItemTypeEnum.Use:
-                result = self.decUse(uuid,num)
-            elif itemType == ItemTypeEnum.Pieces:
-                result = self.decPieces(uuid,num)
-            elif itemType == ItemTypeEnum.Material:
-                result = self.decMaterial(uuid,num)
+                ERROR_MSG("  itemID   is "+ str(itemID) +"   amount  "+ str(item["amount"]))
+                if itemType == ItemTypeEnum.Diamond:
+                    result = self.decDiamond(uuid, num)
+                elif itemType == ItemTypeEnum.Equips:
+                    result = self.decEquip(uuid, num)
+                elif itemType == ItemTypeEnum.Gift:
+                    result = self.decGift(uuid, num)
+                elif itemType == ItemTypeEnum.Use:
+                    result = self.decUse(uuid, num)
+                elif itemType == ItemTypeEnum.Pieces:
+                    result = self.decPieces(uuid, num)
+                elif itemType == ItemTypeEnum.Material:
+                    result = self.decMaterial(uuid, num)
 
-            return  result
-
-        return False
-
-
+                if result is True:
+                    ERROR_MSG("bagModule result is True")
+                else:
+                    ERROR_MSG("bagModule result is False")
+                return result
+        return  False
 
 class ItemOrderBy:
     byItemType = 1
@@ -210,14 +217,14 @@ class ItemTypeEnum:
     Equips = 1001
     # 消耗品
     Use = 1002
-    # 材料
-    Material = 1003
     # 宝石
-    Diamond = 1004
-    # 球员碎片
-    Pieces = 1005
+    Diamond = 1003
     # 礼包
-    Gift = 1006
+    Gift = 1004
+    # 材料
+    Material = 1005
+    # 球员碎片
+    Pieces = 1006
 
 
 

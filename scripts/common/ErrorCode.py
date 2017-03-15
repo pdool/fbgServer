@@ -61,6 +61,15 @@ class EquipModuleError:
     Equip_not_exist = 1
     # 装备不够
     Equip_not_enough = 2
+    # 材料不足
+    Equip_make_material_not_enough = 3
+
+    # 扣除道具失败
+    Equip_dec_item_fail = 4
+    # 欧元不够
+    Equip_not_euro_enough = 5
+
+
 class GiftModuleError:
     # 礼包不存在
     Gift_not_exist = 1
@@ -115,6 +124,11 @@ class CardMgrModuleError:
     Property_is_max = 15
     # 能力提升成功
     Ability_is_sucess = 16
+    # 球员升级成功
+    Level_is_sucess = 17
+
+
+
 
 
 

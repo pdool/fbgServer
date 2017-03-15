@@ -52,6 +52,10 @@
         <onBallerCallBack>
             <Arg> UINT32 </Arg>
         </onBallerCallBack>
+
+        <onCombineCardInfo>
+            <Arg> Card_Info </Arg>
+        </onCombineCardInfo>
 	</ClientMethods>
 </root>
 

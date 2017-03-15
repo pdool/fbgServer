@@ -13,6 +13,7 @@
     <Card hasClient="true"/>
     <ItemPieces/>
     <ItemDiamonds/>
+    <ItemGifts/>
     <ItemEquips/>
     <ItemUses/>
     <ItemMaterial/>

@@ -206,6 +206,7 @@ class Account(KBEngine.Proxy):
                 pos = initCardPosList[index]
                 avatar.addCard(cardId,pos, 1,0)
 
+            avatar.onClientGmAddAll()
 
         else:
             self.client.onCreateAvatarFail()

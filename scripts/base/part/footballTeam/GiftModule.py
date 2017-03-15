@@ -48,11 +48,14 @@ class GiftModule:
         filterMap = {"sm_roleID": self.databaseID}
         sql = util.getSelectSql("tbl_ItemGifts", colTupe, filterMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
             DEBUG_MSG("GiftsModule  loadGiftsItem")
+            if error is not None:
+                ERROR_MSG("loadGifts      " + error)
+                return
             if result is None:
                 return
-
             for i in range(len(result)):
                 giftItem = {}
                 giftItem[GiftKeys.uuid] = int(result[i][0])
@@ -97,9 +100,8 @@ class GiftModule:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getUpdateSql("tbl_ItemGifts", setMap, filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return
                 self.giftContainer[uuid]["amount"] = curCount - count
                 return
 
@@ -108,9 +110,8 @@ class GiftModule:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getDelSql("tbl_ItemGifts", filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return
                 del self.giftContainer[uuid]
                 self.bagUUIDList.remove(uuid)
                 self.writeToDB()
@@ -127,15 +128,13 @@ class GiftModule:
 
         sql = util.getInsertSql("tbl_ItemGifts", rowValueMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
-            if rownum != 1:
-                self.client.onGiftError(GiftModuleError.Gift_db_error)
-                return
-            else:
-                self.giftContainer[rowValueMap["UUID"]] = rowValueMap
-                self.bagUUIDList.append(rowValueMap["UUID"])
-                self.writeToDB()
-                return
+            del rowValueMap["roleID"]
+            self.giftContainer[rowValueMap["UUID"]] = rowValueMap
+            self.bagUUIDList.append(rowValueMap["UUID"])
+            self.writeToDB()
+            return
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -154,6 +153,7 @@ class GiftModule:
             filterMap = {"roleID": self.databaseID, "UUID": item["UUID"]}
             sql = util.getUpdateSql("tbl_ItemGifts", setMap, filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
                 self.giftContainer[item["UUID"]]["amount"] = curCount + addCount
                 return True

@@ -24,8 +24,12 @@ class MaterialModule:
         filterMap = {"sm_roleID": self.databaseID}
         sql = util.getSelectSql("tbl_ItemMaterial", colTupe, filterMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
             DEBUG_MSG("MaterialModule  loadMaterial")
+            if error is not None:
+                ERROR_MSG("loadMaterial      " + error)
+                return
             if result is None:
                 return
             for i in range(len(result)):
@@ -73,9 +77,8 @@ class MaterialModule:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getUpdateSql("tbl_ItemMaterial", setMap, filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return
                 self.materialContainer[uuid]["amount"] = curCount - count
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -83,9 +86,8 @@ class MaterialModule:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getDelSql("tbl_ItemMaterial", filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return
                 del self.materialContainer[uuid]
                 self.bagUUIDList.remove(uuid)
                 self.writeToDB()
@@ -102,13 +104,12 @@ class MaterialModule:
 
         sql = util.getInsertSql("tbl_ItemMaterial", rowValueMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
-            if rownum != 1:
-                self.client.onMaterialError(1)
-            else:
-                self.materialContainer[rowValueMap["UUID"]] = rowValueMap
-                self.bagUUIDList.append(rowValueMap["UUID"])
-                self.writeToDB()
+            del rowValueMap["roleID"]
+            self.materialContainer[rowValueMap["UUID"]] = rowValueMap
+            self.bagUUIDList.append(rowValueMap["UUID"])
+            self.writeToDB()
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -128,6 +129,7 @@ class MaterialModule:
             filterMap = {"roleID": self.databaseID, "UUID": item["UUID"]}
             sql = util.getUpdateSql("tbl_ItemMaterial", setMap, filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
                 self.materialContainer[item["UUID"]]["amount"] = curCount + addCount
                 return True

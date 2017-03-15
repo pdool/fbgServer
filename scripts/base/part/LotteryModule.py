@@ -57,30 +57,37 @@ class LotteryModule:
         moneyCount = configDict["moneyCount"]
         dropIds = configDict["dropIds"]
 
+
         lastTime = self.euroLastTime
         nowTime = util.getCurrentTime()
         period = nowTime - lastTime
 
+        DEBUG_MSG(" period  " + str(period) +"   lasttime  " + str(lastTime) + "  now  "+ str(nowTime))
+        # 免费抽取
+        if period >= cdTime and  self.euroFreeTimes < configDict["freeTime"]:
 
-        isUseEuro = True
-        if period >= cdTime and  self.euroFreeTimes >0:
-            isUseEuro = False
+            self.euroFreeTimes = self.euroFreeTimes + 1
 
-        if isUseEuro :
-            if self.euro >= moneyCount:
-                self.euro = self.euro - moneyCount
-            else:
-                return (ErrorCode.LotteryError.Money_not_enough,"")
-        else:
-            self.euroFreeTimes = self.euroFreeTimes - 1
+            self.euroLastTime = nowTime
+            DEBUG_MSG("-------dropIds len--------" + str(len(dropIds)))
+            for key in dropIds:
+                result += str(key) + ","
+                self.putItemInBag(key,1)
 
-        self.euroLastTime = nowTime
+            DEBUG_MSG("euroLottery----------" + result)
+            return (op,result)
+        # 欧元抽取
+        if self.euro >= moneyCount:
+            self.euro = self.euro - moneyCount
 
-        for key in dropIds:
-            result += str(key) + ","
+            for key in dropIds:
+                result += str(key) + ","
+                self.putItemInBag(key, 1)
 
-        DEBUG_MSG("euroLottery----------" + result)
-        return (op,result)
+            DEBUG_MSG("euroLottery----------" + result)
+            return (op, result)
+
+
 
     # 钻石抽卡
     def diamondLottery(self,configDict):
@@ -97,26 +104,27 @@ class LotteryModule:
         lastTime = self.diamondLastTime
         nowTime = util.getCurrentTime()
         period = nowTime - lastTime
+        # 免费抽取
+        if period >= cdTime and self.diamondFreeTimes < configDict["freeTime"] :
 
-        isUseDiamond = True
-        if period >= cdTime and self.diamondFreeTimes > 0:
-            isUseDiamond = False
+            self.diamondFreeTimes = self.diamondFreeTimes + 1
 
-        if isUseDiamond:
-            if self.diamond >= moneyCount:
-                self.diamond = self.diamond - moneyCount
-            else:
-                return (ErrorCode.LotteryError.Diamond_not_enough, "")
-        else:
-            self.diamondFreeTimes = self.diamondFreeTimes - 1
+            self.diamondLastTime = nowTime
 
-        self.diamondLastTime = nowTime
+            for key in dropIds:
+                result += str(key) + ","
 
-        for key in dropIds:
-            result += str(key) + ","
+            DEBUG_MSG("diamondLottery ----------" + result)
+            return (op, result)
+        # 钻石抽取
+        if  self.diamond >= moneyCount:
+            self.diamond = self.diamond - moneyCount
+            for key in dropIds:
+                result += str(key) + ","
 
-        DEBUG_MSG("diamondLottery ----------" + result)
-        return (op, result)
+            DEBUG_MSG("diamondLottery ----------" + result)
+            return (op, result)
+
 
     # 十连抽
     def tenLottery(self,configDict):
@@ -153,13 +161,12 @@ class LotteryModule:
         if userArg != TimerDefine.Timer_reset_lottery_free_times:
             return
 
-        config = lotteryConfig.lottery[Lottery_Type_Euro]
 
-        self.euroFreeTimes = config["freeTime"]
+        self.euroFreeTimes = 0
 
-        config = lotteryConfig.lottery[Lottery_Type_Diamond]
 
-        self.diamondFreeTimes = config["freeTime"]
+
+        self.diamondFreeTimes = 0
 
 """
     1、倒计时验证

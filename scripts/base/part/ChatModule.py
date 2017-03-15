@@ -50,7 +50,7 @@ class ChatModule:
 
         
         messageInfo = self.makeMessageInfo(message)
-        self.playerMgr.sendWorldChat( self.databaseID,messageInfo)
+        KBEngine.globalData["PlayerMgr"].sendWorldChat( self.databaseID,messageInfo)
 
     # 公会聊天
     def onClientClubChat(self,message):
@@ -82,7 +82,7 @@ class ChatModule:
 
         messageInfo = self.makeMessageInfo(message)
 
-        self.playerMgr.sendAdChat(messageInfo)
+        KBEngine.globalData["PlayerMgr"].sendAdChat(messageInfo)
 
     # 私聊
     def onClientPrivate(self,dbid,message):
@@ -94,12 +94,15 @@ class ChatModule:
 
         messageInfo = self.makeMessageInfo(message)
 
-        self.playerMgr.sendPrivateChat(dbid,self.databaseID,messageInfo)
+        KBEngine.globalData["PlayerMgr"].sendPrivateChat(dbid,self.databaseID,messageInfo)
 
     # --------------------------------------------------------------------------------------------
     #                              服务器内部函数调用函数
     # --------------------------------------------------------------------------------------------
     def onCmdWorldChat(self,senderDBID,messageInfo):
+
+        ERROR_MSG("----------ad  ------")
+
         if self.checkInBlack(senderDBID) is True:
             return
 
@@ -138,14 +141,6 @@ class ChatModule:
             self.client.onChatError(ChatError.Chat_message_is_overflow)
             return False
         return True
-    # 是否有脏话
-    def checkHasBadWords(self,message):
-
-        for word in badWords:
-            if message.find(word) != -1:
-                self.client.onChatError(ChatError.has_bad_words)
-                return True
-        return  False
 
 
 

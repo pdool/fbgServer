@@ -28,11 +28,11 @@ class PiecesModule:
         filterMap = {"sm_roleID":self.databaseID}
         sql = util.getSelectSql("tbl_ItemPieces",colTupe,filterMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
             DEBUG_MSG("PiecesModule  loadPiecesItem")
             if result is None:
                 return
-
             for i in range(len(result)):
                 pieceItem = {}
                 pieceItem[PieceItemKeys.uuid] = int(result[i][0])
@@ -63,36 +63,37 @@ class PiecesModule:
     # 减少碎片
     def decPieces(self,uuid,count):
         if uuid not in self.piecesContainer:
-            self.onPieceError(PieceCombineError.Piece_not_exist)
-            return
+            self.client.onPieceError(PieceCombineError.Piece_not_exist)
+            return False
 
         curCount = self.piecesContainer[uuid]["amount"]
 
         if curCount < count:
-            self.onPieceError(PieceCombineError.Piece_not_enough)
-            return
+            self.client.onPieceError(PieceCombineError.Piece_not_enough)
+            return False
 
         if curCount > count:
             setMap = {"amount": curCount - count}
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getUpdateSql("tbl_ItemPieces", setMap, filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return
                 self.piecesContainer[uuid]["amount"] = curCount - count
+                self.writeToDB()
+                return  True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
         elif curCount == count:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
             sql = util.getDelSql("tbl_ItemPieces",filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
-                if error is not None:
-                    return False
                 del self.piecesContainer[uuid]
                 self.bagUUIDList.remove(uuid)
                 self.writeToDB()
+                return  True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -109,13 +110,12 @@ class PiecesModule:
 
         sql = util.getInsertSql("tbl_ItemPieces",rowValueMap)
 
+        @util.dbDeco
         def cb(result, rownum, error):
-            if rownum != 1:
-                self.client.onPieceError(1)
-            else:
-                self.piecesContainer[rowValueMap["UUID"]] = rowValueMap
-                self.bagUUIDList.append(rowValueMap["UUID"])
-                self.writeToDB()
+            del rowValueMap["roleID"]
+            self.piecesContainer[rowValueMap["UUID"]] = rowValueMap
+            self.bagUUIDList.append(rowValueMap["UUID"])
+            self.writeToDB()
 
 
         KBEngine.executeRawDatabaseCommand(sql,cb)
@@ -135,8 +135,10 @@ class PiecesModule:
             filterMap = {"roleID":self.databaseID,"UUID":item["UUID"]}
             sql = util.getUpdateSql("tbl_ItemPieces",setMap,filterMap)
 
+            @util.dbDeco
             def cb(result, rownum, error):
                 self.piecesContainer[item["UUID"]]["amount"] = curCount + addCount
+                self.writeToDB()
 
             KBEngine.executeRawDatabaseCommand(sql,cb)
 
@@ -156,7 +158,7 @@ class PiecesModule:
         # 3、修改背包
         # 4、生成球员
         if uuid not in self.piecesContainer:
-            self.onPieceError(PieceCombineError.Piece_not_exist)
+            self.client.onPieceError(PieceCombineError.Piece_not_exist)
 
         pieceItem = self.piecesContainer[uuid]
 
@@ -168,15 +170,53 @@ class PiecesModule:
         cardID =  itemsPiecesConfig[configID]["cardID"]
 
         if amount < needCount:
-            self.onPieceError(PieceCombineError.Piece_not_enough)
+            self.client.onPieceError(PieceCombineError.Piece_not_enough)
 
 
         self.decPieces(uuid,needCount)
-
-        self.addCard(cardID)
+        def cb(player):
+            ERROR_MSG("------------  card  info---------------")
+            playerInfo = {}
+            playerInfo["id"] = player.databaseID
+            playerInfo["configID"] = player.configID
+            playerInfo["level"] = player.level
+            playerInfo["star"] = player.star
+            playerInfo["exp"] = player.exp
+            playerInfo["inTeam"] = player.inTeam
+            playerInfo["isSelf"] = player.isSelf
+            playerInfo["brokenLayer"] = player.brokenLayer
+            playerInfo["fightValue"] = player.fightValue
+            playerInfo["shoot"] = player.shoot
+            playerInfo["shootM"] = player.shootM
+            playerInfo["shootExp"] = player.shootExp
+            playerInfo["defend"] = player.defend
+            playerInfo["defendM"] = player.defendM
+            playerInfo["defendExp"] = player.defendExp
+            playerInfo["pass"] = player.passBall
+            playerInfo["passBallM"] = player.passBallM
+            playerInfo["passBallExp"] = player.passBallExp
+            playerInfo["trick"] = player.trick
+            playerInfo["trickM"] = player.trickM
+            playerInfo["trickExp"] = player.trickExp
+            playerInfo["reel"] = player.reel
+            playerInfo["reelM"] = player.reelM
+            playerInfo["reelExp"] = player.reelExp
+            playerInfo["steal"] = player.steal
+            playerInfo["stealM"] = player.stealM
+            playerInfo["stealExp"] = player.stealExp
+            playerInfo["controll"] = player.controll
+            playerInfo["controllM"] = player.controllM
+            playerInfo["controllExp"] = player.controllExp
+            playerInfo["keep"] = player.keep
+            playerInfo["keepM"] = player.keepM
+            playerInfo["keepExp"] = player.keepExp
+            playerInfo["tech"] = player.tech
+            playerInfo["health"] = player.health
+            playerInfo["strikeNeedCost"] = player.strikeNeedCost
+            self.client.onCombineCardInfo(playerInfo)
+        self.addCard(cardID,cb=cb)
 
         pass
-
     # 突破
     def onClientBroke(self,uuid):
         pass
@@ -184,6 +224,13 @@ class PiecesModule:
     def onClientGetAllPieces(self):
 
         DEBUG_MSG("-------------onClientGetAllPieces-------------------------------")
+        # vs = self.piecesContainer.values()
+        #
+        # for v1 in vs:
+        #     for k,v in v1.items():
+        #         ERROR_MSG("  k " + str(k) + "  v   " + str(v))
+        #     break
+        # ERROR_MSG(" kkkkkkkkkkkkkkkkkk              " + str( type(self.piecesContainer.values())))
         self.client.onGetAllPieces(list(self.piecesContainer.values()))
         pass
 

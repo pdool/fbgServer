@@ -6,6 +6,7 @@ from KBEDebug import *
 import random
 import MentalityUpMax
 from ErrorCode import CardMgrModuleError
+from cardsConfig import cardsConfig
 import shopConfig
 
 __author__ = 'yanghao'
@@ -13,6 +14,8 @@ __author__ = 'yanghao'
 """
 意识模块
 """
+
+
 class MentalityModule:
     propDict = ['shoot', 'passBall', 'reel', 'defend', 'trick', 'steal', 'controll', 'keep']
 
@@ -30,7 +33,8 @@ class MentalityModule:
             self.client.onBallerCallBack(CardMgrModuleError.Card_not_exist)
             return
         card = KBEngine.entities.get(cardId)
-        itemCount = self.getItemNumByItemID(MentalityUpMax.MentalityUP[card.star]["materialID"][materialtype])
+        MentalityConfig = MentalityUpMax.MentalityUP[cardsConfig[card.configID]["initStar"]]
+        itemCount = self.getItemNumByItemID(MentalityConfig["materialID"][materialtype])
         if itemCount < 4:
             self.client.onBallerCallBack(CardMgrModuleError.Material_not_enough)
             return
@@ -41,11 +45,16 @@ class MentalityModule:
             Property["name"] = random.choice(self.propDict)
             Property["number"] = self.ComputeAdd(cardId, Property["name"], materialtype)
             self.addPropertyMentality.append(Property)
-        MentalityConfig = MentalityUpMax.MentalityUP[card.star]
         itemID = MentalityConfig["materialID"][materialtype]
 
-        if self.decItem(itemID, 4) is True:
-            self.client.onMentalityUP(self.addPropertyMentality)
+        self.decItem(itemID, 4)
+        self.client.onMentalityUP(self.addPropertyMentality)
+        # if self.decItem(itemID, 4):
+        #     for v in self.addPropertyMentality:
+        #         ERROR_MSG("========" + str(v["name"]) +"      " + str(v["number"]))
+        #     self.client.onMentalityUP(self.addPropertyMentality)
+        # else:
+        #     ERROR_MSG("============return is False====")
 
     # 确认提升意识属性
     def UpDateMentalityInfo(self, cardId):
@@ -58,7 +67,7 @@ class MentalityModule:
             index = propertyList["values"][i]["index"]
             for item in self.addPropertyMentality:
                 if str(index) in item["name"]:
-                    self.AddMainInfo(cardId,item["name"][1:],item["number"])
+                    self.AddMainInfo(cardId, item["name"][1:], item["number"])
 
     # 提升意识十次
     def onClientUpTenMentality(self, cardId, materialtype):
@@ -66,7 +75,8 @@ class MentalityModule:
             self.client.onBallerCallBack(CardMgrModuleError.Card_not_exist)
             return
         card = KBEngine.entities.get(cardId)
-        itemCount = self.getItemNumByItemID(MentalityUpMax.MentalityUP[card.star]["materialID"][materialtype])
+        MentalityConfig = MentalityUpMax.MentalityUP[cardsConfig[card.configID]["initStar"]]
+        itemCount = self.getItemNumByItemID(MentalityConfig["materialID"][materialtype])
         if itemCount / 40 < 1:
             self.client.onBallerCallBack(CardMgrModuleError.Material_not_enough)
             return
@@ -81,13 +91,15 @@ class MentalityModule:
                 Property["number"] = self.ComputeAdd(cardId, Name, materialtype)
                 self.addPropertyMentality.append(Property)
 
-        MentalityConfig = MentalityUpMax.MentalityUP[card.star]
         itemID = MentalityConfig["materialID"][materialtype]
-        if self.decItem(itemID, 40) is True:
-            self.client.onMentalityTenUP(self.addPropertyMentality)
-            # --------------------------------------------------------------------------------------------
-            #                              工具函数调用函数
-            # --------------------------------------------------------------------------------------------
+
+        self.decItem(itemID, 40)
+        self.client.onMentalityTenUP(self.addPropertyMentality)
+        # if self.decItem(itemID, 40) is True:
+        #     self.client.onMentalityTenUP(self.addPropertyMentality)
+        # --------------------------------------------------------------------------------------------
+        #                              工具函数调用函数
+        # --------------------------------------------------------------------------------------------
 
     # 随机属性增加值
     def ComputeAdd(self, cardId, property, material):
@@ -95,7 +107,7 @@ class MentalityModule:
             self.client.onBallerCallBack(CardMgrModuleError.Card_not_exist)
             return
         card = KBEngine.entities.get(cardId)
-        MentalityConfig = MentalityUpMax.MentalityUP[card.star]
+        MentalityConfig = MentalityUpMax.MentalityUP[cardsConfig[card.configID]["initStar"]]
         maxValue = MentalityConfig[property]
         Name = property + "M"
         objectValue = self.GetObjectValue(cardId, Name)
@@ -143,7 +155,7 @@ class MentalityModule:
         setattr(card, property, number)
 
     # 球员意识加成到总属性上
-    def AddMainInfo(self,cardId,name,number):
+    def AddMainInfo(self, cardId, name, number):
         propertyName = name + "M"
         self.SetObjectValue(cardId, propertyName,
                             number + self.GetObjectValue(cardId, propertyName))
