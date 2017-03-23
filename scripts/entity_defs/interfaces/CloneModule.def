@@ -49,6 +49,7 @@
         <onAtkAndDefID>
 
              <Arg>ARRAY <of> UINT64 </of></Arg>
+             <Arg>ARRAY <of> UINT32</of></Arg>
              <Arg>ARRAY <of> UINT64 </of></Arg>
              <Arg>ARRAY <of> UINT64 </of></Arg>
              <Arg>ARRAY <of> UINT64 </of></Arg>

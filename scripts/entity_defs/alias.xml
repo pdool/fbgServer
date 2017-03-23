@@ -213,8 +213,8 @@
             <keep>               <Type> UINT32  </Type>     </keep><!--守门-->
 			<keepM>               <Type> UINT32  </Type>     </keepM><!--守门-->
 			<keepExp>               <Type> UINT32  </Type>     </keepExp><!--守门-->
-            <tech>               <Type> UINT32  </Type>     </tech><!--技术-->
-            <health>             <Type> UINT32  </Type>     </health><!--身体-->
+            <tech>               <Type> FLOAT  </Type>     </tech><!--技术-->
+            <health>             <Type> FLOAT  </Type>     </health><!--身体-->
 			<strikeNeedCost>     <Type> UINT32  </Type>     </strikeNeedCost><!--花费碎片数量-->
         </Properties>
     </Card_Info>
@@ -227,9 +227,9 @@
 			<amount>            <Type> UINT32   </Type>     </amount>
             <star>         		<Type> UINT32   </Type>     </star>
             <strongLevel>     <Type> UINT32   </Type>     </strongLevel>
-			<gem1>            <Type> UINT32   </Type>     </gem1>
-			<gem2>            <Type> UINT32   </Type>     </gem2>
-			<gem3>            <Type> UINT32   </Type>     </gem3>
+			<gem1>            <Type> INT32   </Type>     </gem1>
+			<gem2>            <Type> INT32   </Type>     </gem2>
+			<gem3>            <Type> INT32   </Type>     </gem3>
 
         </Properties>
     </Equip_Info>

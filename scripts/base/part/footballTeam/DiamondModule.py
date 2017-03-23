@@ -53,7 +53,7 @@ class DiamondModule:
     def addDiamond(self,configID,count):
         # 1、是否可以合并
         togetherCount = 1
-        diamondConfig = itemsIndex[int(configID)]
+        diamondConfig = itemsIndex[configID]
         if diamondConfig["togetherCount"] != 0:
             togetherCount = diamondConfig["togetherCount"]
 
@@ -67,8 +67,9 @@ class DiamondModule:
         if uuid not in self.diamondsContainer:
             self.onDiamondError(DiamondModuleError.Diamond_not_exist)
             return
-
+        ERROR_MSG("-----------decDiamond---------uuid-----------" + str(uuid))
         curCount = self.diamondsContainer[uuid]["amount"]
+        itemID = self.diamondsContainer[uuid]["itemID"]
 
         if curCount < count:
             self.onDiamondError(DiamondModuleError.Diamond_not_enough)
@@ -83,7 +84,8 @@ class DiamondModule:
             def cb(result, rownum, error):
 
                 self.diamondsContainer[uuid]["amount"] = curCount - count
-                self.bagUUIDList[uuid]["amount"] = curCount - count
+
+                self.noticeClientBagUpdate(uuid,  itemID, curCount - count)
                 self.writeToDB()
                 return
 
@@ -95,7 +97,7 @@ class DiamondModule:
             @util.dbDeco
             def cb(result, rownum, error):
                 del self.diamondsContainer[uuid]
-                self.bagUUIDList.remove(uuid)
+                self.noticeClientBagUpdate(uuid, itemID, 0)
                 return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -115,8 +117,9 @@ class DiamondModule:
         def cb(result, rownum, error):
             del rowValueMap["roleID"]
             self.diamondsContainer[rowValueMap["UUID"]] = rowValueMap
-            self.bagUUIDList.append(rowValueMap["UUID"])
             self.writeToDB()
+
+            self.noticeClientBagUpdate(rowValueMap["UUID"],configID,count)
 
 
         KBEngine.executeRawDatabaseCommand(sql,cb)
@@ -124,10 +127,11 @@ class DiamondModule:
     def __updateDiamonds(self, configID, addCount):
 
         # 1、是否存在
+        isFind = False
         for item in self.diamondsContainer.values():
             if item["itemID"] != configID:
                 continue
-
+            isFind = True
             curCount = item["amount"]
 
             setMap = {"amount": curCount + addCount}
@@ -138,8 +142,13 @@ class DiamondModule:
             def cb(result, rownum, error):
                 self.diamondsContainer[item["UUID"]]["amount"] = curCount + addCount
 
-            KBEngine.executeRawDatabaseCommand(sql,cb)
+                self.noticeClientBagUpdate(item["UUID"], configID, curCount + addCount)
 
+
+            KBEngine.executeRawDatabaseCommand(sql,cb)
+            break
+        if isFind == True:
+            return
         return self.__insertDiamonds(configID, addCount)
 class DiamondItemKeys:
     uuid = "UUID"

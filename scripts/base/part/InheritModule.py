@@ -64,8 +64,6 @@ class InheritModule:
                 self.BallerCallBack(CardMgrModuleError.Material_not_enough)
                 return
             self.decItem(materialId, 1)
-            # if self.decItem(materialId, 1) is False:
-            #     return
 
         self.putItemInBag(pieceID, card.strikeNeedCost)
 

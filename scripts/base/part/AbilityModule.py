@@ -74,12 +74,10 @@ class AbilityModule:
                 break
 
         setattr(baller, property, allExp)
-        # for i in range(len(selectList)):
-        #     itemID = selectList[i]["itemID"]
-        #     amount = selectList[i]["number"]
-        #     self.decItem(itemID, amount)
-        #     self.client.onBallerCallBack(CardMgrModuleError.Material_not_enough)
-        #     return
+        for i in range(len(selectList)):
+            itemID = selectList[i]["itemID"]
+            amount = selectList[i]["number"]
+            self.decItem(itemID, amount)
 
         # 经验增加不足以升一级
         changeLevel = self.currentLevel

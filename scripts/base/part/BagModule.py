@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import traceback
+
 from BagConfig import BagConfig
 from itemsConfig import itemsIndex
 from KBEDebug import *
@@ -142,11 +144,24 @@ class BagModule:
 
     # 加一个道具到背包，并分发到各个容器
     def putItemInBag(self,itemID,num):
-        if int(itemID) not in itemsIndex:
+        itemID = int(itemID)
+        if itemID not in itemsIndex:
             return
 
-        itemIndex = itemsIndex[int(itemID)]
+
+        itemIndex = itemsIndex[itemID]
         itemType = itemIndex["itemsType"]
+
+        # 检查背包大小
+        isTogether = itemIndex["isTogether"]
+
+        needBagSize = 1
+        if isTogether <= 1:
+            needBagSize = num
+
+        if len(self.bagUUIDList)+ needBagSize > self.bagSize:
+            ERROR_MSG("putItemInBag  len" + str(len(self.bagUUIDList)) + "  needBagSize " + str(needBagSize) + "  bagSize  " + str(self.bagSize))
+            return
 
         if itemType == ItemTypeEnum.Equips:
             self.addEquipByItemID(itemID,num)
@@ -163,26 +178,38 @@ class BagModule:
 
     # 根据itemID获得数量
     def getItemNumByItemID(self,itemID):
-
+        count = 0
         for uuid in self.bagUUIDList:
             _, item = self.getItemByUUID(uuid)
             if item is None:
                 continue
             if item["itemID"] == int(itemID):
-                return item["amount"]
-        return 0
+                count = count +  item["amount"]
+
+        return count
 
     # 删除物品
     def decItem(self,itemID,num):
-        itemIndex = itemsIndex[int(itemID)]
+        itemID = int(itemID)
+        itemIndex = itemsIndex[itemID]
         itemType = itemIndex["itemsType"]
-        ERROR_MSG(" decItem  itemID " + str(itemID) +"     itemType   " + str(itemType))
+        ERROR_MSG(" decItem  itemID " + str(itemID) +"     itemType   " + str(itemType) + "   num  " + str(num))
+
+        decCount = num
+
         for uuid in self.bagUUIDList:
             _, item = self.getItemByUUID(uuid)
             if item is None:
                 continue
-            if item["itemID"] == int(itemID):
+
+            if decCount <= 0:
+                break
+            if item["itemID"] == itemID:
                 result = False
+                amount = item["amount"]
+                if amount < decCount:
+                    num = amount
+
 
                 ERROR_MSG("  itemID   is "+ str(itemID) +"   amount  "+ str(item["amount"]))
                 if itemType == ItemTypeEnum.Diamond:
@@ -198,12 +225,35 @@ class BagModule:
                 elif itemType == ItemTypeEnum.Material:
                     result = self.decMaterial(uuid, num)
 
-                if result is True:
-                    ERROR_MSG("bagModule result is True")
-                else:
-                    ERROR_MSG("bagModule result is False")
-                return result
+                decCount = decCount - amount
+
+                # if result is True:
+                #     ERROR_MSG("bagModule result is True")
+                #     value = {}
+                #     value["UUID"] = uuid
+                #     value["itemID"] = itemID
+                #     value["amount"] = item["amount"] - num
+                #     self.client.onGetItemInfo(value)
+                # else:
+                #     ERROR_MSG("bagModule result is False")
+                # return result
         return  False
+
+    def noticeClientBagUpdate(self,uuid,itemId,num):
+        if uuid not in self.bagUUIDList:
+            if num != 0:
+                self.bagUUIDList.append(uuid)
+            else:
+                ERROR_MSG("--------exec  Error  check now!!! -----------")
+                traceback.print_stack()
+        value = {}
+        value["UUID"] = uuid
+        value["itemID"] = int(itemId)
+        value["amount"] =  num
+        self.client.onGetItemInfo(value)
+
+        if num <= 0:
+            self.bagUUIDList.remove(uuid)
 
 class ItemOrderBy:
     byItemType = 1

@@ -18,7 +18,7 @@ class EquipsModule:
         # 球员碎片容器
         self.equipsContainer = {}
     def loadEquips(self):
-        colTupe = ("sm_UUID", "sm_itemID","sm_amount","sm_star","sm_strongLevel")
+        colTupe = ("sm_UUID", "sm_itemID","sm_amount","sm_star","sm_strongLevel","sm_gem1","sm_gem2","sm_gem3")
         filterMap = {"sm_roleID": self.databaseID}
         sql = util.getSelectSql("tbl_ItemEquips", colTupe, filterMap)
 
@@ -37,6 +37,10 @@ class EquipsModule:
                 equipItem[EquipItemKeys.amount]     = int(result[i][2])
                 equipItem[EquipItemKeys.star] = int(result[i][3])
                 equipItem[EquipItemKeys.strongLevel] = int(result[i][4])
+                equipItem[EquipItemKeys.gem1] = int(result[i][5])
+                equipItem[EquipItemKeys.gem2] = int(result[i][6])
+                equipItem[EquipItemKeys.gem3] = int(result[i][7])
+
                 self.equipsContainer[uuid] = equipItem
 
                 if uuid not in self.bagUUIDList:
@@ -53,13 +57,18 @@ class EquipsModule:
     #                              工具函数
     # --------------------------------------------------------------------------------------------
     def addEquipByItemID(self,itemID,num):
+
+        equipInfo = itemsEquipConfig[itemID]
         rowValueMap = {}
         rowValueMap[EquipItemKeys.roleID] = self.databaseID
         rowValueMap[EquipItemKeys.uuid] = KBEngine.genUUID64()
         rowValueMap["itemID"] = itemID
         rowValueMap["amount"] = num
-        rowValueMap["star"] = 1
+        rowValueMap["star"] = equipInfo["star"]
         rowValueMap["strongLevel"] = 1
+        rowValueMap["gem1"] = 0
+        rowValueMap["gem2"] = -1
+        rowValueMap["gem3"] = -1
 
         self.addEquipByMap(rowValueMap)
 
@@ -87,7 +96,7 @@ class EquipsModule:
             return
 
         curCount = self.equipsContainer[uuid]["amount"]
-
+        itemID = self.equipsContainer[uuid]["itemID"]
         if curCount < count:
             self.onEquipError(EquipModuleError.Equip_not_enough)
             return
@@ -101,6 +110,8 @@ class EquipsModule:
             def cb(result, rownum, error):
                 self.equipsContainer[uuid]["amount"] = curCount - count
 
+                self.noticeClientBagUpdate(uuid,itemID , curCount - count)
+
             KBEngine.executeRawDatabaseCommand(sql, cb)
         elif curCount == count:
             filterMap = {"roleID": self.databaseID, "UUID": uuid}
@@ -109,7 +120,7 @@ class EquipsModule:
             @util.dbDeco
             def cb(result, rownum, error):
                 del self.equipsContainer[uuid]
-                self.bagUUIDList.remove(uuid)
+                self.noticeClientBagUpdate(uuid, itemID, 0)
                 return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -124,15 +135,19 @@ class EquipsModule:
         rowValueMap[EquipItemKeys.amount] = paramMap["amount"]
         rowValueMap[EquipItemKeys.star] = paramMap["star"]
         rowValueMap[EquipItemKeys.strongLevel] = paramMap["strongLevel"]
-
+        rowValueMap[EquipItemKeys.gem1] = paramMap["gem1"]
+        rowValueMap[EquipItemKeys.gem2] = paramMap["gem2"]
+        rowValueMap[EquipItemKeys.gem3] = paramMap["gem3"]
         sql = util.getInsertSql("tbl_ItemEquips", rowValueMap)
 
         @util.dbDeco
         def cb(result, rownum, error):
             del rowValueMap["roleID"]
             self.equipsContainer[uuid] = rowValueMap
-            self.bagUUIDList.append(uuid)
             self.writeToDB()
+
+            self.noticeClientBagUpdate(rowValueMap["UUID"], paramMap["itemID"],  paramMap["amount"])
+
             return
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -157,7 +172,10 @@ class EquipsModule:
             def cb(result, rownum, error):
                 self.equipsContainer[item["UUID"]]["amount"] = curCount + paramMap["amount"]
 
+                self.noticeClientBagUpdate(item["UUID"], paramMap["itemID"], curCount + paramMap["amount"])
+
             KBEngine.executeRawDatabaseCommand(sql, cb)
+            break
 
         if isFind == True:
             return
@@ -186,6 +204,10 @@ class EquipsModule:
         paramMap[EquipItemKeys.amount] = equipInfo["amount"]
         paramMap[EquipItemKeys.star] = equipInfo["star"]
         paramMap[EquipItemKeys.strongLevel] = equipInfo["strongLevel"]
+        paramMap[EquipItemKeys.gem1] = equipInfo["gem1"]
+        paramMap[EquipItemKeys.gem2] = equipInfo["gem2"]
+        paramMap[EquipItemKeys.gem3] = equipInfo["gem3"]
+
         paramMap["count"]  = 1
         self.addEquipByMap(equipInfo)
 
@@ -204,6 +226,9 @@ class EquipItemKeys:
     itemType = "itemType"
     star     ="star"
     strongLevel ="strongLevel"
+    gem1="gem1"
+    gem2 = "gem2"
+    gem3 = "gem3"
 
     shoot = "shoot"
     passBall ="pass"

@@ -66,6 +66,46 @@
             <Arg>UINT32</Arg>
             <Arg>UINT32</Arg>
         </onClientTakeOffEquip>
+
+        !--客户端请求镶嵌宝石-->
+        <onClientInsetGem>
+          <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT32</Arg>
+            <Arg>UINT64</Arg>
+            <Arg>UINT32</Arg>
+        </onClientInsetGem>
+
+       !--客户端请求卸下宝石-->
+        <onClentTakeOffGem>
+          <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT32</Arg>
+            <Arg>UINT64</Arg>
+        </onClentTakeOffGem>
+
+       !--客户端请求宝石开槽-->
+        <onClientGemOpen>
+          <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT32</Arg>
+            <Arg>UINT64</Arg>
+        </onClientGemOpen>
+
+        !--客户端请求装备传承-->
+        <onClientEqupInherit>
+          <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT64</Arg>
+            <Arg>UINT64</Arg>
+        </onClientEqupInherit>
+
+      !--客户端请求宝石合成-->
+        <onClientGemCompound>
+          <Exposed/>
+            <Arg>UINT64</Arg>
+        </onClientGemCompound>
+
 	</BaseMethods>
 
 	<CellMethods>
@@ -78,22 +118,40 @@
           <Arg>UINT32</Arg>
         </makeEquipSucc>
 
+
+        <!-- 通知客户端宝石合成成功-->
+        <gemCompoundSucc>
+          <Arg>UINT32</Arg>
+        </gemCompoundSucc>
+
          <!--返回装备列表-->
         <getEquipList>
            <Arg>UINT32</Arg>
            <Arg>  ARRAY <of> Equip_Info </of> </Arg>
         </getEquipList>
 
+       <!--返回宝石镶嵌开孔结果-->
+        <returnGemResult>
+           <Arg>UINT32</Arg>
+            <Arg>  ARRAY <of> Equip_Info </of> </Arg>
+        </returnGemResult>
+
+        <!--返回装备传承结果-->
+        <returnInheritResult>
+           <Arg>UINT32</Arg>
+            <Arg>  ARRAY <of> Equip_Info </of> </Arg>
+        </returnInheritResult>
+
         <!-- 通知客户端装备升星成功-->
         <starUpEquipSucc>
           <Arg>UINT32</Arg>
-          <Arg>UINT32</Arg>
+          <Arg>Equip_Info</Arg>
         </starUpEquipSucc>
 
         <!-- 通知客户端装备强化成功-->
         <strongUpEquipSucc>
           <Arg>UINT32</Arg>
-          <Arg>UINT32</Arg>
+          <Arg>Equip_Info</Arg>
         </strongUpEquipSucc>
 
          <!-- 通知客户端装备星级和强化等级-->
@@ -105,7 +163,7 @@
          <!--返回装备一键强化结果列表-->
         <getOneKeyUpStrongResult>
            <Arg>UINT32</Arg>
-           <Arg>UINT32</Arg>
+           <Arg>Equip_Info</Arg>
            <Arg>  ARRAY <of> OneKeyStrongUp_Info </of> </Arg>
         </getOneKeyUpStrongResult>
 

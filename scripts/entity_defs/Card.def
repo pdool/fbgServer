@@ -215,13 +215,13 @@
         </keepM>
         <!-- 技术 -->
         <tech>
-            <Type>UINT32</Type>
+            <Type>FLOAT</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </tech>
         <!-- 身体 -->
         <health>
-            <Type>UINT32</Type>
+            <Type>FLOAT</Type>
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </health>

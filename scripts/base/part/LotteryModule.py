@@ -120,6 +120,7 @@ class LotteryModule:
         if  self.diamond >= moneyCount:
             self.diamond = self.diamond - moneyCount
             for key in dropIds:
+                self.putItemInBag(key, 1)
                 result += str(key) + ","
 
             DEBUG_MSG("diamondLottery ----------" + result)
@@ -151,6 +152,7 @@ class LotteryModule:
 
         for i in range(count):
             for key in dropIds:
+                self.putItemInBag(key, 1)
                 result += str(key) + ","
 
         DEBUG_MSG("tenLottery ----------" + result)

@@ -32,6 +32,7 @@ class CloneModule:
         self.o1 = 1
 
         self.atkList = []
+        self.atkPosList =[]
         self.defList = []
 
         # 技术统计

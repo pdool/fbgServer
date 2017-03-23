@@ -34,13 +34,33 @@
             <Type> UINT32 </Type>
             <Flags>			BASE			</Flags>
             <Persistent>		true				</Persistent>
-        </star>
+          </star>
 
         <strongLevel>
             <Type> UINT32 </Type>
             <Flags>			BASE			</Flags>
             <Persistent>		true				</Persistent>
         </strongLevel>
+
+
+        <!--宝石信息配置-->
+         <gem1>
+            <Type> INT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+         </gem1>
+
+          <gem2>
+            <Type> INT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+         </gem2>
+
+          <gem3>
+            <Type> INT32 </Type>
+            <Flags>			BASE			</Flags>
+            <Persistent>		true				</Persistent>
+          </gem3>
 
 		</Properties>
 

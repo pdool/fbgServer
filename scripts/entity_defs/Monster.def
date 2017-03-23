@@ -58,13 +58,13 @@
 
        <!-- 技术 -->
 			<tech>
-				<Type> UINT32 </Type>
+				<Type> FLOAT </Type>
                  <Flags>			ALL_CLIENTS			</Flags>
 			</tech>
 
        <!-- 身体 -->
 			<health>
-				<Type> UINT32 </Type>
+				<Type> FLOAT </Type>
                  <Flags>			ALL_CLIENTS			</Flags>
 			</health>
            <!-- 位置 -->

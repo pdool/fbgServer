@@ -67,7 +67,7 @@ class MaterialModule:
             return
 
         curCount = self.materialContainer[uuid]["amount"]
-
+        itemID = self.materialContainer[uuid]["itemID"]
         if curCount < count:
             self.onMaterialError(MaterialModuleError.Use_not_enough)
             return
@@ -80,6 +80,8 @@ class MaterialModule:
             @util.dbDeco
             def cb(result, rownum, error):
                 self.materialContainer[uuid]["amount"] = curCount - count
+                self.noticeClientBagUpdate(uuid, itemID , curCount - count)
+
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
         elif curCount == count:
@@ -88,8 +90,11 @@ class MaterialModule:
 
             @util.dbDeco
             def cb(result, rownum, error):
+
                 del self.materialContainer[uuid]
-                self.bagUUIDList.remove(uuid)
+
+                self.noticeClientBagUpdate(uuid, itemID, 0)
+
                 self.writeToDB()
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -108,8 +113,9 @@ class MaterialModule:
         def cb(result, rownum, error):
             del rowValueMap["roleID"]
             self.materialContainer[rowValueMap["UUID"]] = rowValueMap
-            self.bagUUIDList.append(rowValueMap["UUID"])
             self.writeToDB()
+
+            self.noticeClientBagUpdate( rowValueMap["UUID"], configID, count)
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -132,10 +138,12 @@ class MaterialModule:
             @util.dbDeco
             def cb(result, rownum, error):
                 self.materialContainer[item["UUID"]]["amount"] = curCount + addCount
+
+                self.noticeClientBagUpdate(item["UUID"], configID, curCount + addCount)
                 return True
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
-
+            break
         if isFind == True:
             return
         return self.__insertMaterial(configID, addCount)

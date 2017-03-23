@@ -56,6 +56,19 @@ class DiamondModuleError:
     Diamond_not_exist = 1
     # 宝石不够
     Diamond_not_enough = 2
+    # 宝石已经镶嵌
+    Diamond_exist = 3
+    # 宝石未开槽
+    Diamond_hold_not_open =4
+    # 宝石开槽材料不足
+    Diamond_not_material = 5
+    # 宝石已经开槽
+    Diamond_exist_hold = 6
+    # 宝石合成材料不足
+    Diamond_compound_not_material = 7
+    # 宝石不可合成
+    Diamond_not_compound = 8
+
 class EquipModuleError:
     # 装备不存在
     Equip_not_exist = 1
@@ -68,6 +81,9 @@ class EquipModuleError:
     Equip_dec_item_fail = 4
     # 欧元不够
     Equip_not_euro_enough = 5
+    # 传承装备强化等级不够
+    Equip_not_strong_enough = 6
+
 
 
 class GiftModuleError:

@@ -69,6 +69,7 @@ class Clone(KBEngine.Entity):
         self.o1 = 1
 
         self.atkList = []
+        self.atkPosList = []
         self.defList = []
 
         # 门将id
@@ -502,7 +503,13 @@ class Clone(KBEngine.Entity):
             defHealth = defHealth + defPlayer.health * defRatio
 
             #     P3=(进攻者射门值*O1*L1-防守者防守值)*(1+进攻者技术值-防守者身体值)*(0.1*rand()+0.95)/门将守门值
-        coordinate = attackObj.coordinate
+
+        posStr = ""
+        for pos in controllerObj.atkPosList:
+
+            posStr = posStr + "    "+str(pos)
+        ERROR_MSG("curPart ----- " + str(self.curPart) +"    posStr==   "+ posStr )
+        coordinate =  self.__getCurRoundAtkCoordinate(self.curPart)
 
         L1 = positionAttribute.PositionAttribute[coordinate]["powerPer"]
 
@@ -549,7 +556,7 @@ class Clone(KBEngine.Entity):
         #
         # ERROR_MSG(keyStr)
 
-        attackObj.coordinate = coordinate
+        controller.atkPosList.append(coordinate)
 
         ERROR_MSG("attackObj id  " + str(attackObj.id) +"   pos  " + str(attackObj.pos) + "   coordinate  " + str(coordinate))
 
@@ -628,6 +635,7 @@ class Clone(KBEngine.Entity):
         defObj = KBEngine.entities.get(self.defenderID)
 
         controllerObj.atkList = []
+        controllerObj.atkPosList = []
         defObj.defList = []
         defObj.preDefIds = []
         for part in range(3):
@@ -643,6 +651,7 @@ class Clone(KBEngine.Entity):
             self.__getAtkCoordinate(part + 1)
 
         atkList = controllerObj.atkList
+        atkPosList = controllerObj.atkPosList
         firstDefList = defObj.defList[0]
         secondDefList = defObj.defList[1]
         thirdDefList = defObj.defList[2]
@@ -671,14 +680,8 @@ class Clone(KBEngine.Entity):
 
         ERROR_MSG(thirdDefListStr)
 
-
-
-
-
-
-
         # ERROR_MSG("-----------------------------defObj.keeperID -------------------  " + str(defObj.keeperID) + "   objID   "+ str(defObj.id))
-        avatar.client.onAtkAndDefID(atkList, firstDefList,secondDefList,thirdDefList,defObj.keeperID)
+        avatar.client.onAtkAndDefID(atkList,atkPosList, firstDefList,secondDefList,thirdDefList,defObj.keeperID)
         # 第一步
         self.__onFirstPart()
 
@@ -805,6 +808,21 @@ class Clone(KBEngine.Entity):
             ERROR_MSG("========= list index out of range  self.curPart  =========  " + str(part-1) +"   atklist len   " + str(len(controllerObj.atkList)))
 
         return attackId
+    # 获得当前轮的攻击者ID
+    def __getCurRoundAtkCoordinate(self,part):
+
+        controllerObj = KBEngine.entities.get(self.controllerID)
+
+
+        attackCoordinate = -1
+        try:
+            attackCoordinate = controllerObj.atkPosList[part -1]
+
+            ERROR_MSG("------------------------self.curPart - 1    "+str(part-1 )+"   attackCoordinate-------------" +str(attackCoordinate))
+        except:
+            ERROR_MSG("========= list index out of range  self.curPart  =========  " + str(part-1) +"   atklist len   " + str(len(controllerObj.atkList)))
+
+        return attackCoordinate
 
     # 获得当前轮的防守者ID List
     def __getCurRoundDefList(self,part):

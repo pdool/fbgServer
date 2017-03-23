@@ -16,7 +16,7 @@
             <Type>			ARRAY <of> UINT64 </of>                 </Type>
 			<Flags>			BASE		  </Flags>
 			<Default>						          </Default>
-			<Persistent>		true		          </Persistent>
+			<!--<Persistent>		true		          </Persistent>-->
         </bagUUIDList>
 
         <!--打开礼包的概率-->
@@ -68,6 +68,11 @@
         <onGetItemList>
             <Arg>  ARRAY <of> Item_Info </of> </Arg>
         </onGetItemList>
+
+        <!--背包信息改变回调-->
+        <onGetItemInfo>
+            <Arg>  Item_Info  </Arg>
+        </onGetItemInfo>
 
 
 	</ClientMethods>

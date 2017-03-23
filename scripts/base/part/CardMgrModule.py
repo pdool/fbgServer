@@ -143,12 +143,10 @@ class CardMgrModule:
         # 当前等级，经验
         level = card.level
         exp = card.exp
-
         # 等级配置
         levelConfig = levelIniConfig[0]
         # 最高等级
         maxLevel = levelConfig["maxLevel"]
-
         if level >= maxLevel:
             self.client.onBallerCallBack(CardMgrModuleError.Card_is_max_level)
             return
@@ -163,33 +161,30 @@ class CardMgrModule:
             return
         addValueF = itemsUseConfig[itemID]["addValue"]
         resultExp = eval(str(exp) + addValueF)
-        
-
-        # 升级配置
-        levelUpgradeConfig = cardLevelUpgradeConfig[level + 1]
-        upExp = levelUpgradeConfig["maxExp"]
 
         self.decUses(uuid,num)
 
         # 循环
-        while (resultExp > upExp):
-            resultExp = resultExp - upExp
-
-            card.level      = card.level    + 1
-            card.shoot      = card.shoot    + levelUpgradeConfig["shoot"]
-            card.passBall   = card.passBall + levelUpgradeConfig["pass"]
-            card.reel       = card.reel     + levelUpgradeConfig["reel"]
-            card.defend     = card.defend   + levelUpgradeConfig["defend"]
-            card.trick      = card.trick    + levelUpgradeConfig["trick"]
-            card.steal      = card.steal    + levelUpgradeConfig["steal"]
-            card.controll   = card.controll + levelUpgradeConfig["controll"]
-            card.keep       = card.keep     + levelUpgradeConfig["keep"]
+        while (card.level <= maxLevel):
 
             if card.level + 1 > maxLevel:
                 break
-
-            levelUpgradeConfig = cardLevelUpgradeConfig[card.level + 1]
+                # 升级配置
+            levelUpgradeConfig = cardLevelUpgradeConfig[card.level]
             upExp = levelUpgradeConfig["maxExp"]
+            if resultExp >= upExp:
+                card.level      = card.level    + 1
+                levelUpgradeConfig = cardLevelUpgradeConfig[card.level]
+                card.shoot      = card.shoot    + levelUpgradeConfig["shoot"]
+                card.passBall   = card.passBall + levelUpgradeConfig["pass"]
+                card.reel       = card.reel     + levelUpgradeConfig["reel"]
+                card.defend     = card.defend   + levelUpgradeConfig["defend"]
+                card.trick      = card.trick    + levelUpgradeConfig["trick"]
+                card.steal      = card.steal    + levelUpgradeConfig["steal"]
+                card.controll   = card.controll + levelUpgradeConfig["controll"]
+                card.keep       = card.keep     + levelUpgradeConfig["keep"]
+            else:
+                break;
 
         card.exp = resultExp
         self.client.onBallerCallBack(CardMgrModuleError.Level_is_sucess)
@@ -217,7 +212,7 @@ class CardMgrModule:
             card.configID = config["id"]
             card.isSelf = isSelf
             card.star = config["initStar"]
-            card.brokenLayer = 1
+            card.brokenLayer = 0
             card.level = 1
             card.fightValue = 100
             card.aShootExp = 0
@@ -241,18 +236,17 @@ class CardMgrModule:
             card.aHealthExp = 0
             card.healthM = 0
             card.strikeNeedCost = 0
-            strikeID = card.star * 100 + card.brokenLayer
             levelUpgradeConfig = cardLevelUpgradeConfig[card.level]
-            card.shoot = config["shoot"] + strikeConfig.StrikeConfig[strikeID]["shoot"] + levelUpgradeConfig["shoot"]
-            card.defend = config["defend"] + strikeConfig.StrikeConfig[strikeID]["defend"] + levelUpgradeConfig["defend"]
-            card.passBall = config["pass"] + strikeConfig.StrikeConfig[strikeID]["pass"] + levelUpgradeConfig["pass"]
-            card.trick = config["trick"] + strikeConfig.StrikeConfig[strikeID]["trick"] + levelUpgradeConfig["trick"]
-            card.reel = config["reel"] + strikeConfig.StrikeConfig[strikeID]["reel"] + levelUpgradeConfig["reel"]
-            card.steal = config["steal"] + strikeConfig.StrikeConfig[strikeID]["steal"] + levelUpgradeConfig["steal"]
-            card.controll = config["controll"] + strikeConfig.StrikeConfig[strikeID]["controll"] + levelUpgradeConfig["controll"]
-            card.keep = config["keep"] + strikeConfig.StrikeConfig[strikeID]["keep"] + levelUpgradeConfig["keep"]
-            card.tech = config["tech"] + strikeConfig.StrikeConfig[strikeID]["tech"]
-            card.health = config["health"] + strikeConfig.StrikeConfig[strikeID]["health"]
+            card.shoot = config["shoot"] +  levelUpgradeConfig["shoot"]
+            card.defend = config["defend"] + levelUpgradeConfig["defend"]
+            card.passBall = config["pass"] + levelUpgradeConfig["pass"]
+            card.trick = config["trick"] + levelUpgradeConfig["trick"]
+            card.reel = config["reel"] + levelUpgradeConfig["reel"]
+            card.steal = config["steal"] + levelUpgradeConfig["steal"]
+            card.controll = config["controll"] + levelUpgradeConfig["controll"]
+            card.keep = config["keep"] + levelUpgradeConfig["keep"]
+            card.tech = config["tech"]
+            card.health = config["health"]
 
             card.inTeam = inTeam
 

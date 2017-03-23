@@ -41,8 +41,6 @@ class SlevelModule:
 
         for itemId, num in cost_info.items():
             self.decItem(itemId, num)
-            # if self.decItem(itemId, num) is False:
-            #     return
 
         card.star = card.star + 1
         card.shoot = card.shoot + config["shoot"]
@@ -53,8 +51,6 @@ class SlevelModule:
         card.steal = card.steal + config["steal"]
         card.controll = card.controll + config["controll"]
         card.keep = card.keep + config["keep"]
-        card.health = card.health + config["health"]
-        card.tech = card.tech + config["tech"]
 
         self.client.onBallerCallBack(CardMgrModuleError.Slevel_sucess)
 

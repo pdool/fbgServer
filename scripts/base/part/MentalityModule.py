@@ -49,12 +49,7 @@ class MentalityModule:
 
         self.decItem(itemID, 4)
         self.client.onMentalityUP(self.addPropertyMentality)
-        # if self.decItem(itemID, 4):
-        #     for v in self.addPropertyMentality:
-        #         ERROR_MSG("========" + str(v["name"]) +"      " + str(v["number"]))
-        #     self.client.onMentalityUP(self.addPropertyMentality)
-        # else:
-        #     ERROR_MSG("============return is False====")
+
 
     # 确认提升意识属性
     def UpDateMentalityInfo(self, cardId):
@@ -95,8 +90,7 @@ class MentalityModule:
 
         self.decItem(itemID, 40)
         self.client.onMentalityTenUP(self.addPropertyMentality)
-        # if self.decItem(itemID, 40) is True:
-        #     self.client.onMentalityTenUP(self.addPropertyMentality)
+
         # --------------------------------------------------------------------------------------------
         #                              工具函数调用函数
         # --------------------------------------------------------------------------------------------

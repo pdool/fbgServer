@@ -90,7 +90,7 @@ class GiftModule:
             return
 
         curCount = self.giftContainer[uuid]["amount"]
-
+        itemID =  self.giftContainer[uuid]["itemID"]
         if curCount < count:
             self.onGiftError(GiftModuleError.Gift_not_enough)
             return
@@ -103,6 +103,8 @@ class GiftModule:
             @util.dbDeco
             def cb(result, rownum, error):
                 self.giftContainer[uuid]["amount"] = curCount - count
+
+                self.noticeClientBagUpdate(uuid,itemID, curCount - count)
                 return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -113,8 +115,9 @@ class GiftModule:
             @util.dbDeco
             def cb(result, rownum, error):
                 del self.giftContainer[uuid]
-                self.bagUUIDList.remove(uuid)
                 self.writeToDB()
+
+                self.noticeClientBagUpdate(uuid, itemID, 0)
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
 
@@ -132,8 +135,10 @@ class GiftModule:
         def cb(result, rownum, error):
             del rowValueMap["roleID"]
             self.giftContainer[rowValueMap["UUID"]] = rowValueMap
-            self.bagUUIDList.append(rowValueMap["UUID"])
             self.writeToDB()
+
+            self.noticeClientBagUpdate(rowValueMap["UUID"], configID, count)
+
             return
 
         KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -156,10 +161,12 @@ class GiftModule:
             @util.dbDeco
             def cb(result, rownum, error):
                 self.giftContainer[item["UUID"]]["amount"] = curCount + addCount
-                return True
+
+                self.noticeClientBagUpdate(item["UUID"], configID,  curCount + addCount)
+                return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
-
+            break
         if isFind == True:
             return
         return self.__insertGift(configID, addCount)

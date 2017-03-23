@@ -67,7 +67,7 @@ class UseModule:
             return
 
         curCount = self.useContainer[uuid]["amount"]
-
+        itemID = self.useContainer[uuid]["itemID"]
         if curCount < count:
             self.onUseError(UseModuleError.Use_not_enough)
             return
@@ -80,6 +80,9 @@ class UseModule:
             @util.dbDeco
             def cb(result, rownum, error):
                 self.useContainer[uuid]["amount"] = curCount - count
+
+                self.noticeClientBagUpdate(uuid,itemID , curCount - count)
+
                 return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -89,10 +92,11 @@ class UseModule:
 
             @util.dbDeco
             def cb(result, rownum, error):
-
                 del self.useContainer[uuid]
-                self.bagUUIDList.remove(uuid)
                 self.writeToDB()
+
+                self.noticeClientBagUpdate(uuid, itemID, 0)
+
                 return
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
@@ -111,7 +115,9 @@ class UseModule:
         def cb(result, rownum, error):
             del rowValueMap["roleID"]
             self.useContainer[rowValueMap["UUID"]] = rowValueMap
-            self.bagUUIDList.append(rowValueMap["UUID"])
+
+            self.noticeClientBagUpdate(rowValueMap["UUID"], configID, count)
+
             self.writeToDB()
             return True
 
@@ -135,9 +141,11 @@ class UseModule:
             @util.dbDeco
             def cb(result, rownum, error):
                 self.useContainer[item["UUID"]]["amount"] = curCount + addCount
+                self.noticeClientBagUpdate(item["UUID"], configID, curCount + addCount)
+
 
             KBEngine.executeRawDatabaseCommand(sql, cb)
-
+            break
         if isFind == False:
             return self.__insertUse(configID, addCount)
         else:
