@@ -156,11 +156,11 @@ class BagModule:
         isTogether = itemIndex["isTogether"]
 
         needBagSize = 1
-        if isTogether <= 1:
+        if isTogether <= 0:
             needBagSize = num
 
         if len(self.bagUUIDList)+ needBagSize > self.bagSize:
-            ERROR_MSG("putItemInBag  len" + str(len(self.bagUUIDList)) + "  needBagSize " + str(needBagSize) + "  bagSize  " + str(self.bagSize))
+            ERROR_MSG("putItemInBag  itemId  "+str(itemID)+"   len  " + str(len(self.bagUUIDList)) + "  needBagSize " + str(needBagSize) + "  bagSize  " + str(self.bagSize))
             return
 
         if itemType == ItemTypeEnum.Equips:

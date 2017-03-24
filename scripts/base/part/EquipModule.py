@@ -95,10 +95,10 @@ class EquipModule:
             if equip_info["itemID"] == equipId:
                 self.takeOffEquip(equip_info)
                 card.equips.remove(equip_info)
+                self.cardPropCompute(2, card, equip_info)
                 break
 
         self.client.takeOffEquipSucc(cardId)
-
         card.writeToDB()
         self.writeToDB()
         pass
@@ -135,9 +135,13 @@ class EquipModule:
         paramMap["gem1"] = euqip_data["gem1"]
         paramMap["gem2"] = euqip_data["gem2"]
         paramMap["gem3"] = euqip_data["gem3"]
+
+
+
         self.decEquip(euqip_data["UUID"],1)
         card.equips.append(paramMap)
 
+        self.cardPropCompute(1, card, paramMap)
         self.client.putOnEquipSucc(cardId)
 
         card.writeToDB()
@@ -656,7 +660,7 @@ class EquipModule:
 
         retItems = []
         value = {}
-        value["UUID"] = 0
+        value["UUID"] =  euqip_data["UUID"]
         value["itemID"] = euqip_data["itemID"]
         value["amount"] = euqip_data["amount"]
         value["star"] = euqip_data["star"]
@@ -679,9 +683,12 @@ class EquipModule:
         retItems.append(value1)
 
         # 写数据库
-
-        card = KBEngine.entities.get(player_id)
-        card.writeToDB()
+        if player_id != 0:
+           card = KBEngine.entities.get(player_id)
+           card.writeToDB()
+        else:
+           setequipMap = {"strongLevel": inherit_lv}
+           self.updateEquipProps(euqip_data["itemID"], setequipMap)
 
         setMap = {"strongLevel": 1}
         self.updateEquipProps(select_id, setMap)
@@ -727,6 +734,62 @@ class EquipModule:
 
 
         pass
+
+    # 球员属性计算type 1增加属性 2减掉属性
+    def cardPropCompute(self,type,card,equipMap):
+
+        item_id = equipMap["itemID"]
+        strong  =  equipMap["strongLevel"]
+        star    =    equipMap["star"]
+        gem1 = equipMap["gem1"]
+        gem2 = equipMap["gem2"]
+        gem3 = equipMap["gem3"]
+
+        prop_list=["shoot","pass","reel","defend","trick","steal","controll","keep"]
+        gem_list=[gem1,gem2,gem3]
+
+
+        equip_star_key   = str(item_id) + "_" + str(star)
+        equip_strong_key = str(star) + "_" + str(strong)
+
+        if equip_star_key not in equipStarConfig.EquipStarConfig:
+            ERROR_MSG("-----------EquipStar -----not exist key ----------------  " + equip_star_key)
+            return
+        if equip_strong_key not in equipStrongConfig.EquipStrongConfig:
+            ERROR_MSG("-----------EquipStrong -----not exist key ----------------  " + equip_strong_key)
+            return
+
+        equip_base = itemsEquip.itemsEquipConfig[item_id]
+
+        equip_star = equipStarConfig.EquipStarConfig[equip_star_key]
+
+        equip_strong = equipStrongConfig.EquipStrongConfig[equip_strong_key]
+
+        if type == 1:
+            for gem in gem_list:
+                if gem > 0:
+                    gem1_data = itemsDiamond.itemsDiamondConfig[gem1]
+                    prop_name = gem1_data["propName"]
+                    card[prop_name] = card[prop_name] + gem1_data["propValue"]
+
+            for prop in prop_list:
+                 card[prop] = card[prop] + equip_base[prop] + equip_star[prop] + equip_strong[prop]
+
+        if type ==2 :
+            for gem in gem_list:
+                if gem > 0:
+                    gem1_data = itemsDiamond.itemsDiamondConfig[gem1]
+                    prop_name = gem1_data["propName"]
+                    card[prop_name] = card[prop_name] - gem1_data["propValue"]
+
+            for prop in prop_list:
+                card[prop] = card[prop] - equip_base[prop] - equip_star[prop] - equip_strong[prop]
+
+
+
+        pass
+
+
 
 
 

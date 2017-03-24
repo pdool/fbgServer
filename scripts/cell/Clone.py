@@ -531,6 +531,8 @@ class Clone(KBEngine.Entity):
     """
     step 4.7 判定Atk1Player、Atk2Player、Atk3Player的进攻位置；根据进攻队员位置判定Def1Player1、Def1Player2、Def2Player1、Def2Player2、Def3Player1、Def3Player2的防守位置
 	4.71 根据【射门位置及系数sheet】中逻辑，将4.1~4.6所获得的球员随机到相应进攻/防守位置上
+
+	曾经用过的点不再用
     """
     def __getAtkCoordinate(self,part):
 
@@ -540,10 +542,9 @@ class Clone(KBEngine.Entity):
         pos = attackObj.pos
         curRound = "round" + str(part)
         # 候选的攻击点
-        candidateList = playerAtkPosition.PlayerAtkPosition[pos][curRound]
+        candidateTuple = playerAtkPosition.PlayerAtkPosition[pos][curRound]
 
-
-
+        candidateList = [i for i in  candidateTuple if i not in controller.atkPosList]
         # 选中的坐标
         coordinate = random.choice(candidateList)
 
@@ -659,6 +660,12 @@ class Clone(KBEngine.Entity):
         atkIDStr = "atkID      "
         for id in controllerObj.atkList:
             atkIDStr = atkIDStr + "  id  " + str(id) +" pos " +str(KBEngine.entities[id].pos)
+
+        ERROR_MSG(atkIDStr)
+
+        atkIDStr = "atkPosList      "
+        for id in controllerObj.atkPosList:
+            atkIDStr = atkIDStr + "     coordinate  " + str(id)
 
         ERROR_MSG(atkIDStr)
 

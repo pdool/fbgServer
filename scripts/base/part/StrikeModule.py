@@ -56,6 +56,7 @@ class StrikeModule:
         card.tech = card.tech + Config["tech"]
         card.health = card.health + Config["health"]
         card.strikeNeedCost = card.strikeNeedCost + Config["needCount"]
+        card.calcFightValue()
         self.client.onBallerCallBack(CardMgrModuleError.Strike_sucess)
 
 

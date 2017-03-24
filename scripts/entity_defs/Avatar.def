@@ -71,7 +71,7 @@
         </nation>
         <!--战斗力-->
         <fightValue>
-            <Type> UINT32 </Type>
+            <Type> UINT64 </Type>
 			<Flags> BASE_AND_CLIENT </Flags>
 			<Persistent> true </Persistent>
         </fightValue>
@@ -170,6 +170,12 @@
 	    <onGiftError>
 	         <Arg>UINT32</Arg>
 	    </onGiftError>
+        <onCardFightValueChange>
+            <Arg>UINT64</Arg>
+            <Arg>UINT64</Arg>
+        </onCardFightValueChange>
+
+
 	</ClientMethods>
 
 

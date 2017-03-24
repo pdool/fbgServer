@@ -51,7 +51,7 @@ class SlevelModule:
         card.steal = card.steal + config["steal"]
         card.controll = card.controll + config["controll"]
         card.keep = card.keep + config["keep"]
-
+        card.calcFightValue()
         self.client.onBallerCallBack(CardMgrModuleError.Slevel_sucess)
 
         # --------------------------------------------------------------------------------------------

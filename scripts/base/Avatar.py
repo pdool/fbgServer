@@ -256,7 +256,12 @@ class Avatar(KBEngine.Proxy,
         self.diamond = 99999999
         self.addRmb(99999999)
         self.euro = 9999999
+
+        card = KBEngine.entities.get(self.cardID)
+        card.level = 22
         self.level = 22
+
+
         for k ,v in GMConfig.items():
             self.putItemInBag(k,v["itemCountCount"])
 

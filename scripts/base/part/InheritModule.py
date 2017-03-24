@@ -70,7 +70,8 @@ class InheritModule:
         cardExp = int(card.exp * config["exp"])
         if cardExp > inHeriter.exp:
             inHeriter.exp = cardExp
-        card.exp = 0
+            card.exp = 0
+            card.level = 1
         mentalityLevelRate = config["mentalityLevel"]
         abilityRate = config["powerLevel"]
 
@@ -137,6 +138,8 @@ class InheritModule:
         playerInfo["tech"] = inHeriter.tech
         playerInfo["health"] = inHeriter.health
         playerInfo["strikeNeedCost"] = inHeriter.strikeNeedCost
+        inHeriter.calcFightValue()
+        card.calcFightValue()
         self.client.onInheritSucess(playerInfo)
 
             # --------------------------------------------------------------------------------------------

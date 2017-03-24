@@ -56,9 +56,14 @@ class CardMgrModule:
         if card is None:
             ERROR_MSG("card create fail")
             return
+
+        card.playerID = self.id
+        card.calcFightValue()
+
         if card.isSelf == PlayerInfoSelfStatus.isSelf:
 
             self.cardID = card.id
+            self.level = card.level
 
         if card.inTeam == 1:
             self.inTeamcardIDList.append(card.id)
@@ -187,6 +192,7 @@ class CardMgrModule:
                 break;
 
         card.exp = resultExp
+        card.calcFightValue()
         self.client.onBallerCallBack(CardMgrModuleError.Level_is_sucess)
         card.writeToDB()
 
@@ -209,6 +215,7 @@ class CardMgrModule:
 
         if card is not None:
             card.roleID = self.databaseID
+            card.playerID = self.id
             card.configID = config["id"]
             card.isSelf = isSelf
             card.star = config["initStar"]
@@ -250,6 +257,7 @@ class CardMgrModule:
 
             card.inTeam = inTeam
 
+            card.calcFightValue()
             if inTeam == PlayerInfoTeamStatus.inTeam and card.id not in self.inTeamcardIDList:
                 self.inTeamcardIDList.append(card.id)
 
@@ -283,6 +291,9 @@ class CardMgrModule:
             if player.configID == cardID:
                 return True
         return False
+
+
+
 
 class PlayerInfoKeys:
     configID = "configID"

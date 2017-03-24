@@ -155,3 +155,7 @@ class MentalityModule:
                             number + self.GetObjectValue(cardId, propertyName))
         mainAdd = self.GetObjectValue(cardId, name) + self.GetObjectValue(cardId, propertyName)
         self.SetObjectValue(cardId, name, mainAdd)
+        if cardId not in self.cardIDList:
+            return
+        card = KBEngine.entities.get(cardId)
+        card.calcFightValue()

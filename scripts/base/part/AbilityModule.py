@@ -31,6 +31,7 @@ class AbilityModule:
     def onClientUpAbilityInfo(self, cardId, property, selectList):
 
         ERROR_MSG("onClientUpAbilityInfo " + str(cardId) + "    " + property)
+
         if cardId not in self.cardIDList:
             self.client.onBallerCallBack(CardMgrModuleError.Card_not_exist)
             return

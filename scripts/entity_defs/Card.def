@@ -64,7 +64,7 @@
 
          <!--战斗力-->
         <fightValue>
-            <Type>UINT32</Type>
+            <Type>UINT64</Type>
             <Flags>BASE</Flags>
             <Persistent>true</Persistent>
             <Default>0</Default>
