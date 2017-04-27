@@ -1,0 +1,196 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+	     <!--替补数量-->
+         <benchSize>
+            <Type>			UINT32                   </Type>
+			<Flags>			BASE_AND_CLIENT		  </Flags>
+			<Default>			0			          </Default>
+			<Persistent>		true		          </Persistent>
+        </benchSize>
+	    <!--玩家拥有阵型-->
+	     <formationIDList>
+            <Type> ARRAY <of> INT32 </of> </Type>
+			<Flags> BASE </Flags>
+			<Persistent> true </Persistent>
+        </formationIDList>
+
+        <!--替补球员-->
+	    <benchBallerIDList>
+            <Type> ARRAY <of> UINT32 </of> </Type>
+			<Flags> BASE </Flags>
+			<Persistent> true </Persistent>
+        </benchBallerIDList>
+
+
+        <!--玩家阵型系统升级-->
+        <formationSystem>
+            <Type>ARRAY <of> Formation_Info</of></Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </formationSystem>
+
+	</Properties>
+
+	<BaseMethods>
+
+	   <!-- 获取已经解锁阵型ID-->
+         <onClientActiveFormationIDList>
+            <Exposed/>
+        </onClientActiveFormationIDList>
+
+	    <!--客户端请求球员上阵-->
+         <onBallerEnterTeam>
+            <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT32</Arg>
+            <Arg>UINT32</Arg>
+        </onBallerEnterTeam>
+
+        <!--客户端请求球员上阵-->
+         <onClientBallerExchangePos>
+            <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT32</Arg>
+        </onClientBallerExchangePos>
+
+          <!--客户端请求改变球员上阵位置-->
+       <onChangeBallerPos>
+            <Exposed/>
+            <Arg>UINT32</Arg>
+            <Arg>UINT32</Arg>
+       </onChangeBallerPos>
+
+         <!-- 客户端请求阵型系统-->
+        <onClientFormationSystem>
+          <Exposed/>
+        </onClientFormationSystem>
+
+         <!-- 客户端请求阵型解锁-->
+        <onClientActiveFormation>
+          <Exposed/>
+          <Arg>UINT32</Arg>
+        </onClientActiveFormation>
+
+        <!-- 客户端请求球员替补席处理-->
+        <onClientBenchBaller>
+          <Exposed/>
+          <Arg>UINT32</Arg>
+          <Arg>UINT64</Arg>
+        </onClientBenchBaller>
+
+       <!-- 客户端请求球员替补席交换球员-->
+        <onClientExchangeBench>
+          <Exposed/>
+          <Arg>UINT64</Arg>
+          <Arg>UINT64</Arg>
+       </onClientExchangeBench>
+
+
+        <!-- 客户端请求球员替补席开启-->
+        <onClientOpenBench>
+          <Exposed/>
+          <Arg>UINT32</Arg>
+        </onClientOpenBench>
+
+        <!--客户端请求阵型系统升级-->
+        <onClientFormationStrong>
+          <Exposed/>
+          <Arg>INT32</Arg>
+        </onClientFormationStrong>
+
+       <!--客户端请求使用阵型-->
+       <onClientUseFormation>
+          <Exposed/>
+          <Arg>INT32</Arg>
+       </onClientUseFormation>
+
+	   <!-- 请求阵型和羁绊属性-->
+         <onClientForamtAndRelateProp>
+            <Exposed/>
+        </onClientForamtAndRelateProp>
+	</BaseMethods>
+
+	<CellMethods>
+	</CellMethods>
+
+	<ClientMethods>
+       <!--通知客户端制上阵成功-->
+        <onBallerInTeamSucc>
+          <Arg>UINT32</Arg>
+          <Arg>UINT32</Arg>
+          <Arg>UINT32</Arg>
+        </onBallerInTeamSucc>
+
+        <!--通知客户端制球员交换位置成功-->
+        <onBallerExchangeSucc>
+          <Arg>UINT32</Arg>
+          <Arg>UINT32</Arg>
+        </onBallerExchangeSucc>
+
+        <!--通知客户端制球员改变位置成功-->
+        <changeBallerPosSucc>
+          <Arg>UINT32</Arg>
+          <Arg>UINT32</Arg>
+        </changeBallerPosSucc>
+
+        <!--返回阵型系统列表-->
+        <getFormationSysList>
+           <Arg>  ARRAY <of> Formation_Info </of> </Arg>
+        </getFormationSysList>
+
+        <!--返回解锁阵型ID列表-->
+        <getForamtionIDList>
+           <Arg>  ARRAY <of> INT32 </of> </Arg>
+        </getForamtionIDList>
+
+        <!--返回阵型解锁-->
+        <activeFormationSucc>
+           <Arg> UINT32 </Arg>
+        </activeFormationSucc>
+
+       <!--返回球员替补席结果-->
+        <benchResult>
+           <Arg> UINT32 </Arg>
+           <Arg> UINT64 </Arg>
+        </benchResult>
+
+       <!--返回球员替补席交换成功-->
+        <benchChangeSucc>
+           <Arg> UINT64 </Arg>
+           <Arg> UINT64 </Arg>
+        </benchChangeSucc>
+
+        <!--返回球员替补席开启-->
+        <benchBoxOpen>
+           <Arg> UINT32 </Arg>
+        </benchBoxOpen>
+
+        <!--返回阵型系统升级结果-->
+        <onFormationStrongSucc>
+           <Arg> Formation_Info </Arg>
+        </onFormationStrongSucc>
+
+        <!--返回使用阵型成功-->
+        <onUseFormationSucc>
+           <Arg> UINT32 </Arg>
+        </onUseFormationSucc>
+
+        <!--得到阵型属性加成-->
+        <getFormationProp>
+           <Arg> UINT32 </Arg>
+           <Arg>  ARRAY <of> AddProp </of> </Arg>
+        </getFormationProp>
+
+         <!--得到羁绊属性加成-->
+        <getRelateProp>
+           <Arg> UINT32 </Arg>
+           <Arg> UINT64 </Arg>
+           <Arg>  ARRAY <of> AddProp </of> </Arg>
+        </getRelateProp>
+
+	</ClientMethods>
+</root>
+

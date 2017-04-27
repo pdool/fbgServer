@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from cardsConfig import cardsConfig
 import strikeConfig
+import TimerDefine
 from ErrorCode import CardMgrModuleError
 from part.BagModule import  ItemTypeEnum
 from cardLevelUpgradeConfig import cardLevelUpgradeConfig
 from cardLevelUpgradeConfig import levelIniConfig
 from itemsUse import itemsUseConfig
-
+import BabyLikingStarConfig
 __author__ = 'chongxin'
 __createTime__  = '2017年1月5日'
 
@@ -29,12 +30,16 @@ class CardMgrModule:
     def __init__(self):
         self.cardIDList = []  # 玩家拥有的卡牌对象内存ID
         self.inTeamcardIDList = []  # 玩家拥有的卡牌对象内存ID
+        self.benchBallerIDList =[]  #玩家替补席球员ID
         pass
 
     def onEntitiesEnabled(self):
 
+        self.loadNum = 0
         for cardDBID in self.cardDBIDList:
             KBEngine.createBaseFromDBID("Card", cardDBID, self.loadCardCB)
+        self.addTimer(1, 1, TimerDefine.Timer_reset_baller_addInfo)
+
         pass
 
     """
@@ -42,6 +47,7 @@ class CardMgrModule:
     dbid会是实体的数据库ID
     wasActive是True则baseRef是已经存在的实体的引用(已经从数据库检出)
     """
+
     def loadCardCB(self, baseRef, dbid, wasActive):
         if wasActive:
             ERROR_MSG("card :(%i):not create success!" % (self.id))
@@ -58,24 +64,37 @@ class CardMgrModule:
             return
 
         card.playerID = self.id
-        card.calcFightValue()
 
         if card.isSelf == PlayerInfoSelfStatus.isSelf:
 
             self.cardID = card.id
             self.level = card.level
-
         if card.inTeam == 1:
             self.inTeamcardIDList.append(card.id)
-        self.cardIDList.append(card.id)
 
+        if card.bench == 1:
+            self.benchBallerIDList.append(card.id)
+
+        self.cardIDList.append(card.id)
+        card.calcFightValue()
+        self.loadNum = self.loadNum + 1
+
+        if self.loadNum == len(self.cardDBIDList):
+
+            self.ballerRelationProp()
 
         pass
+
+    # def onTimer(self, id, userArg):
+    #     if userArg == TimerDefine.Timer_reset_baller_addInfo:
+    #     pass
+
     # --------------------------------------------------------------------------------------------
     #                              客户端调用函数
     # --------------------------------------------------------------------------------------------
 
     def onClientGetAllCardInfo(self):
+
         playerInfos = []
         for id in self.cardIDList:
             player = KBEngine.entities.get(id)
@@ -86,6 +105,8 @@ class CardMgrModule:
             playerInfo["star"] = player.star
             playerInfo["exp"] = player.exp
             playerInfo["inTeam"] = player.inTeam
+            playerInfo["bench"] = player.bench
+            playerInfo["pos"] = player.pos
             playerInfo["isSelf"] = player.isSelf
             playerInfo["brokenLayer"] = player.brokenLayer
             playerInfo["fightValue"] = player.fightValue
@@ -116,9 +137,12 @@ class CardMgrModule:
             playerInfo["tech"] = player.tech
             playerInfo["health"] = player.health
             playerInfo["strikeNeedCost"] = player.strikeNeedCost
+            playerInfo["keepPercent"] = player.keepPercent
+            playerInfo["controllPercent"] = player.controllPercent
+            playerInfo["shootPercent"] = player.shootPercent
+            playerInfo["defendPercent"] = player.defendPercent
             playerInfos.append(playerInfo)
         self.client.onGetAllCardInfo(playerInfos)
-
 
     # 球员升级
     def onClientLevelUp(self,cardID,uuid,num):
@@ -148,6 +172,9 @@ class CardMgrModule:
         # 当前等级，经验
         level = card.level
         exp = card.exp
+        if card.level >= self.level:
+            self.client.onLevelMax(self.level)
+            return
         # 等级配置
         levelConfig = levelIniConfig[0]
         # 最高等级
@@ -167,16 +194,22 @@ class CardMgrModule:
         addValueF = itemsUseConfig[itemID]["addValue"]
         resultExp = eval(str(exp) + addValueF)
 
-        self.decUses(uuid,num)
+        self.decItem(itemID,num)
 
         # 循环
         while (card.level <= maxLevel):
 
             if card.level + 1 > maxLevel:
+                card.exp = resultExp
+                self.client.onBallerCallBack(CardMgrModuleError.Level_is_sucess)
                 break
-                # 升级配置
+            # 升级配置
             levelUpgradeConfig = cardLevelUpgradeConfig[card.level]
             upExp = levelUpgradeConfig["maxExp"]
+            if card.level >= self.level:
+                card.exp = upExp
+                self.client.onLevelMax(self.level)
+                break
             if resultExp >= upExp:
                 card.level      = card.level    + 1
                 levelUpgradeConfig = cardLevelUpgradeConfig[card.level]
@@ -189,11 +222,10 @@ class CardMgrModule:
                 card.controll   = card.controll + levelUpgradeConfig["controll"]
                 card.keep       = card.keep     + levelUpgradeConfig["keep"]
             else:
+                card.exp = resultExp
+                self.client.onBallerCallBack(CardMgrModuleError.Level_is_sucess)
                 break;
-
-        card.exp = resultExp
         card.calcFightValue()
-        self.client.onBallerCallBack(CardMgrModuleError.Level_is_sucess)
         card.writeToDB()
 
     # --------------------------------------------------------------------------------------------
@@ -243,6 +275,10 @@ class CardMgrModule:
             card.aHealthExp = 0
             card.healthM = 0
             card.strikeNeedCost = 0
+            card.keepPercent = 0.0
+            card.controllPercent = 0.0
+            card.shootPercent = 0.0
+            card.defendPercent = 0.0
             levelUpgradeConfig = cardLevelUpgradeConfig[card.level]
             card.shoot = config["shoot"] +  levelUpgradeConfig["shoot"]
             card.defend = config["defend"] + levelUpgradeConfig["defend"]
@@ -254,15 +290,21 @@ class CardMgrModule:
             card.keep = config["keep"] + levelUpgradeConfig["keep"]
             card.tech = config["tech"]
             card.health = config["health"]
-
+            if card.isSelf == 1:
+                card.tech = card.tech + float(BabyLikingStarConfig.BabyLikingStarConfig[1]["teamTuple"].split(",")[1])
+                card.health = card.health + float(BabyLikingStarConfig.BabyLikingStarConfig[1]["teamTuple"].split(",")[0])
             card.inTeam = inTeam
 
-            card.calcFightValue()
+            card.skill1 = config["skill1ID"]
+            card.skill2 = config["skill2ID"]
+
             if inTeam == PlayerInfoTeamStatus.inTeam and card.id not in self.inTeamcardIDList:
                 self.inTeamcardIDList.append(card.id)
 
             if isSelf == PlayerInfoSelfStatus.isSelf:
                 self.cardID = card.id
+
+            card.calcFightValue()
 
             if pos != -1:
                 card.pos = pos
@@ -278,8 +320,9 @@ class CardMgrModule:
         if self.isDestroyed:
             if card is not None:
                 card.destroy(True)
+                return
 
-        DEBUG_MSG("-------------__onCardSaved succ  ---------------------------")
+        DEBUG_MSG("-------------__onCardSaved succ  ------card.id-----" + str(card.id)+ "   DBID  " + str(card.databaseID))
         self.cardDBIDList.append(card.databaseID)
         self.writeToDB()
         self.cardIDList.append(card.id)

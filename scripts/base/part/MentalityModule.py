@@ -43,7 +43,19 @@ class MentalityModule:
         for i in range(count):
             Property = {}
             Property["name"] = random.choice(self.propDict)
-            Property["number"] = self.ComputeAdd(cardId, Property["name"], materialtype)
+            number = self.ComputeAdd(cardId, Property["name"], materialtype)
+            MentalityConfig = MentalityUpMax.MentalityUP[cardsConfig[card.configID]["initStar"]]
+            maxValue = MentalityConfig[Property["name"]]
+            Name = Property["name"] + "M"
+            if number == 0:
+                Property["number"] = 1
+            else:
+                Property["number"] = number
+            objectValue = self.GetObjectValue(cardId, Name)
+            if  objectValue < maxValue and objectValue +  Property["number"] > maxValue:
+                Property["number"] = maxValue - objectValue
+            elif objectValue >= maxValue:
+                continue
             self.addPropertyMentality.append(Property)
         itemID = MentalityConfig["materialID"][materialtype]
 
@@ -54,7 +66,12 @@ class MentalityModule:
     # 确认提升意识属性
     def UpDateMentalityInfo(self, cardId):
         for item in self.addPropertyMentality:
-            self.AddMainInfo(cardId, item["name"], item["number"])
+            self.UpdateMainInfo(cardId, item["name"], item["number"])
+        if cardId not in self.cardIDList:
+            return
+        card = KBEngine.entities.get(cardId)
+        self.client.onBallerCallBack(CardMgrModuleError.Mentality_is_sucess)
+        self.client.onUpdateCardInfo(self.UpdateBallerInfo(card))
 
     # 客户端选择属性提示
     def ChooseUpMentalityInfo(self, cardId, propertyList):
@@ -62,7 +79,12 @@ class MentalityModule:
             index = propertyList["values"][i]["index"]
             for item in self.addPropertyMentality:
                 if str(index) in item["name"]:
-                    self.AddMainInfo(cardId, item["name"][1:], item["number"])
+                    self.UpdateMainInfo(cardId, item["name"][1:], item["number"])
+        if cardId not in self.cardIDList:
+             return
+        card = KBEngine.entities.get(cardId)
+        self.client.onBallerCallBack(CardMgrModuleError.Mentality_is_sucess)
+        self.client.onUpdateCardInfo(self.UpdateBallerInfo(card))
 
     # 提升意识十次
     def onClientUpTenMentality(self, cardId, materialtype):
@@ -83,7 +105,18 @@ class MentalityModule:
                 Property = {}
                 Property["name"] = str(i) + random.choice(self.propDict)
                 Name = Property["name"][1:]
-                Property["number"] = self.ComputeAdd(cardId, Name, materialtype)
+                number = self.ComputeAdd(cardId, Name, materialtype)
+                MentalityConfig = MentalityUpMax.MentalityUP[cardsConfig[card.configID]["initStar"]]
+                maxValue = MentalityConfig[Name]
+                if number == 0:
+                    Property["number"] = 1
+                else:
+                    Property["number"] = number
+                objectValue = self.GetObjectValue(cardId, Name)
+                if objectValue < maxValue and objectValue + Property["number"] > maxValue:
+                    Property["number"] = maxValue - objectValue
+                elif objectValue >= maxValue:
+                    continue
                 self.addPropertyMentality.append(Property)
 
         itemID = MentalityConfig["materialID"][materialtype]
@@ -104,6 +137,7 @@ class MentalityModule:
         MentalityConfig = MentalityUpMax.MentalityUP[cardsConfig[card.configID]["initStar"]]
         maxValue = MentalityConfig[property]
         Name = property + "M"
+        count = 0
         objectValue = self.GetObjectValue(cardId, Name)
         if material == 0:
             if objectValue >= 0 and objectValue < 0.2 * maxValue:
@@ -148,14 +182,7 @@ class MentalityModule:
         card = KBEngine.entities.get(cardId)
         setattr(card, property, number)
 
-    # 球员意识加成到总属性上
-    def AddMainInfo(self, cardId, name, number):
-        propertyName = name + "M"
-        self.SetObjectValue(cardId, propertyName,
-                            number + self.GetObjectValue(cardId, propertyName))
-        mainAdd = self.GetObjectValue(cardId, name) + self.GetObjectValue(cardId, propertyName)
-        self.SetObjectValue(cardId, name, mainAdd)
-        if cardId not in self.cardIDList:
-            return
-        card = KBEngine.entities.get(cardId)
-        card.calcFightValue()
+        # 球员意识加成到总属性上
+    def UpdateMainInfo(self, cardId, name, number):
+        self.SetObjectValue(cardId, name,number + self.GetObjectValue(cardId, name))
+        self.SetObjectValue(cardId, name + "M", number + self.GetObjectValue(cardId, name + "M"))

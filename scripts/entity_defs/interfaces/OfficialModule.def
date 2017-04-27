@@ -1,0 +1,38 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+
+        <!--官职-->
+        <officalPosition>
+            <Type> UINT32 </Type>
+            <Flags> BASE_AND_CLIENT </Flags>
+            <Persistent> true </Persistent>
+            <Default> 0 </Default>
+        </officalPosition>
+
+        <!--政绩-->
+        <achievements>
+            <Type> UINT64 </Type>
+            <Flags> BASE_AND_CLIENT </Flags>
+            <Persistent> true </Persistent>
+            <Default> 0 </Default>
+        </achievements>
+
+	</Properties>
+
+	<BaseMethods>
+
+
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+
+	</ClientMethods>
+</root>
+

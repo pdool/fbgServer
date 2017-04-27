@@ -1,0 +1,87 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+        <arenaInitialList>
+            <Type>			ARRAY <of> ArenaInfo  </of>   </Type>
+			<Flags>			BASE				</Flags>
+			<Default>						</Default>
+			<Persistent>		true		</Persistent>
+        </arenaInitialList>
+
+
+        <blackMoney>
+            <Type>			UINT32    </Type>
+			<Flags>			BASE_AND_CLIENT	 </Flags>
+			<Default>						</Default>
+			<Persistent>		true		</Persistent>
+        </blackMoney>
+
+        <myRank>
+            <Type>			UINT32    </Type>
+			<Flags>			BASE_AND_CLIENT	 </Flags>
+			<Persistent>		true		</Persistent>
+        </myRank>
+
+        <selfRank>
+			<Type> UINT32 </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</selfRank>
+
+        <arenaTimes>
+			<Type> UINT32 </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+            <Default>	5 </Default>
+		</arenaTimes>
+
+        <selfDBID>
+			<Type> UINT32 </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</selfDBID>
+
+	</Properties>
+
+	<BaseMethods>
+
+        <!--刷新竞技对手排行榜-->
+        <onClientUpdateArenaRank>
+            <Exposed/>
+        </onClientUpdateArenaRank>
+
+
+
+        <!--请求竞技场排行榜-->
+        <onClientGetArenaRank>
+            <Exposed/>
+            <Arg>UINT32</Arg> <!-- 页签 -->
+        </onClientGetArenaRank>
+
+
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+
+
+	<ClientMethods>
+        <!--推送财竞技场排行榜-->
+        <onGetThreeArenaValue>
+           <Arg> ARRAY <of> ArenaInfo </of></Arg>
+            <Arg>UINT32</Arg> <!-- 挑战次数 -->
+        </onGetThreeArenaValue>
+
+        <!--推送财竞技场排行榜-->
+        <onGetArenaRankValue>
+           <Arg> ARRAY <of> ArenaInfo </of></Arg>
+        </onGetArenaRankValue>
+
+
+	</ClientMethods>
+</root>
+

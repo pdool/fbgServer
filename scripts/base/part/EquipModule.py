@@ -8,6 +8,7 @@ import equipStrongCritConfig
 import itemsEquip
 import itemsDiamond
 import gemCompoundConfig
+import equipSuitConfig
 from ErrorCode import EquipModuleError
 from ErrorCode import DiamondModuleError
 from KBEDebug import *
@@ -48,10 +49,15 @@ class EquipModule:
         bag_retItems = []
 
         for item in self.equipsContainer:
-            if item is None:
+            if item is None :
                 continue
+
             value = {}
             pair = self.equipsContainer[item]
+
+            if pair["state"] == 2 :
+                continue
+
             value["UUID"] = pair["UUID"]
             value["itemID"] = pair["itemID"]
             value["amount"] = pair["amount"]
@@ -91,11 +97,15 @@ class EquipModule:
             return
 
         card = KBEngine.entities.get(cardId)
+        self.onCardPropSuit(2, card)
+
         for equip_info in card.equips:  # 第一个实例
             if equip_info["itemID"] == equipId:
                 self.takeOffEquip(equip_info)
                 card.equips.remove(equip_info)
+                self.onCardPropSuit(1, card)
                 self.cardPropCompute(2, card, equip_info)
+
                 break
 
         self.client.takeOffEquipSucc(cardId)
@@ -110,6 +120,7 @@ class EquipModule:
             return
         # 判断背包装备是否存在
         card = KBEngine.entities.get(cardId)
+        self.onCardPropSuit(2, card)
 
         if equipUUId not in self.equipsContainer:
             self.client.onEquipError(EquipModuleError.Equip_not_exist)
@@ -123,6 +134,7 @@ class EquipModule:
             item_info = itemsEquip.itemsEquipConfig[equip_info["itemID"]]
             if item_info["position"] == put_on_equip["position"]:
                 self.takeOffEquip(equip_info)
+                self.cardPropCompute(3, card, equip_info)
                 card.equips.remove(equip_info)
                 break
 
@@ -141,6 +153,7 @@ class EquipModule:
         self.decEquip(euqip_data["UUID"],1)
         card.equips.append(paramMap)
 
+        self.onCardPropSuit(1, card)
         self.cardPropCompute(1, card, paramMap)
         self.client.putOnEquipSucc(cardId)
 
@@ -221,6 +234,9 @@ class EquipModule:
             #     ERROR_MSG(m"dec fail")
             #     return
 
+        if player_id != 0:
+            self.cardPropCompute(3, card, euqip_data)
+
         euqip_data["star"] = euqip_data["star"]+1
 
         value = {}
@@ -235,6 +251,7 @@ class EquipModule:
 
         if player_id != 0:
             card = KBEngine.entities.get(player_id)
+            self.cardPropCompute(1,card,euqip_data)
             card.writeToDB()
         else:
             #     写数据库
@@ -312,7 +329,9 @@ class EquipModule:
 
             INFO_MSG("add_strong_lv_ran_num" + str(ran_num) +"--------vipLevel-----"+str(self.vipLevel)+ "------lv" + str(levl))
 
-        self.euro = self.euro - strong_cost
+        if player_id!=0:
+            self.cardPropCompute(3,card,euqip_data)
+        self.useEuro(strong_cost)
         euqip_data["strongLevel"] = equip_next_strong
 
         value = {}
@@ -328,6 +347,7 @@ class EquipModule:
 
         if player_id != 0:
             card = KBEngine.entities.get(player_id)
+            self.cardPropCompute(1, card, euqip_data)
             card.writeToDB()
         else:
             #     写数据库
@@ -402,8 +422,7 @@ class EquipModule:
 
             if equip_next_strong >= max_strong:
                 equip_next_strong = max_strong
-
-            self.euro = self.euro - strong_cost
+            self.useEuro(strong_cost)
             euqip_data["strongLevel"] = equip_next_strong
 
             value = {}
@@ -414,6 +433,9 @@ class EquipModule:
             retItems.append(value)
 
             equip_cur_strong = equip_next_strong
+
+        if player_id != 0:
+            self.cardPropCompute(3, card, euqip_data)
 
         euqip_data["strongLevel"] = equip_cur_strong
 
@@ -430,6 +452,7 @@ class EquipModule:
 
         if player_id != 0:
             card = KBEngine.entities.get(player_id)
+            self.cardPropCompute(1,card,euqip_data)
             card.writeToDB()
         else:
         #     写数据库
@@ -463,6 +486,9 @@ class EquipModule:
             self.client.onEquipError(DiamondModuleError.Diamond_hold_not_open)
             return
 
+        if player_id!=0:
+            self.cardPropCompute(3,card,euqip_data)
+
         euqip_data[gem_pos] = 0
 
         retItems = []
@@ -480,6 +506,7 @@ class EquipModule:
 
         if player_id != 0:
             card = KBEngine.entities.get(player_id)
+            self.cardPropCompute(2,card,euqip_data)
             card.writeToDB()
         else:
             #     写数据库
@@ -531,6 +558,8 @@ class EquipModule:
             if gem_data["propType"] == gem_info["propType"]:
                 return
 
+        if player_id!=0:
+            self.cardPropCompute(3,card,euqip_data)
 
         euqip_data[gem_pos] = gem_id
         retItems = []
@@ -549,6 +578,7 @@ class EquipModule:
         self.decItem(gem_id, 1)
         if player_id != 0:
             card = KBEngine.entities.get(player_id)
+            self.cardPropCompute(1,card,euqip_data)
             card.writeToDB()
         else:
             #     写数据库
@@ -577,12 +607,12 @@ class EquipModule:
             self.client.onEquipError(DiamondModuleError.Diamond_exist_hold)
             return
 
-        equip_id = euqip_data["itemID"]
-        if equip_id not in itemsEquip.itemsEquipConfig:
+        item_id = euqip_data["itemID"]
+        if item_id not in itemsEquip.itemsEquipConfig:
             self.client.onEquipError(EquipModuleError.Equip_not_exist)
             return
 
-        equip_info = itemsEquip.itemsEquipConfig[equip_id]
+        equip_info = itemsEquip.itemsEquipConfig[item_id]
 
         material_id = equip_info["openGemMaterial"]
         material_info = equip_info["needOpenHold"]
@@ -616,6 +646,7 @@ class EquipModule:
         else:
             #     写数据库
             setMap = {gem_pos: 0}
+            INFO_MSG("-----gem_pos-----"+str(gem_pos)+"----equip_id----"+str(equip_id))
             self.updateEquipProps(equip_id, setMap)
 
         self.client.returnGemResult(player_id, retItems)
@@ -652,8 +683,7 @@ class EquipModule:
             self.client.onEquipError(EquipModuleError.Equip_not_euro_enough)
             return
 
-        self.euro = self.euro - need_euro
-
+        self.useEuro(need_euro)
         euqip_data["strongLevel"] = inherit_lv
         select_data["strongLevel"] = 1
 
@@ -685,10 +715,11 @@ class EquipModule:
         # 写数据库
         if player_id != 0:
            card = KBEngine.entities.get(player_id)
+           self.cardPropCompute(1, card, euqip_data)
            card.writeToDB()
         else:
            setequipMap = {"strongLevel": inherit_lv}
-           self.updateEquipProps(euqip_data["itemID"], setequipMap)
+           self.updateEquipProps(equip_id, setequipMap)
 
         setMap = {"strongLevel": 1}
         self.updateEquipProps(select_id, setMap)
@@ -735,7 +766,51 @@ class EquipModule:
 
         pass
 
-    # 球员属性计算type 1增加属性 2减掉属性
+
+    # 球员装备套装属性
+    def onCardPropSuit(self,type,card):
+
+
+        # 套装属性
+        for suit_id, suit in equipSuitConfig.equipSuitConfig.items():  # 第一个实例
+            suit_num = 0
+            for equip_info in card.equips:  # 第一个实例
+                item = itemsEquip.itemsEquipConfig[equip_info["itemID"]]
+                if item["suit"] == suit_id:
+                    suit_num = suit_num + 1
+
+            ERROR_MSG("-------suit_id-----" + str(suit_id) + "---------suit_num-------" + str(suit_num))
+            if suit_num <= 1:
+                continue
+
+
+            ERROR_MSG("-------suitProp-----" + str(suit["suitProp"]))
+            suit_prop = suit["suitProp"][suit_num]
+            ERROR_MSG("-------suit_prop-----" + str(suit_prop))
+
+            add_prop = suit_prop[0]
+
+            prop = add_prop.split("_")[0]
+            value = add_prop.split("_")[1]
+
+            if type == 1:
+                add_value = getattr(card, prop) + value
+            elif type == 2 :
+                add_value = getattr(card, prop) - value
+
+            ERROR_MSG("---suitprop---" + str(prop) + "---value---" + str(value) + "---addvalue---" + str(add_value))
+            setattr(card, prop, add_value)
+
+
+
+        pass
+
+
+    prop_list = ["shoot", "passBall", "reel", "defend", "trick", "steal", "controll", "keep"]
+    # 球员属性计算type 1增加属性 2减掉属性 3更换
+    """
+
+    """
     def cardPropCompute(self,type,card,equipMap):
 
         item_id = equipMap["itemID"]
@@ -745,58 +820,63 @@ class EquipModule:
         gem2 = equipMap["gem2"]
         gem3 = equipMap["gem3"]
 
-        prop_list=["shoot","pass","reel","defend","trick","steal","controll","keep"]
-        gem_list=[gem1,gem2,gem3]
+        gem_list = [gem1, gem2, gem3]
+        # 宝石属性
+        for gem in gem_list:
+            if gem <= 0:
+                continue
+            ERROR_MSG("---gem---" + str(gem))
+            gem1_data = itemsDiamond.itemsDiamondConfig[gem]
+            prop = gem1_data["propName"]
+            value = gem1_data["propValue"]
 
+            if value > 1:
+                value = int(value)
+
+            if type == 1:
+                add_value = getattr(card, prop) + value
+            elif type == 2 or type == 3:
+                add_value = getattr(card, prop) - value
+
+            INFO_MSG("---gemprop---" + str(prop) + "---value---" + str(value) + "---addvalue---" + str(add_value))
+
+            setattr(card, prop, add_value)
+
+        INFO_MSG("---item_id---"+str(item_id))
+        equip_base = itemsEquip.itemsEquipConfig[item_id]
 
         equip_star_key   = str(item_id) + "_" + str(star)
-        equip_strong_key = str(star) + "_" + str(strong)
+        equip_strong_key = str(equip_base["star"]) + "_" + str(strong)
 
         if equip_star_key not in equipStarConfig.EquipStarConfig:
-            ERROR_MSG("-----------EquipStar -----not exist key ----------------  " + equip_star_key)
+            INFO_MSG("-----------EquipStar -----not exist key ----------------  " + equip_star_key)
             return
         if equip_strong_key not in equipStrongConfig.EquipStrongConfig:
-            ERROR_MSG("-----------EquipStrong -----not exist key ----------------  " + equip_strong_key)
+            INFO_MSG("-----------EquipStrong -----not exist key ----------------  " + equip_strong_key)
             return
 
-        equip_base = itemsEquip.itemsEquipConfig[item_id]
 
         equip_star = equipStarConfig.EquipStarConfig[equip_star_key]
 
         equip_strong = equipStrongConfig.EquipStrongConfig[equip_strong_key]
 
-        if type == 1:
-            for gem in gem_list:
-                if gem > 0:
-                    gem1_data = itemsDiamond.itemsDiamondConfig[gem1]
-                    prop_name = gem1_data["propName"]
-                    card[prop_name] = card[prop_name] + gem1_data["propValue"]
 
-            for prop in prop_list:
-                 card[prop] = card[prop] + equip_base[prop] + equip_star[prop] + equip_strong[prop]
+        # 装备基础属性+强化属性+进阶属性
+        for prop in self.prop_list:
 
-        if type ==2 :
-            for gem in gem_list:
-                if gem > 0:
-                    gem1_data = itemsDiamond.itemsDiamondConfig[gem1]
-                    prop_name = gem1_data["propName"]
-                    card[prop_name] = card[prop_name] - gem1_data["propValue"]
+            if type == 1:
+                add_value = getattr(card ,prop) + equip_base[prop] + equip_star[prop] + equip_strong[prop]
+            elif type == 2 or type == 3:
+                add_value = getattr(card ,prop) - equip_base[prop] - equip_star[prop] - equip_strong[prop]
 
-            for prop in prop_list:
-                card[prop] = card[prop] - equip_base[prop] - equip_star[prop] - equip_strong[prop]
+            INFO_MSG("---equipprop---" + str(prop)+"---addvalue---"+str(add_value))
+
+            setattr(card, prop, add_value)
 
 
-
+        if type == 1 or type ==2:
+            self.client.onUpdateCardInfo(self.UpdateBallerInfo(card))
         pass
-
-
-
-
-
-
-
-
-
 
 
 

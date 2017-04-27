@@ -1,0 +1,11 @@
+<root>
+
+
+	<BaseMethods>
+        <onCmd>
+             <Arg> STRING </Arg>
+             <Arg>PY_DICT</Arg>
+        </onCmd>
+	</BaseMethods>
+
+</root>

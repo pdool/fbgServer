@@ -53,6 +53,10 @@
             <Arg> UINT32 </Arg>
         </onBallerCallBack>
 
+        <onLevelMax>
+            <Arg> UINT32 </Arg>
+        </onLevelMax>
+
         <onCombineCardInfo>
             <Arg> Card_Info </Arg>
         </onCombineCardInfo>

@@ -3,6 +3,10 @@ import KBEngine
 import Watcher
 from KBEDebug import *
 
+isGuildMgrLoad = False
+isRankMgrLoad = False
+isArenaMgrLoad = False
+
 def onBaseAppReady(isBootstrap):
     """
     KBEngine method.
@@ -25,8 +29,22 @@ def onBaseAppReady(isBootstrap):
 
         KBEngine.globalData["Onlines"] = set()
 
-        KBEngine.createBaseLocally("CloneMgr", {})
-        pass
+        KBEngine.createBaseLocally("GlobalTimerMgr", {})
+
+        KBEngine.createBaseLocally("RoomMgr", {})
+
+        if isGuildMgrLoad is False:
+            guildMgr = KBEngine.createBaseLocally("GuildMgr", {})
+            guildMgr.writeToDB(None,True)
+
+        if isRankMgrLoad is False:
+            rankMgr = KBEngine.createBaseLocally("RankMgr", {})
+            rankMgr.writeToDB(None,True)
+
+        if isArenaMgrLoad is False:
+            arenaMgr = KBEngine.createBaseLocally("ArenaMgr", {})
+            arenaMgr.loadFakeData()
+            arenaMgr.writeToDB(None, True)
 
 def onBaseAppShutDown(state):
     """
@@ -81,6 +99,22 @@ def onAutoLoadEntityCreate(entityType, dbid):
     """
     INFO_MSG('onAutoLoadEntityCreate: entityType=%s, dbid=%i' % (entityType, dbid))
     KBEngine.createBaseAnywhereFromDBID(entityType, dbid)
+
+    if entityType == "GuildMgr":
+        ERROR_MSG("   GuildMgr is Load  ")
+        global  isGuildMgrLoad
+        isGuildMgrLoad = True
+
+    if entityType == "RankMgr":
+        ERROR_MSG("   RankMgr is Load  ")
+        global  isRankMgrLoad
+        isRankMgrLoad = True
+
+    if entityType == "ArenaMgr":
+        ERROR_MSG("   ArenaMgr is Load  ")
+        global  isArenaMgrLoad
+        isArenaMgrLoad = True
+
 
 def onInit(isReload):
     """

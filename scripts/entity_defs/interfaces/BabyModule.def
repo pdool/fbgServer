@@ -1,0 +1,120 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+
+             <!--足球宝贝内存D-->
+            <babyID>
+                <Type> UINT64 </Type>
+                <Flags> BASE </Flags>
+            </babyID>
+
+            <!--足球宝贝的数据库ID-->
+            <babyDBID>
+                <Type> UINT64 </Type>
+                <Flags> BASE </Flags>
+                <Persistent> true </Persistent>
+            </babyDBID>
+
+	</Properties>
+
+	<BaseMethods>
+        <onClientGetBabyInfo>
+            <Exposed/>
+        </onClientGetBabyInfo>
+
+        <onClientGetBabyItemInfo>
+            <Exposed/>
+        </onClientGetBabyItemInfo>
+
+        <onClientChangeClothes>
+            <Exposed/>
+            <Arg> UINT32 </Arg><!--configID-->
+        </onClientChangeClothes>
+
+        <onClientClothesSlevel>
+            <Exposed/>
+            <Arg> UINT32 </Arg><!--config-->
+        </onClientClothesSlevel>
+
+        <onClientGetMapReward>
+            <Exposed/>
+            <Arg> UINT32 </Arg><!--config-->
+        </onClientGetMapReward>
+
+        <onClientClothesLevel>
+            <Exposed/>
+            <Arg> UINT32 </Arg><!--config-->
+            <Arg>	ARRAY <of> Ability_Piece</of>     </Arg>
+        </onClientClothesLevel>
+
+        <onClientTouchBabyInfo>
+            <Exposed/>
+            <Arg> UINT32 </Arg><!--触摸道具-->
+            <Arg> UINT32 </Arg><!--触摸部位-->
+            <Arg> UINT32 </Arg><!--当前星级-->
+        </onClientTouchBabyInfo>
+
+        <onClientInheritClothes>
+            <Exposed/>
+            <Arg> UINT32 </Arg><!--传承者-->
+            <Arg> UINT32 </Arg><!--被传承者-->
+            <Arg> UINT32 </Arg><!--道具类型-->
+        </onClientInheritClothes>
+
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+        <onGetBabyInfo>
+            <Arg> UINT32 </Arg><!--好感度-->
+            <Arg> UINT32 </Arg><!--好感度变满的时间戳-->
+            <Arg> UINT32 </Arg><!--亲密抚摸次数-->
+            <Arg> UINT32 </Arg><!--道具抚摸次数-->
+            <Arg> UINT32 </Arg><!--好感度倒计时-->
+            <Arg>ARRAY <of> UINT32 </of></Arg>
+        </onGetBabyInfo>
+
+        <onFullTimeOver>
+            <Arg> UINT32 </Arg><!--exp-->
+            <Arg> UINT32 </Arg><!--level-->
+            <Arg> UINT32 </Arg><!--level-->
+        </onFullTimeOver>
+
+        <onTouchSucess>
+            <Arg> UINT32 </Arg><!--exp-->
+            <Arg> UINT32 </Arg><!--level-->
+        </onTouchSucess>
+
+
+        <onLevelSucessCallBack>
+            <Arg> UINT32 </Arg><!--exp-->
+            <Arg> UINT32 </Arg><!--level-->
+        </onLevelSucessCallBack>
+
+        <onSlevelSucessCallBack>
+            <Arg> UINT32 </Arg><!--star-->
+        </onSlevelSucessCallBack>
+
+
+
+        <onGetRewardSuceess>
+            <Arg> UINT32 </Arg><!--errorid-->
+        </onGetRewardSuceess>
+
+        <onBabyCallBack>
+            <Arg> UINT32 </Arg><!--errorid-->
+        </onBabyCallBack>
+
+        <onGetBabyItemInfo>
+            <Arg> ARRAY <of> Baby_ItemInfo </of> </Arg>
+        </onGetBabyItemInfo>
+
+
+	</ClientMethods>
+</root>
+

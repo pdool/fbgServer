@@ -78,7 +78,7 @@ class LotteryModule:
             return (op,result)
         # 欧元抽取
         if self.euro >= moneyCount:
-            self.euro = self.euro - moneyCount
+            self.useEuro(moneyCount)
 
             for key in dropIds:
                 result += str(key) + ","
@@ -86,6 +86,8 @@ class LotteryModule:
 
             DEBUG_MSG("euroLottery----------" + result)
             return (op, result)
+        # 钱不够，时间不够（抽卡失败）TODO:
+        return (ErrorCode.LotteryError.Fail,result)
 
 
 
@@ -126,6 +128,8 @@ class LotteryModule:
             DEBUG_MSG("diamondLottery ----------" + result)
             return (op, result)
 
+        return (ErrorCode.LotteryError.Fail,result)
+
 
     # 十连抽
     def tenLottery(self,configDict):
@@ -163,9 +167,7 @@ class LotteryModule:
         if userArg != TimerDefine.Timer_reset_lottery_free_times:
             return
 
-
         self.euroFreeTimes = 0
-
 
 
         self.diamondFreeTimes = 0

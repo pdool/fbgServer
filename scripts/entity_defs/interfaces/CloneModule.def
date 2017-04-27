@@ -3,6 +3,16 @@
 	</Implements>
 
 	<Properties>
+
+        <passCloneInfo>
+
+            <Type>			ARRAY <of> CloneInfo	 </of> 		</Type>
+			<Flags>			BASE				</Flags>
+            <Persistent> true </Persistent>
+        </passCloneInfo>
+
+
+
         <cloneID>
 			<Type> UINT32 </Type>
 			<Flags> CELL_PRIVATE </Flags>
@@ -38,9 +48,15 @@
         <!--客户端调用 选择传球还是射门-->
         <onClientSelectOp>
             <Exposed/>
+             <Arg> INT8 </Arg>
              <Arg>ARRAY <of> UINT32 </of></Arg>
              <Arg>ARRAY <of> UINT32 </of></Arg>
         </onClientSelectOp>
+
+        <onCloneGM>
+            <Exposed/>
+            <Arg> UINT32 </Arg>
+        </onCloneGM>
 
 	</CellMethods>
 
@@ -82,8 +98,14 @@
            <Arg>UINT8</Arg>
        </onTotalAttackTimes>
 
+        <onSkillSucc>
+            <!--技能使用成功的卡牌ID-->
+            <Arg> ARRAY <of> UINT32 </of></Arg>
+        </onSkillSucc>
 
-
+       <onSkillError>
+           <Arg>UINT8</Arg>
+       </onSkillError>
 	</ClientMethods>
 </root>
 

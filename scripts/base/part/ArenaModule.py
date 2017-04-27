@@ -1,0 +1,202 @@
+# -*- coding: utf-8 -*-
+from KBEDebug import *
+import ArenaConfig
+__author__ = 'yangh'
+"""
+竞技场
+"""
+
+
+class ArenaModule:
+    def onEntitiesEnabled(self):
+        if len(self.arenaInitialList) == 0:
+            return
+        self.client.onGetThreeArenaValue(self.arenaInitialList,self.arenaTimes)
+        pass
+
+    # --------------------------------------------------------------------------------------------
+    #                              客户端调用函数
+    # --------------------------------------------------------------------------------------------
+
+
+
+
+    # --------------------------------------------------------------------------------------------
+    #                              工具函数调用函数
+    # --------------------------------------------------------------------------------------------
+
+    def onArenaMgrQueryResult(self, itemList):
+        clientResult = []
+        self.chanllengeMap = {}
+        if len(self.arenaInitialList) > 0:
+            self.arenaTimes = self.arenaTimes - 1
+        self.arenaInitialList = []
+        inStr = ""
+        for i in range(len(itemList)):
+            dbid = itemList[i]["dbid"]
+            rank = itemList[i]["rank"]
+            isRobot = itemList[i]["isRobot"]
+
+            self.chanllengeMap[dbid] = {"rank":rank,"isRobot": isRobot,"inTeamCardIDDict":{}}
+            if isRobot == 1:
+                # 填充配置文件
+                clientResultItem  = {}
+                config = ArenaConfig.ArenaConfig[dbid]
+                clientResultItem["dbid"] = dbid
+                clientResultItem["rank"] = rank
+                clientResultItem["name"] = config["playerName"]
+                clientResultItem["club"] = config["clubName"]
+                clientResultItem["formation"] = config["campId"]
+                clientResultItem["camp"] = config["camp"]
+                clientResultItem["fightValue"] = config["fightValue"]
+                clientResult.append(clientResultItem)
+                self.arenaInitialList.append(clientResultItem)
+                continue
+            clientResultItem = {}
+            clientResultItem["dbid"] = dbid
+            clientResultItem["rank"] = rank
+            clientResult.append(clientResultItem)
+            self.arenaInitialList.append(clientResultItem)
+            inStr = inStr + str(dbid)  + ","
+
+        if inStr != "":
+            inStr = inStr[:-1]
+            def cb(result, rownum, error):
+                if result is not  None:
+                    for i in range(len(result)):
+                        dbid = int(result[i][0])
+                        name = result[i][1].decode('utf-8')
+                        club = result[i][2].decode('utf-8')
+                        formation = int(result[i][3])
+                        fightValue = int(result[i][4])
+                        cardConfigID = int(result[i][5])
+                        skill1 = int(result[i][6])
+                        skill2 = int(result[i][7])
+                        camp = int(result[i][8])
+                        item = self.chanllengeMap[dbid]
+                        inTeamCardIDDict = item["inTeamCardIDDict"]
+                        inTeamCardIDDict[cardConfigID] = {"skill1":skill1,"skill2":skill2}
+                        for resultItem in clientResult:
+                            if resultItem["dbid"] == dbid:
+                                resultItem["name"] = name
+                                resultItem["club"] = club
+                                resultItem["fightValue"] = fightValue
+                                resultItem["formation"] = formation
+                                resultItem["camp"] = camp
+                        for Item in self.arenaInitialList:
+                            if Item["dbid"] == dbid:
+                                Item["name"] = name
+                                Item["club"] = club
+                                Item["fightValue"] = fightValue
+                                Item["formation"] = formation
+                                Item["camp"] = camp
+
+                self.client.onGetThreeArenaValue(clientResult,self.arenaTimes)
+                pass
+
+            sql = "SELECT a.id, a.sm_name, a.sm_club, a.sm_formation, a.sm_fightValue,c.sm_configID, c.sm_skill1, c.sm_skill2,a.sm_camp FROM tbl_Avatar AS a, tbl_Card AS c WHERE a.id in("+inStr+") AND c.sm_inTeam = 1"
+
+            KBEngine.executeRawDatabaseCommand(sql,cb)
+        else:
+            self.client.onGetThreeArenaValue(clientResult,self.arenaTimes)
+
+
+    def onArenaMgrValueRankResult(self,itemList):
+        clientResult = []
+        inStr = ""
+        for i in range(len(itemList)):
+            dbid = itemList[i]["dbid"]
+            rank = itemList[i]["rank"]
+            isRobot = itemList[i]["isRobot"]
+            if isRobot == 1:
+                clientResultItem = {}
+                config = ArenaConfig.ArenaConfig[dbid]
+                clientResultItem["dbid"] = dbid
+                clientResultItem["rank"] = rank
+                clientResultItem["name"] = config["playerName"]
+                clientResultItem["club"] = config["clubName"]
+                clientResultItem["formation"] = config["campId"]
+                clientResultItem["camp"] = config["camp"]
+                clientResultItem["fightValue"] = config["fightValue"]
+                clientResult.append(clientResultItem)
+                continue
+            clientResultItem = {}
+            clientResultItem["dbid"] = dbid
+            clientResultItem["rank"] = rank
+            clientResult.append(clientResultItem)
+            inStr = inStr + str(dbid) + ","
+        if inStr == "":
+            self.client.onGetArenaRankValue(clientResult)
+            return
+        inStr = inStr[:-1]
+        def cb(result, rownum, error):
+            if result is not None:
+                for i in range(len(result)):
+                    dbid = int(result[i][0])
+                    name = result[i][1].decode('utf-8')
+                    club = result[i][2].decode('utf-8')
+                    formation = int(result[i][3])
+                    fightValue = int(result[i][4])
+                    camp = int(result[i][5])
+                    for resultItem in clientResult:
+                        if resultItem["dbid"] == dbid:
+                            resultItem["name"] = name
+                            resultItem["club"] = club
+                            resultItem["formation"] = formation
+                            resultItem["fightValue"] = fightValue
+                            resultItem["camp"] = camp
+                self.client.onGetArenaRankValue(clientResult)
+            pass
+        sql = "SELECT a.id, a.sm_name, a.sm_club, a.sm_formation, a.sm_fightValue,a.sm_camp FROM tbl_Avatar AS a, tbl_Card AS c WHERE a.id in(" + inStr + ") AND c.sm_inTeam = 1"
+        KBEngine.executeRawDatabaseCommand(sql, cb)
+
+
+    # 初始化自己的排行
+    def defaultMyRank(self,param):
+        rank = param["rank"]
+        self.myRank = rank
+        self.onClientUpdateArenaRank()
+
+    # 刷新自己的排行榜
+    def onUpdateRank(self,enemyDBID,enemyRank):
+        param = {
+            "selfRank": self.myRank,
+            "selfDBID": self.databaseID,
+            "enemyDBID": enemyDBID,
+            "enemyRank": enemyRank,
+        }
+        arenaMgr = KBEngine.globalData["ArenaMgr"]
+        arenaMgr.onCmd("onCmdUpdateArenaRank",param)
+
+
+
+    # 请求竞技场排行榜
+    def onClientGetArenaRank(self,page):
+        param = {
+            "playerMB": self,
+            "page": page,
+        }
+        arenaMgr = KBEngine.globalData["ArenaMgr"]
+        arenaMgr.onCmd("onCmdGetArenaRankValue", param)
+
+
+    # 刷新竞技对手排行榜
+    def onClientUpdateArenaRank(self):
+        if self.arenaTimes == 0:
+            return
+        param = {
+            "selfRank": self.myRank,
+            "playerMB": self,
+        }
+        arenaMgr = KBEngine.globalData["ArenaMgr"]
+        arenaMgr.onCmd("onCmdGetChanllengeMember", param)
+
+    # 加入竞技场排行
+    def onAddArenaRank(self):
+        param = {
+            "selfDBID": self.databaseID,
+            "isRobot": 0,
+            "playerMB": self,
+        }
+        arenaMgr = KBEngine.globalData["ArenaMgr"]
+        arenaMgr.onCmd("onCmdInsertArenaRank", param)

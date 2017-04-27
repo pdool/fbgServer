@@ -1,0 +1,119 @@
+<root>
+	<Properties>
+        <!--公会等级-->
+        <level>
+            <Type> UINT32 </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </level>
+        <!--公会名字-->
+        <name>
+            <Type> UNICODE </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </name>
+        <!--公会阵营-->
+        <camp>
+            <Type> UINT8 </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </camp>
+
+        <!--公会领袖名字-->
+        <leader>
+            <Type> UNICODE </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </leader>
+        <!--副会长名字-->
+        <vicePresident>
+            <Type> ARRAY <of> UNICODE </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </vicePresident>
+
+
+        <!--公会简介 （对外）-->
+        <introduction>
+            <Type> UNICODE </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </introduction>
+
+        <!--公会公告（对内）-->
+        <notice>
+            <Type> UNICODE </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </notice>
+
+        <!--公会资金-->
+        <guildFunds>
+            <Type> UINT32 </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </guildFunds>
+
+        <!--公会声望-->
+        <reputation>
+            <Type> UINT32 </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </reputation>
+
+        <!--创建时间-->
+        <createTime>
+            <Type> UINT64 </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </createTime>
+
+        <!--公会成员-->
+        <guildMember>
+            <Type> ARRAY <of> Guild_MemberInfo </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </guildMember>
+
+        <!--公会建筑-->
+        <guildBuild>
+            <Type> ARRAY <of> Guild_Build </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </guildBuild>
+
+        <!--离开的成员-->
+        <leaveGuildMember>
+            <Type> ARRAY <of> Guild_MemberInfo </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </leaveGuildMember>
+
+
+        <!--公会申请成员-->
+        <applyMember>
+            <Type> ARRAY <of> Guild_ApplyMemberInfo </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </applyMember>
+
+
+    </Properties>
+    <BaseMethods>
+       <onCmd>
+            <Arg> STRING </Arg>
+            <Arg>PY_DICT</Arg>
+        </onCmd>
+
+    </BaseMethods>
+
+	<CellMethods>
+        <!--<setAvatarID>-->
+            <!--<Arg>UINT32</Arg>-->
+        <!--</setAvatarID>-->
+	</CellMethods>
+
+
+
+
+</root>

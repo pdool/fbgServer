@@ -1,0 +1,32 @@
+<root>
+	<Properties>
+        <dbid>
+			<Type> UINT32 </Type>
+			<Flags> BASE</Flags>
+			<Persistent> true </Persistent>
+		</dbid>
+        <rank>
+			<Type> UINT32 </Type>
+			<Flags> BASE </Flags>
+			<Persistent> true </Persistent>
+		</rank>
+        <isRobot>
+			<Type> UINT32 </Type>
+			<Flags> BASE </Flags>
+			<Persistent> true </Persistent>
+		</isRobot>
+    </Properties>
+    <BaseMethods>
+
+    </BaseMethods>
+
+	<CellMethods>
+        <!--<setAvatarID>-->
+            <!--<Arg>UINT32</Arg>-->
+        <!--</setAvatarID>-->
+	</CellMethods>
+
+
+
+
+</root>

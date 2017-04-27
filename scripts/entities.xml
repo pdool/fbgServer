@@ -10,16 +10,22 @@
 
     <Mails/>
     <PlayerMgr/>
+    <GlobalTimerMgr/>
     <Card hasClient="true"/>
+    <Baby/>
     <ItemPieces/>
     <ItemDiamonds/>
     <ItemGifts/>
     <ItemEquips/>
     <ItemUses/>
     <ItemMaterial/>
-
-
-    <CloneMgr/>
-    <Clone/>
+    <Guild/>
+    <GuildMgr/>
+    <ArenaMgr/>
+    <ArenaRow/>
+    <RankMgr/>
+    <RoomMgr/>
+    <Room/>
+    <NpcController/>
     <Monster hasClient="true"/>
 </root>

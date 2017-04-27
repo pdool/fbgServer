@@ -1,0 +1,178 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+        <guildDBID>
+			<Type> UINT32 </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</guildDBID>
+
+       <applyGuildList>
+			<Type> ARRAY <of> UINT64 </of> </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</applyGuildList>
+
+        <!--在公会中的职位-->
+        <guildPower>
+			<Type> UINT32 </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</guildPower>
+
+
+       <guildName>
+            <Type> UNICODE </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+       </guildName>
+
+	</Properties>
+
+	<BaseMethods>
+            <!--客户端方法-->
+        <onClientCreateGuild>
+            <Exposed/>
+            <Arg> UNICODE </Arg> <!-- 公会名字 -->
+            <Arg> UNICODE </Arg> <!-- 公会介绍 -->
+        </onClientCreateGuild>
+        <!--获得公会信息-->
+        <onClientGetGuildInfo>
+            <Exposed/>
+        </onClientGetGuildInfo>
+
+        <!--请求公会列表-->
+        <onClientGuildList>
+            <Exposed/>
+        </onClientGuildList>
+
+        <!--查找派系-->
+        <onClientFindCamp>
+            <Exposed/>
+            <Arg> UNICODE </Arg> <!-- 公会关键字 -->
+        </onClientFindCamp>
+
+        <!--申请加入公会-->
+        <onClientApplyJoinGuild>
+            <Exposed/>
+            <Arg> UINT64 </Arg> <!-- 公会DBID-->
+        </onClientApplyJoinGuild>
+
+        <!--拒绝申请-->
+        <onClientRejectApply>
+            <Exposed/>
+            <Arg> UINT64 </Arg> <!-- 公会DBID-->
+        </onClientRejectApply>
+
+
+        <!--取消申请-->
+        <onClientCancelApply>
+            <Exposed/>
+            <Arg> UINT64 </Arg> <!-- 公会DBID-->
+        </onClientCancelApply>
+
+        <!--申请公会副队及简介-->
+        <onClientGetViceIntroduce>
+            <Exposed/>
+            <Arg> UINT64 </Arg> <!-- 公会DBID-->
+        </onClientGetViceIntroduce>
+
+        <!--修改公告和简介-->
+        <onClientChangeNotice>
+            <Exposed/>
+            <Arg> UINT8 </Arg> <!-- 公会简介是否修改 1 修改-->
+            <Arg> UNICODE </Arg> <!-- 简介 -->
+            <Arg> UINT8 </Arg> <!-- 公告是否修改 1 修改-->
+            <Arg> UNICODE </Arg> <!-- 公告 -->
+        </onClientChangeNotice>
+
+
+        <!--修改公会名字-->
+        <onClientChangeName>
+            <Exposed/>
+            <Arg> UNICODE </Arg> <!-- 公会新名字-->
+        </onClientChangeName>
+
+        <!--解散公会-->
+        <onClientDismissGuild>
+            <Exposed/>
+        </onClientDismissGuild>
+
+        <!--取消解散公会-->
+        <onClientCancelDismiss>
+            <Exposed/>
+        </onClientCancelDismiss>
+
+
+        <setGuildDBID>
+            <Arg> PY_DICT </Arg>
+        </setGuildDBID>
+
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+   <ClientMethods>
+        <!--查找自己的派系-->
+        <onFindCamp>
+
+           <Arg> UINT32 </Arg>        <!-- 数量-->
+           <Arg> ARRAY <of> GuildMgr_ItemInfo </of></Arg>
+       </onFindCamp>
+
+       onGuildViceIntroduce
+
+       <!--获取公会副会长及简介-->
+       <onGuildViceIntroduce>
+           <Arg> ARRAY <of> UNICODE </of></Arg>
+           <Arg> UNICODE </Arg>        <!-- 公会简介-->
+       </onGuildViceIntroduce>
+
+        <!--公会申请人列表-->
+       <onGuildApplyList>
+           <Arg> ARRAY <of> Guild_ApplyMemberInfo </of></Arg>
+       </onGuildApplyList>
+
+       <!--公会成员列表-->
+       <onGuildMemberList>
+           <Arg> ARRAY <of> Guild_MemberInfo </of></Arg>
+       </onGuildMemberList>
+
+
+       <!--已经申请过的公会列表-->
+       <onApplyGuildIDList>
+           <Arg> ARRAY <of> UINT64 </of></Arg>
+       </onApplyGuildIDList>
+
+       <!--公会信息-->
+        <onGetGuildInfo>
+           <Arg> UINT32 </Arg>          <!-- 公会等级-->
+           <Arg> UNICODE </Arg>        <!-- 公会名字-->
+           <Arg> UINT32 </Arg>          <!-- 公会人数-->
+           <Arg> UINT32 </Arg>         <!-- 公会基金-->
+           <Arg> UINT32 </Arg>        <!-- 公会声望-->
+           <Arg> UNICODE </Arg>        <!-- 公会公告-->
+       </onGetGuildInfo>
+
+
+       <!--返回公会建筑信息-->
+       <onClientGuildBuildInfo>
+           <Arg> Guild_Build </Arg>        <!-- 建筑-->
+       </onClientGuildBuildInfo>
+
+
+       <onGuildError>
+           <Arg>UINT8</Arg>
+       </onGuildError>
+
+      <onResponse>
+           <Arg>UINT8</Arg>
+       </onResponse>
+
+	</ClientMethods>
+</root>
+

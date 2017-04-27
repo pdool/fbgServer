@@ -1,21 +1,28 @@
 <root>
 	<Implements>
-        <Interface>	MailsModule		    </Interface>
-        <Interface>	LotteryModule		    </Interface>
-        <Interface>	ShopModule		        </Interface>
-        <Interface>	FriendModule		    </Interface>
-        <Interface>	BodyPowerModule		</Interface>
-        <Interface>	ChatModule		        </Interface>
-        <Interface>	BagModule		        </Interface>
-        <Interface>	CardMgrModule		    </Interface>
+        <Interface>	MailsModule		    </Interface><!--邮件系统-->
+        <Interface>	LotteryModule		    </Interface><!--抽卡系统-->
+        <Interface>	ShopModule		        </Interface><!--商城系统-->
+        <Interface>	FriendModule		    </Interface><!--好友系统-->
+        <Interface>	BodyPowerModule		</Interface><!--体力系统-->
+        <Interface>	ChatModule		        </Interface><!--聊天系统-->
+        <Interface>	BagModule		        </Interface><!--背包系统-->
+        <Interface>	CardMgrModule		    </Interface><!--卡牌管理系统-->
         <Interface>	PiecesModule		    </Interface>
         <Interface>	SlevelModule		    </Interface>
-        <Interface>	EquipModule		    </Interface>
-        <Interface>	CloneModule		    </Interface>
-        <Interface>	MentalityModule		    </Interface>
-        <Interface>	StrikeModule		    </Interface>
-        <Interface>	InheritModule		    </Interface>
-        <Interface>	AbilityModule		    </Interface>
+        <Interface>	EquipModule		    </Interface><!--装备系统-->
+        <Interface>	CloneModule		    </Interface><!--副本系统-->
+        <Interface>	MentalityModule		</Interface><!--意识系统-->
+        <Interface>	StrikeModule		    </Interface><!--强化系统-->
+        <Interface>	InheritModule		    </Interface><!--继承系统-->
+        <Interface>	AbilityModule		    </Interface><!--能力系统-->
+        <Interface>	BabyModule		    	</Interface><!--足球宝贝系统-->
+        <Interface>	OfficialModule		    </Interface><!--官职系统-->
+        <Interface>	GuildModule		    </Interface><!--公会系统-->
+        <Interface>    FormationModule       </Interface><!--阵型系统-->
+        <Interface>    GameShopModule        </Interface><!--游戏商城-->
+        <Interface>    ArenaModule           </Interface><!--竞技场-->
+        <Interface>    RankModule            </Interface><!--排行榜-->
 	</Implements>
 
 	<Properties>
@@ -90,7 +97,6 @@
 		</job>
 
 
-
         <!--欧元（游戏中送）-->
 		<euro>
 			<Type> UINT32 </Type>
@@ -130,6 +136,12 @@
 			<Persistent> true </Persistent>
         </formation>
 
+        <!-- 阵营 -->
+        <camp>
+            <Type> INT8 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+        </camp>
 	</Properties>
 
 	<BaseMethods>
@@ -143,6 +155,13 @@
             <Exposed/>
             <Arg> STRING </Arg>
     </onClientGM>
+
+
+    <onClientGetPlayerInfo>
+            <Exposed/>
+            <Arg> UINT32 </Arg>
+    </onClientGetPlayerInfo>
+
 
     <onClientChangeSolgan>
             <Exposed/>
@@ -175,6 +194,9 @@
             <Arg>UINT64</Arg>
         </onCardFightValueChange>
 
+        <onGetPlayerInfo>
+            <Arg> PlayerInfo </Arg>
+        </onGetPlayerInfo>
 
 	</ClientMethods>
 

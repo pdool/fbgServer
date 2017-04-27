@@ -3,6 +3,7 @@ __author__ = 'chongxin'
 
 
 class LotteryError:
+    Fail = 3
     Success=0
     Money_not_enough =1
     Diamond_not_enough = 2
@@ -142,10 +143,98 @@ class CardMgrModuleError:
     Ability_is_sucess = 16
     # 球员升级成功
     Level_is_sucess = 17
+    # 球员意识提升成功
+    Mentality_is_sucess = 18
+
+class GuildModuleError:
+    # 公会名字不符合规则
+    Guild_name_error = 1
+
+    # 公会简介不符合规则
+    Guild_introduction_error = 2
+
+    # 钻石不足
+    Guild_diamond_not_enough = 3
+
+    # 重复的名字
+    Guild_repeat_name = 4
+
+    # 已经加入公会
+    Guild_already_in_guild = 5
+    # 不存在的公会
+    Guild_guild_not_exist = 6
+    # 不在公会中
+    Guild_not_in_guild = 7
+
+    # 已经申请了
+    Guild_already_apply = 8
+
+    # 公会简介不符合规则
+    Guild_notice_error = 9
+    # 还没加入公会
+    Guild_has_not_join = 10
+    # 没有权利
+    Guild_not_has_the_power = 11
+
+    # 公会人员已满，请腾出空间再试！
+    Guild_is_full = 12
+
+    # 领袖离线时间不到7天
+    Guild_leader_offline_not_enough = 13
+
+class BabyModuleError:
+    # 宝贝不存在
+    Baby_not_exist = 1
+    # 时装已满级
+    Clothes_level_max = 2
+    # 时装已满星
+    Clothes_star_max = 3
+    # 欧元不足
+    Money_not_enough = 4
+    # 材料不足
+    Material_not_enough = 5
+    # 更换
+    Change_is_sucess = 6
+    # 时装不存在
+    Clothes_not_exist = 7
+    # 传承成功
+    Inherit_is_sucess = 8
+    # 触摸成功
+    Touch_is_sucess = 9
+    # 好感度已满
+    Liking_is_max = 10
+    # 已领取
+    Have_GetReward = 11
+
+
+class SkillModuleError:
+    # 技能和操作不匹配
+    not_match_skill = 1
+    # 错误的操作
+    worong_op = 2
+
+class GameShopModuleError:
+    # 欧元不足
+    Euro_not_enough = 1
+    # 钻石不足
+    Diamod_not_enough = 2
+    # 黑市币
+    Black_not_enough = 3
+    # 购买成功
+    Shopping_sucess = 4
 
 
 
+class CloneModuleError:
+    # 副本未开启
+    clone_not_open = 1
+    # 剩余挑战次数不足
+    clone_not_enough_rest_count = 2
+    # 体力不足
+    clone_not_enough_power = 3
 
+    # 不足三星
+    clone_not_enough_3Star = 4
 
 
 

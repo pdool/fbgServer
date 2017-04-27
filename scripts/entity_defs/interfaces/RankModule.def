@@ -1,0 +1,108 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+
+
+
+	</Properties>
+
+	<BaseMethods>
+
+        <!--请求战斗力排行榜-->
+        <onClientGetFightValueRank>
+            <Exposed/>
+            <Arg>UINT32</Arg> <!-- 页签 -->
+        </onClientGetFightValueRank>
+
+        <!--请求战斗力排行榜-->
+        <onClientGetLevelValueRank>
+            <Exposed/>
+            <Arg>UINT32</Arg> <!-- 页签 -->
+        </onClientGetLevelValueRank>
+
+         <!--请求财富排行榜-->
+        <onClientGetMoneyValueRank>
+            <Exposed/>
+            <Arg>UINT32</Arg> <!-- 页签 -->
+        </onClientGetMoneyValueRank>
+
+         <!--请求官职排行榜-->
+        <onClientGetOfficialValueRank>
+            <Exposed/>
+            <Arg>UINT32</Arg> <!-- 页签 -->
+        </onClientGetOfficialValueRank>
+
+        <!--请求球员排行榜-->
+        <onClientGetBallerValueRank>
+            <Exposed/>
+            <Arg>UINT32</Arg> <!-- 页签 -->
+        </onClientGetBallerValueRank>
+
+         <!--请求球员排行榜-->
+        <onClientGetGuildValueRank>
+            <Exposed/>
+            <Arg>UINT32</Arg> <!-- 页签 -->
+        </onClientGetGuildValueRank>
+
+         <!--请求自己的排行-->
+        <onClientGetMySelfValueRank>
+            <Exposed/>
+            <Arg>UINT32</Arg> <!-- dibid -->
+            <Arg>STRING</Arg> <!-- 当前排行类型 -->
+        </onClientGetMySelfValueRank>
+
+
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+
+        <!--推送战斗力排行榜-->
+        <onGetFightValue>
+           <Arg> ARRAY <of> RankFightValueItem </of></Arg>
+            <Arg>UINT8</Arg>
+        </onGetFightValue>
+
+         <!--推送等级排行榜-->
+        <onGetLevelValue>
+           <Arg> ARRAY <of> RankLevelValueItem </of></Arg>
+            <Arg>UINT8</Arg>
+        </onGetLevelValue>
+
+          <!--推送财富排行榜-->
+        <onGetMoneyValue>
+           <Arg> ARRAY <of> RankEuroValueItem </of></Arg>
+            <Arg>UINT8</Arg>
+        </onGetMoneyValue>
+
+          <!--推送官职排行榜-->
+        <onGetOfficalValue>
+           <Arg> ARRAY <of> RankOfficalValueItem </of></Arg>
+            <Arg>UINT8</Arg>
+        </onGetOfficalValue>
+
+         <!--推送球员排行榜-->
+        <onGetBallerValue>
+           <Arg> ARRAY <of> RankBallerValueItem </of></Arg>
+            <Arg>UINT8</Arg>
+        </onGetBallerValue>
+
+         <!--推送公会排行榜-->
+        <onGetGuildValue>
+           <Arg> ARRAY <of> RankGuildValueItem </of></Arg>
+            <Arg>UINT8</Arg>
+        </onGetGuildValue>
+
+         <!--推送自己所在排行榜的页数-->
+        <onGetMySelfRank>
+            <Arg>UINT8</Arg>
+        </onGetMySelfRank>
+
+	</ClientMethods>
+</root>
+

@@ -186,7 +186,9 @@
             <star>             <Type> UINT32   </Type>     </star>
             <exp>             <Type> UINT64   </Type>     </exp>
             <inTeam>          <Type> UINT8   </Type>     </inTeam>
+			<bench>           <Type> UINT8   </Type>     </bench>
             <isSelf>          <Type> UINT8   </Type>     </isSelf>
+			<pos>             <Type> UINT32   </Type>     </pos><!--阵型位置-->
 			<brokenLayer>       <Type> UINT32  </Type>     </brokenLayer><!--突破-->
             <fightValue>        <Type> UINT64   </Type>     </fightValue><!--configID-->
 			<shoot>              <Type> UINT32  </Type>     </shoot><!--射门-->
@@ -215,6 +217,10 @@
 			<keepExp>               <Type> UINT32  </Type>     </keepExp><!--守门-->
             <tech>               <Type> FLOAT  </Type>     </tech><!--技术-->
             <health>             <Type> FLOAT  </Type>     </health><!--身体-->
+			<defendPercent>             <Type> FLOAT  </Type>     </defendPercent><!--防守百分比加成-->
+			<keepPercent>             <Type> FLOAT  </Type>     </keepPercent><!--守门百分比加成-->
+			<controllPercent>             <Type> FLOAT  </Type>     </controllPercent><!--控球百分比加成-->
+			<shootPercent>             <Type> FLOAT  </Type>     </shootPercent><!--射门百分比加成-->
 			<strikeNeedCost>     <Type> UINT32  </Type>     </strikeNeedCost><!--花费碎片数量-->
         </Properties>
     </Card_Info>
@@ -271,5 +277,198 @@
         </Properties>
     </Ability_Piece>
 
+    <!--足球宝贝装备属性-->
+    <Baby_ItemInfo>  FIXED_DICT
+        <Properties>
+            <configID>              <Type> UINT32   </Type>     </configID>     <!--时装ID-->
+			<type>              	<Type> UINT32   </Type>     </type>     <!--时装部位-->
+			<firstName>              <Type> STRING   </Type>      </firstName>       <!--增加的第一个属性名-->
+			<seondName>              <Type> STRING   </Type>      </seondName>       <!--增加的第二个属性名-->
+			<maxLevel>              <Type> UINT8   </Type>      </maxLevel>       <!--最大等级-->
+			<maxStar>              <Type> UINT8   </Type>      </maxStar>       <!--最大星级-->
+			<isWear>                <Type> UINT8   </Type>      </isWear>       <!--是否穿戴-->
+			<level>                 <Type> UINT32   </Type>     </level>         <!--等级-->
+            <star>                  <Type> UINT8   </Type>      </star>          <!--星级-->
+            <exp>                   <Type> UINT32   </Type>     </exp>            <!--经验-->
+        </Properties>
+    </Baby_ItemInfo>
+    <!--公会管理器保存公会属性-->
+    <GuildMgr_ItemInfo>  FIXED_DICT
+        <Properties>
+            <dbid>                    <Type> UINT64   </Type>       </dbid>             <!--公会ID-->
+            <guildName>              <Type> UNICODE   </Type>      </guildName>        <!--公会名字-->
+            <camp>                    <Type> UINT8   </Type>         </camp>            <!--阵营-->
+            <level>                   <Type> UINT32   </Type>         </level>          <!--等级-->
+            <count>                   <Type> UINT32   </Type>         </count>          <!--人数-->
+            <leader>                  <Type> UNICODE   </Type>      </leader>           <!--领袖-->
+        </Properties>
+    </GuildMgr_ItemInfo>
+
+    <!--公会成员属性-->
+    <Guild_MemberInfo>  FIXED_DICT
+        <Properties>
+            <dbid>                    <Type> UINT64   </Type>        </dbid>     <!--玩家DBID-->
+			<playerName>             <Type> UNICODE   </Type>      </playerName>       <!--玩家名字-->
+            <power>                   <Type> UINT8   </Type>         </power>       <!--公会权利-->
+            <offical>                 <Type> UINT8   </Type>         </offical>       <!--官职-->
+            <level>                   <Type> UINT32   </Type>         </level>       <!--等级-->
+            <weekDonate>              <Type> UINT32   </Type>         </weekDonate>       <!--本周贡献-->
+            <sumDonate>               <Type> UINT32   </Type>         </sumDonate>       <!--累积贡献-->
+            <onlineState>             <Type> INT32   </Type>         </onlineState>       <!--状态，离开，在帮会-->
+        </Properties>
+    </Guild_MemberInfo>
+
+        <!--公会申请属性-->
+    <Guild_ApplyMemberInfo>  FIXED_DICT
+        <Properties>
+            <dbid>                    <Type> UINT64   </Type>        </dbid>     <!--玩家DBID-->
+			<playerName>             <Type> UNICODE   </Type>       </playerName>       <!--玩家名字-->
+            <offical>                 <Type> UINT8   </Type>         </offical>       <!--官职-->
+            <level>                   <Type> UINT32   </Type>        </level>       <!--等级-->
+            <applyTime>               <Type> UINT64   </Type>        </applyTime>       <!--申请时间-->
+        </Properties>
+    </Guild_ApplyMemberInfo>
+
+	<!--阵型系统属性-->
+    <Formation_Info>  FIXED_DICT
+        <Properties>
+            <id>                  <Type> INT32  </Type>     </id>     <!--阵型系统ID-->
+            <active>              <Type> UINT8   </Type>        </active>     <!--激活-->
+            <open>                <Type> UINT8   </Type>        </open>     <!--是否开放-->
+			<strongLevel>        <Type> UINT32   </Type>        </strongLevel>       <!--系统强化等级-->
+        </Properties>
+    </Formation_Info>
+
+    <AddProp>  FIXED_DICT
+        <Properties>
+            <propName>           <Type> STRING   </Type>     </propName>
+            <value>         <Type> UINT32    </Type>     </value>
+        </Properties>
+    </AddProp>
+
+     <!--商城-->
+    <ShopItemInfo>  FIXED_DICT
+        <Properties>
+            <itemID>            <Type> UINT32   </Type>     </itemID><!--itemID-->
+            <limitTimes>        <Type> UINT32   </Type>     </limitTimes><!--限购次数-->
+        </Properties>
+    </ShopItemInfo>
+
+    <!--公会建筑-->
+    <Guild_Build>  FIXED_DICT
+        <Properties>
+            <id>               <Type> UINT32   </Type>      </id><!--ID-->
+            <level>            <Type> UINT32   </Type>     </level> <!--等级-->
+            <endTimes>        <Type> UINT64  </Type>       </endTimes><!--升级结束时间-->
+        </Properties>
+    </Guild_Build>
+
+    <!--战斗力排行榜条目-->
+    <RankFightValueItem>  FIXED_DICT
+        <Properties>
+            <dbid>        <Type> UINT32   </Type>     </dbid><!--dbid-->
+            <name>        <Type> UNICODE   </Type>     </name><!--玩家名字-->
+            <camp>        <Type> UINT32   </Type>     </camp><!--阵营-->
+            <level>       <Type> UINT32   </Type>     </level><!--玩家等级-->
+            <fightValue>  <Type> UINT32   </Type>     </fightValue><!--战斗力-->
+        </Properties>
+    </RankFightValueItem>
+
+    <!--等级排行榜条目-->
+    <RankLevelValueItem>  FIXED_DICT
+        <Properties>
+            <dbid>        <Type> UINT32   </Type>     </dbid><!--dbid-->
+            <name>        <Type> UNICODE   </Type>     </name><!--玩家名字-->
+            <camp>        <Type> UINT32   </Type>     </camp><!--阵营-->
+            <level>       <Type> UINT32   </Type>     </level><!--玩家等级-->
+            <guildName>        <Type> UNICODE   </Type>     </guildName><!--战斗力-->
+        </Properties>
+    </RankLevelValueItem>
+
+    <!--财富排行榜条目-->
+    <RankEuroValueItem>  FIXED_DICT
+        <Properties>
+            <dbid>        <Type> UINT32   </Type>     </dbid><!--dbid-->
+            <name>        <Type> UNICODE   </Type>     </name><!--玩家名字-->
+            <camp>        <Type> UINT32   </Type>     </camp><!--阵营-->
+            <euro>       <Type> UINT32   </Type>     </euro><!--欧元-->
+            <guildName>        <Type> UNICODE   </Type>     </guildName><!--战斗力-->
+        </Properties>
+    </RankEuroValueItem>
+
+    <!--官职排行榜条目-->
+    <RankOfficalValueItem>  FIXED_DICT
+        <Properties>
+            <dbid>        <Type> UINT32   </Type>     </dbid><!--dbid-->
+            <name>        <Type> UNICODE   </Type>     </name><!--玩家名字-->
+            <camp>        <Type> UINT32   </Type>     </camp><!--阵营-->
+            <officalPosition>     <Type> UINT32   </Type>     </officalPosition><!--欧元-->
+            <achievements>        <Type> UINT64   </Type>     </achievements><!--战斗力-->
+        </Properties>
+    </RankOfficalValueItem>
+
+     <!--官职排行榜条目-->
+    <RankBallerValueItem>  FIXED_DICT
+        <Properties>
+            <dbid>        <Type> UINT32   </Type>     </dbid><!--dbid-->
+            <name>        <Type> UNICODE   </Type>     </name><!--玩家名字-->
+            <camp>        <Type> UINT32   </Type>     </camp><!--阵营-->
+            <level>     <Type> UINT32   </Type>     </level><!--球员等级-->
+            <cardFightValue>        <Type> UINT32   </Type>     </cardFightValue><!--战斗力-->
+            <cardConfigID>        <Type> UINT64   </Type>     </cardConfigID><!--客户端ID-->
+        </Properties>
+    </RankBallerValueItem>
+
+    <!--公会排行榜条目-->
+    <RankGuildValueItem>  FIXED_DICT
+        <Properties>
+            <dbid>        <Type> UINT32   </Type>     </dbid><!--dbid-->
+            <name>        <Type> UNICODE   </Type>     </name><!--公会名字-->
+            <camp>        <Type> UINT32   </Type>     </camp><!--阵营-->
+            <level>     <Type> UINT32   </Type>     </level><!--公会等级-->
+            <leader>        <Type> UNICODE   </Type>     </leader><!--会长-->
+            <reputation>        <Type> UINT32   </Type>     </reputation><!--声望-->
+        </Properties>
+    </RankGuildValueItem>
+
+     <!--副本表-->
+    <CloneInfo>  FIXED_DICT
+        <Properties>
+            <cloneID>        <Type> UINT32   </Type>     </cloneID><!--副本ID-->
+            <star>           <Type> UINT32   </Type>     </star><!--星数-->
+            <restCount>     <Type> UINT32   </Type>     </restCount>
+        </Properties>
+    </CloneInfo>
+
+
+     <!--玩家信息-->
+    <PlayerInfo>  FIXED_DICT
+        <Properties>
+            <dbid>          <Type> UINT32   </Type>     </dbid><!--dbid-->
+            <fightValue>   <Type> UINT32   </Type>     </fightValue><!--fightValue-->
+            <playerName>   <Type> UNICODE   </Type>     </playerName><!--玩家名字-->
+            <vipLevel>      <Type> UINT32   </Type>     </vipLevel><!--vipLevel-->
+            <level>         <Type> UINT32   </Type>     </level><!--level-->
+            <slogan>        <Type> UNICODE   </Type>     </slogan><!--slogan-->
+            <club>          <Type> UNICODE   </Type>     </club><!--club-->
+            <nation>        <Type> UINT32   </Type>     </nation><!--nation-->
+            <offical>        <Type> UINT32   </Type>     </offical><!--offical-->
+            <guildName>        <Type> UNICODE   </Type>     </guildName><!--offical-->
+        </Properties>
+    </PlayerInfo>
+
+
+    <!--竞技场表-->
+    <ArenaInfo>  FIXED_DICT
+        <Properties>
+            <dbid>     <Type> UINT32   </Type>     </dbid>
+            <rank>     <Type> UINT32   </Type>     </rank>
+            <name>        <Type> UNICODE   </Type>     </name><!--副本ID-->
+            <club>        <Type> UNICODE   </Type>     </club><!--副本ID-->
+            <fightValue>           <Type> UINT32   </Type>     </fightValue><!--星数-->
+            <formation>     <Type> UINT32   </Type>     </formation>
+            <camp>     <Type> UINT32   </Type>     </camp>
+        </Properties>
+    </ArenaInfo>
 
 </root>

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import KBEngine
+import propChangeFightConfig
 from KBEDebug import ERROR_MSG
 
 __author__ = 'chongxin'
@@ -49,6 +50,11 @@ class Card(KBEngine.Base):
         KBEngine method.
         entity的cell部分实体丢失
         """
+        if hasattr(self, "cellLoseReason"):
+            ERROR_MSG("cellLoseReason   is " + self.cellLoseReason)
+
+
+
         if hasattr(self,"cellLoseReason") and self.cellLoseReason == "clientDeath":
             self.destroy()
     def destroyCardCell( self ):
@@ -92,18 +98,79 @@ class Card(KBEngine.Base):
         string = string + " trick " + str(self.trick) + " steal " + str(self.steal) + " health " + str(self.health)
         string = string + " keep " + str(self.keep)
 
+        formationFight = self.formationValue()
+
         # ERROR_MSG(string)
-        fightValue = int(shoot + passBall + reel + tech + controll + defend + trick + steal + health + keep)
+        fightValue = int(shoot + passBall + reel + tech + controll + defend + trick + steal + health + keep) + int(formationFight)
+
 
         self.fightValue = fightValue
 
-        avatar.fightValue = avatar.fightValue - oldFightValue + fightValue
+        if self.inTeam == 1:
+            avatar.fightValue = avatar.fightValue - oldFightValue + fightValue
+
 
         avatar.client.onCardFightValueChange(self.id,fightValue)
-
+        avatar.updateFightValueRank()
+        if self.isSelf!=1:
+            card = KBEngine.entities.get(self.id)
+            if card is None:
+                return
+            avatar.updateBallerValueRank(card)
         return  fightValue
 
+    # 减去下阵球员战斗力
+    def subBallerFightValue(self):
+        avatar = KBEngine.entities.get(self.playerID)
+        avatar.fightValue = avatar.fightValue - self.fightValue
 
+        pass
+
+    # 增加上阵球员战斗力
+    def addBallerFightValue(self):
+        avatar = KBEngine.entities.get(self.playerID)
+        avatar.fightValue = avatar.fightValue + self.fightValue
+
+    # 阵型战斗力
+    def formationValue(self):
+
+        avatar = KBEngine.entities.get(self.playerID)
+
+
+        if self.id not in  avatar.inTeamcardIDList :
+            return 0
+
+        fightValue = 0
+
+        propChangeFight = propChangeFightConfig.PropChangeFightConfig[1]
+
+        # 阵型加成
+        for id in avatar.fomationPropContainer:
+            formatList = avatar.fomationPropContainer[id]
+            for info in formatList:
+                name = info["propName"]
+                value = info["value"]
+                ERROR_MSG("--FormatName--" + str(name) + "--Formatvalue--" + str(value))
+                fightValue = fightValue + int(propChangeFight[name] * value)
+
+        # ERROR_MSG("-- formatFightAdd--" + str(fightValue)+"--avatar.relatPropContainer--"+str(len(avatar.relatPropContainer)))
+
+        # 羁绊球员属性加成
+        if self.id not in avatar.relatPropContainer:
+            return fightValue
+
+        relatePropList = avatar.relatPropContainer[self.id]
+
+        relatefightAdd = 0
+        for propInfo in relatePropList:
+            name = propInfo["propName"]
+            value =  propInfo["value"]
+            ERROR_MSG("--propName--" + str(name)+"--propvalue--" +str(value))
+            fightValue = fightValue+int(propChangeFight[name]*value)
+            relatefightAdd = relatefightAdd + int(propChangeFight[name]*value)
+        # ERROR_MSG("--relatefightAdd--"+str(relatefightAdd))
+
+        return fightValue
 
 
 

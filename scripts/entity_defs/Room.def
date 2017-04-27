@@ -1,0 +1,30 @@
+<root>
+	<Properties>
+        <roomID>
+            <Type> UINT32 </Type>
+            <Flags> BASE </Flags>
+        </roomID>
+
+
+        <actionType>
+            <Type> UINT8 </Type>
+            <Flags> BASE </Flags>
+        </actionType>
+    </Properties>
+    <BaseMethods>
+        <onCmd>
+             <Arg> STRING </Arg>
+             <Arg>PY_DICT</Arg>
+        </onCmd>
+    </BaseMethods>
+
+	<CellMethods>
+        <!--<setAvatarID>-->
+            <!--<Arg>UINT32</Arg>-->
+        <!--</setAvatarID>-->
+	</CellMethods>
+
+
+
+
+</root>

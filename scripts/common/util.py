@@ -3,7 +3,20 @@ import time
 import datetime
 import KBEDebug
 import random
-
+import sys
+import os
+def printStackTrace(info):
+    retStr = ""
+    curindex=0
+    f = sys._getframe()
+    f = f.f_back        # first frame is detailtrace, ignore it
+    while hasattr(f, "f_code"):
+        co = f.f_code
+        retStr = "%s(%s:%s)->"%(os.path.basename(co.co_filename),
+                  co.co_name,
+                  f.f_lineno) + retStr
+        f = f.f_back
+    return retStr+info
 
 # 获取当前时间 秒级时间戳
 def getCurrentTime():
@@ -16,10 +29,12 @@ def randFunc():
         seed = 1.0
     return seed
 
-    # 字符串操作
+# 返回[0,100]
+def randInHundred():
+    return random.randint(0,100)
 
 
-
+# 字符串操作
 
 def splitParam(origin, flag=','):
     return origin.split(flag)
@@ -250,3 +265,7 @@ def dbDeco(func):
         func(result,rowNum,error)
 
     return __deco
+
+
+
+

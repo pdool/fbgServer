@@ -1,0 +1,68 @@
+<root>
+	<Properties>
+
+        <!--战斗力排行-->
+        <fightRankList>
+            <Type> ARRAY <of> RankFightValueItem </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </fightRankList>
+
+        <!--战斗力排行-->
+        <levelRankList>
+            <Type> ARRAY <of> RankLevelValueItem </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </levelRankList>
+
+        <!--财富排行-->
+        <moneyRankList>
+            <Type> ARRAY <of> RankEuroValueItem </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </moneyRankList>
+
+        <!--官职排行-->
+        <officalRankList>
+            <Type> ARRAY <of> RankOfficalValueItem </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </officalRankList>
+
+         <!--球员排行-->
+        <ballerRankList>
+            <Type> ARRAY <of> RankBallerValueItem </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </ballerRankList>
+
+        !--公会排行-->
+        <guildRankList>
+            <Type> ARRAY <of> RankGuildValueItem </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </guildRankList>
+
+    </Properties>
+    <BaseMethods>
+
+
+    <onCmd>
+         <Arg> STRING </Arg>
+         <Arg> PY_DICT </Arg>
+    </onCmd>
+
+
+
+    </BaseMethods>
+
+	<CellMethods>
+        <!--<setAvatarID>-->
+            <!--<Arg>UINT32</Arg>-->
+        <!--</setAvatarID>-->
+	</CellMethods>
+
+
+
+
+</root>

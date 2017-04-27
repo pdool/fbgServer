@@ -6,6 +6,8 @@
 #                              定时枚举
 # --------------------------------------------------------------------------------------------
 
+Time_sync_DB = 8888
+
 Timer_shop_recover = 1
 
 # 重置抽奖免费次数
@@ -23,3 +25,14 @@ Timer_leave_clone = 6
 
 # 重置每日购买欧元次数
 Timer_reset_buy_euro = 7
+
+# 宝贝好感度
+Timer_reset_baby_liking = 8
+# 宝贝好感度倒计时
+Timer_reset_baby_likingTime = 9
+# 宝贝好感度已满
+Timer_reset_baby_fullTime = 10
+# 宝贝好感度增加的属性
+Timer_reset_baller_addInfo = 11
+# 重置商城限购次数
+Timer_reset_shop_item = 12

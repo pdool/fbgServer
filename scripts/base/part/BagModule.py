@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import datetime
 import traceback
 
+import TimerDefine
 from BagConfig import BagConfig
 from itemsConfig import itemsIndex
 from KBEDebug import *
@@ -9,6 +11,7 @@ __createTime__  = '2016年12月26日'
 """
 背包模块
 """
+
 class BagModule:
 
 
@@ -22,9 +25,11 @@ class BagModule:
         # 加载材料
         self.loadMaterial()
         # 加载碎片
-        self.loadPiecesItem()
+        self.loadPieces()
         # 加载消耗品
-        self.loadUse()
+        self.loadUses()
+
+        self.addTimer(60,60,TimerDefine.Time_sync_DB)
         pass
 
     # --------------------------------------------------------------------------------------------
@@ -35,7 +40,7 @@ class BagModule:
         retItems = []
         for uuid in self.bagUUIDList:
             _,item = self.getItemByUUID(uuid)
-            if item  is None:
+            if item  is None or item["state"] == DBState.Del :
                 continue
             value = {}
             value["UUID"] = uuid
@@ -94,7 +99,7 @@ class BagModule:
             self.decMaterial(uuid,num)
 
         # if result is True:
-        self.euro = sellMoney
+        self.rechargeEuro(num * price)
         ERROR_MSG("------------itemID ----------------" + str(itemId) + "  price   "+ str(price))
 
     # 扩容
@@ -124,11 +129,11 @@ class BagModule:
         if uuid in self.equipsContainer:
             item = self.equipsContainer[uuid]
             itemType = ItemTypeEnum.Equips
-        elif uuid in self.useContainer:
-            item = self.useContainer[uuid]
+        elif uuid in self.usesContainer:
+            item = self.usesContainer[uuid]
             itemType = ItemTypeEnum.Use
-        elif uuid in self.materialContainer:
-            item = self.materialContainer[uuid]
+        elif uuid in self.materialsContainer:
+            item = self.materialsContainer[uuid]
             itemType = ItemTypeEnum.Material
         elif uuid in self.diamondsContainer:
             item = self.diamondsContainer[uuid]
@@ -136,8 +141,8 @@ class BagModule:
         elif uuid in self.piecesContainer:
             item = self.piecesContainer[uuid]
             itemType = ItemTypeEnum.Pieces
-        elif uuid in self.giftContainer:
-            item = self.giftContainer[uuid]
+        elif uuid in self.giftsContainer:
+            item = self.giftsContainer[uuid]
             itemType = ItemTypeEnum.Gift
 
         return itemType,item
@@ -146,7 +151,7 @@ class BagModule:
     def putItemInBag(self,itemID,num):
         itemID = int(itemID)
         if itemID not in itemsIndex:
-            return
+            return False
 
 
         itemIndex = itemsIndex[itemID]
@@ -161,20 +166,22 @@ class BagModule:
 
         if len(self.bagUUIDList)+ needBagSize > self.bagSize:
             ERROR_MSG("putItemInBag  itemId  "+str(itemID)+"   len  " + str(len(self.bagUUIDList)) + "  needBagSize " + str(needBagSize) + "  bagSize  " + str(self.bagSize))
-            return
-
+            return False
+        ERROR_MSG(
+            "putItemInBag  itemId  " + str(itemID) + "   len  " + str(len(self.bagUUIDList)) + "  needBagSize " + str(
+                needBagSize) + "  bagSize  " + str(self.bagSize))
         if itemType == ItemTypeEnum.Equips:
-            self.addEquipByItemID(itemID,num)
+            return self.addEquipByItemID(itemID,num)
         elif itemType == ItemTypeEnum.Use:
-            self.addUse(itemID,num)
+            return self.addUse(itemID,num)
         elif itemType == ItemTypeEnum.Material:
-            self.addMaterial(itemID,num)
+            return self.addMaterial(itemID,num)
         elif itemType == ItemTypeEnum.Diamond:
-            self.addDiamond(itemID,num)
+            return self.addDiamond(itemID,num)
         elif itemType == ItemTypeEnum.Pieces:
-            self.addPieces(itemID,num)
+            return self.addPieces(itemID,num)
         elif itemType == ItemTypeEnum.Gift:
-            self.addGift(itemID,num)
+            return self.addGift(itemID,num)
 
     # 根据itemID获得数量
     def getItemNumByItemID(self,itemID):
@@ -255,6 +262,24 @@ class BagModule:
         if num <= 0:
             self.bagUUIDList.remove(uuid)
 
+    def onTimer(self, tid, userArg):
+        if userArg != TimerDefine.Time_sync_DB:
+            return
+
+        self.onTimerSaveBag()
+
+    def onTimerSaveBag(self):
+        now = datetime.datetime.now()
+
+        now.strftime('%Y-%m-%d %H:%M:%S')
+        ERROR_MSG(" syn DB-=================================================" + str(now))
+        self.onTimerSyncDiamondDB()
+        self.onTimerSyncEquipDB()
+        self.onTimerSyncGiftDB()
+        self.onTimerSyncMaterialDB()
+        self.onTimerSyncPieceDB()
+        self.onTimerSyncUseDB()
+
 class ItemOrderBy:
     byItemType = 1
     byQualityOrder = 2
@@ -276,15 +301,15 @@ class ItemTypeEnum:
     # 球员碎片
     Pieces = 1006
 
+class DBState:
+    NoAction = -1
+    Insert = 0
+    Update = 1
+    Del = 2
 
 
 
-
-
-
-
-
-    # 装备
+        # 装备
 
 if __name__ == "__main__":
     print(__file__)

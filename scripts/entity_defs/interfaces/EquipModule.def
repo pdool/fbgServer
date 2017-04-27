@@ -181,6 +181,10 @@
             <Exposed/>
             <Arg>UINT32</Arg>
         </onEquipError>
+
+        <onUpdateCardInfo>
+            <Arg> Card_Info </Arg>
+        </onUpdateCardInfo>
 	</ClientMethods>
 </root>
 

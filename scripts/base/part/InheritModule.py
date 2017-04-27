@@ -11,6 +11,7 @@ import shopConfig
 __author__ = 'yanghao'
 
 if __name__ == "__main__":
+
     pass
 
 
@@ -55,8 +56,7 @@ class InheritModule:
         if self.euro < money:
             self.BallerCallBack(CardMgrModuleError.Money_not_enough)
             return
-        self.euro = self.euro - money
-
+        self.useEuro(money)
         # 判断需要道具的时候道具数量是否足够
         if materialId > 0:
             itemCount = self.getItemNumByItemID(materialId)
@@ -101,11 +101,22 @@ class InheritModule:
             # 球员当前经验小于所需升级经验，不能继续升级，跳出循环
             elif inHeriter.exp < maxExp:
                  break
+        card.calcFightValue()
+        self.client.onInheritSucess(self.UpdateBallerInfo(inHeriter))
+
+            # --------------------------------------------------------------------------------------------
+            #                              工具函数调用函数
+            # --------------------------------------------------------------------------------------------
+
+    def UpdateBallerInfo(self,inHeriter):
+        inHeriter.calcFightValue()
         playerInfo = {}
         playerInfo["id"] = inHeriter.id
         playerInfo["configID"] = inHeriter.configID
         playerInfo["star"] = inHeriter.star
         playerInfo["inTeam"] = inHeriter.inTeam
+        playerInfo["bench"] = inHeriter.bench
+        playerInfo["pos"] = inHeriter.pos
         playerInfo["isSelf"] = inHeriter.isSelf
         playerInfo["brokenLayer"] = inHeriter.brokenLayer
         playerInfo["fightValue"] = inHeriter.fightValue
@@ -138,13 +149,14 @@ class InheritModule:
         playerInfo["tech"] = inHeriter.tech
         playerInfo["health"] = inHeriter.health
         playerInfo["strikeNeedCost"] = inHeriter.strikeNeedCost
-        inHeriter.calcFightValue()
-        card.calcFightValue()
-        self.client.onInheritSucess(playerInfo)
+        playerInfo["keepPercent"] = inHeriter.keepPercent
+        playerInfo["controllPercent"] = inHeriter.controllPercent
+        playerInfo["shootPercent"] = inHeriter.shootPercent
+        playerInfo["defendPercent"] = inHeriter.defendPercent
+        return playerInfo
 
-            # --------------------------------------------------------------------------------------------
-            #                              工具函数调用函数
-            # --------------------------------------------------------------------------------------------
+
+
 
     def BallerCallBack(self, errorID):
         self.client.onBallerCallBack(errorID)

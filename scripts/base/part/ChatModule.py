@@ -45,8 +45,7 @@ class ChatModule:
             self.client.onChatError(ChatError.Chat_world_cd)
             return
         # 4、有脏话
-        if self.checkHasBadWords(message) is True:
-            return
+        message = self.replaceBadWords(message)
 
         
         messageInfo = self.makeMessageInfo(message)
@@ -57,8 +56,7 @@ class ChatModule:
         if self.checkMessageLen(message) is False:
             # 消息超过规定长度
             return
-        if self.checkHasBadWords(message) is True:
-            return
+        message = self.replaceBadWords(message)
         messageInfo = self.makeMessageInfo(message)
         messageInfo[MessageInfoEnum.clubPosition] = "manager"
 
@@ -69,8 +67,7 @@ class ChatModule:
         if self.checkMessageLen(message) is False:
             # 消息超过规定长度
             return
-        if self.checkHasBadWords(message) is True:
-            return
+        message = self.replaceBadWords(message)
         # 检查道具
         # 检查钻石
         adCost = chatConfig.ChatConfig[1]["adCostDiamond"]
@@ -89,8 +86,7 @@ class ChatModule:
         if self.checkMessageLen(message) is False:
             # 消息超过规定长度
             return
-        if self.checkHasBadWords(message) is True:
-            return
+        message = self.replaceBadWords(message)
 
         messageInfo = self.makeMessageInfo(message)
 
@@ -106,8 +102,8 @@ class ChatModule:
         if self.checkInBlack(senderDBID) is True:
             return
 
-        if messageInfo[MessageInfoEnum.name] == self.name:
-            return
+        # if messageInfo[MessageInfoEnum.name] == self.name:
+        #     return
 
         
         self.client.onWorldChat(messageInfo)

@@ -1,0 +1,28 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+       <anger>
+            <Type>			UINT32                   </Type>
+			<Flags>			ALL_CLIENTS             </Flags>
+        </anger>
+
+	</Properties>
+
+	<BaseMethods>
+
+
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+
+
+
+	</ClientMethods>
+</root>
+

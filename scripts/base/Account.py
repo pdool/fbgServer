@@ -2,7 +2,7 @@
 import time
 import socket
 import struct
-
+import BabyTouchItemConfig
 import initCardConfig
 import util
 from KBEDebug import *
@@ -185,8 +185,10 @@ class Account(KBEngine.Proxy):
             avatar.destroy(True)
             return
         if success:
+            avatar.onCreateRole()
             self.lastClientIpAddr = socket.inet_ntoa(struct.pack('I', socket.htonl(self.clientAddr[0])))
             self.lastSelCharacter = avatar.databaseID
+            avatar.roleId = avatar.databaseID
             self.writeToDB()
             self.activeAvatar = avatar
             avatar.accountEntity = self
@@ -198,7 +200,6 @@ class Account(KBEngine.Proxy):
             initRoleCardIdPos = cardConfig["initRoleCardIdPos"]
 
             avatar.addCard(initRoleCardId,initRoleCardIdPos,1, 1)
-
             initCardIdList = cardConfig["initCardIdList"]
             initCardPosList = cardConfig["initCardPosList"]
             for index in range(len(initCardIdList)):
@@ -206,7 +207,27 @@ class Account(KBEngine.Proxy):
                 pos = initCardPosList[index]
                 avatar.addCard(cardId,pos, 1,0)
 
-            avatar.onClientGmAddAll()
+            avatar.ballerRelationProp()
+
+            self.createBaby(avatar)
 
         else:
-            self.client.onCreateAvatarFail()
+            avatar.client.onCreateAvatarFail()
+
+
+    def createBaby(self,avatar):
+
+        param = {}
+        baby = KBEngine.createBaseLocally("Baby",param)
+        baby.roleID = avatar.databaseID
+        baby.playerID = avatar.id
+        def __createBabyCB(success, baby):
+            avatar.babyDBID = baby.databaseID
+            avatar.babyID = baby.id
+            baby.closeTouch = BabyTouchItemConfig.BabyTouchItemConfig[102034]["times"]
+            baby.putItemInfoInBaby(1,1)
+            baby.putItemInfoInBaby(2,0)
+            avatar.writeToDB()
+            INFO_MSG("create Baby success  " + str(baby.databaseID))
+
+        baby.writeToDB(__createBabyCB)

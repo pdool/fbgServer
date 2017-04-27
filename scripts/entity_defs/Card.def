@@ -87,6 +87,12 @@
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </shootM>
+        <!-- 射门百分比加成 -->
+        <shootPercent>
+            <Type>FLOAT</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </shootPercent>
         <!-- 防守 -->
         <defend>
             <Type>UINT32</Type>
@@ -105,6 +111,12 @@
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </defendM>
+        <!-- 防守百分比加成 -->
+        <defendPercent>
+            <Type>FLOAT</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </defendPercent>
         <!-- 传球 -->
         <passBall>
             <Type>UINT32</Type>
@@ -195,6 +207,12 @@
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </controllM>
+        <!-- 控球百分比加成 -->
+        <controllPercent>
+            <Type>FLOAT</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </controllPercent>
         <!-- 守门 -->
         <keep>
             <Type>UINT32</Type>
@@ -213,6 +231,12 @@
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </keepM>
+        <!-- 守门百分比加成 -->
+        <keepPercent>
+            <Type>FLOAT</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </keepPercent>
         <!-- 技术 -->
         <tech>
             <Type>FLOAT</Type>
@@ -231,8 +255,16 @@
             <Flags>BASE_AND_CLIENT</Flags>
             <Persistent>true</Persistent>
         </inTeam>
+
+        <!-- 是否替补 -->
+        <bench>
+            <Type>UINT8</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </bench>
+
         <equips>
-            <Type>ARRAY <of> Equip_Info</of>></Type>
+            <Type>ARRAY <of> Equip_Info</of></Type>
             <Flags>BASE</Flags>
             <Persistent>true</Persistent>
         </equips>
@@ -241,11 +273,6 @@
             <Type>PYTHON</Type>
             <Flags>CELL_PUBLIC</Flags>
         </baseProp>
-        <!--球场上的坐标-->
-        <coordinate>
-            <Type>UINT32</Type>
-            <Flags>ALL_CLIENTS</Flags>
-        </coordinate>
 
         <!--配置ID-->
         <configID_B>
@@ -253,7 +280,43 @@
             <Flags>ALL_CLIENTS</Flags>
         </configID_B>
 
+        <!--阵型位置-->
+        <pos>
+            <Type> UINT32 </Type>
+            <Flags>	BASE_AND_CLIENT	</Flags>
+            <Persistent>true</Persistent>
 
+        </pos>
+        <!--技能1ID-->
+        <skill1>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </skill1>
+        <!--技能2ID-->
+        <skill2>
+            <Type>UINT32</Type>
+            <Flags>BASE_AND_CLIENT</Flags>
+            <Persistent>true</Persistent>
+        </skill2>
+
+        <!--技能1ID-->
+        <skill1_B>
+            <Type>UINT32</Type>
+            <Flags>CELL_PUBLIC</Flags>
+        </skill1_B>
+        <!--技能2ID-->
+        <skill2_B>
+            <Type>UINT32</Type>
+            <Flags>CELL_PUBLIC</Flags>
+        </skill2_B>
+
+
+        <!--怒气-->
+        <anger>
+            <Type>UINT32</Type>
+            <Flags>CELL_PUBLIC</Flags>
+        </anger>
 
 
     </Properties>

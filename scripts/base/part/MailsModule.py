@@ -49,7 +49,7 @@ class MailsModule:
     # --------------------------------------------------------------------------------------------
     def sendMail(self, to_dbid, mailType, title, text, attachment=None, extern_info=None):
         rowValueMap = {}
-        rowValueMap["to_dbid"] = to_dbid
+        rowValueMap["to_dbid"] = self.databaseID
         rowValueMap["mail_type"] = mailType
         rowValueMap["title"] = title
         rowValueMap["from_name"] = self.name
@@ -70,7 +70,7 @@ class MailsModule:
           +attachment +"','"\
           +str(Mails.Mail_State_Not_Open)+"','"\
           +extern_info + \
-          "' from dual where exists (select * from tbl_Avatar where id = " + str(to_dbid) +")"
+          "' from dual where exists (select * from tbl_Avatar where id = " + str(self.databaseID) +")"
 
         DEBUG_MSG("sendMail             " + sql)
 

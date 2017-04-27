@@ -6,13 +6,11 @@ import strikeConfig
 import CardByColor
 from ErrorCode import CardMgrModuleError
 import shopConfig
+import cardsConfig
 
 __author__ = 'yanghao'
 
-if __name__ == "__main__":
-    useStr={102019: 15,102020: 3}
-    print(useStr.split(','))
-    pass
+
 # 突破模块
 class StrikeModule:
     def __init__(self):
@@ -24,6 +22,7 @@ class StrikeModule:
 
     def StrikeBaller(self, cardId, ItemId):
         if cardId not in self.cardIDList:
+            ERROR_MSG("       cardID       " + str(cardId))
             self.client.onBallerCallBack(CardMgrModuleError.Card_not_exist)
             return
         self.itemId = ItemId
@@ -31,14 +30,15 @@ class StrikeModule:
         if card.brokenLayer >= 20:
             self.client.onBallerCallBack(CardMgrModuleError.Strike_is_max)
             return
-        strikeID = card.star * 100 + card.brokenLayer + 1
+        initStar = cardsConfig.cardsConfig[card.configID]["initStar"]
+        strikeID = initStar * 100 + card.brokenLayer + 1
 
 
         Config = strikeConfig.StrikeConfig[strikeID]
 
-        ERROR_MSG("strikeID  " + str(strikeID) + "  needCount " + str(Config["needCount"]))
+
         itemCount = self.getItemNumByItemID(ItemId)
-        ERROR_MSG(" ===========StrikeBaller====ItemId  " + str(ItemId)  + "   count  "+ str(itemCount))
+
         if itemCount < Config["needCount"]:
             self.client.onBallerCallBack(CardMgrModuleError.Material_not_enough)
             return
@@ -56,8 +56,9 @@ class StrikeModule:
         card.tech = card.tech + Config["tech"]
         card.health = card.health + Config["health"]
         card.strikeNeedCost = card.strikeNeedCost + Config["needCount"]
-        card.calcFightValue()
         self.client.onBallerCallBack(CardMgrModuleError.Strike_sucess)
+        self.client.onUpdateCardInfo(self.UpdateBallerInfo(card))
+
 
 
     def SwitchPiece(self, ItemId, pieceId, number, cardID):
@@ -69,10 +70,11 @@ class StrikeModule:
             self.client.onBallerCallBack(CardMgrModuleError.Material_not_enough)
             return
         card = KBEngine.entities.get(cardID)
-        config = CardByColor.UsePieces[card.star]
+        initStar = cardsConfig.cardsConfig[card.configID]["initStar"]
+        config = CardByColor.UsePieces[initStar]
         money = config["money"]
         if self.euro >= money * number:
-            self.euro = self.euro - money * number
+            self.useEuro(money * number)
             self.decItem(pieceId, number)
             self.putItemInBag(ItemId, number)
             self.client.onBallerCallBack(CardMgrModuleError.Switch_is_sucess)

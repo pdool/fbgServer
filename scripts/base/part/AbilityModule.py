@@ -62,6 +62,7 @@ class AbilityModule:
             self.client.onBallerCallBack(CardMgrModuleError.Property_is_max)
             return
         allExp = ballerPropertyExp + self.pieceAddExp
+
         # 通过经验值判断属性当前等级
         self.currentLevel = 0
         for i in range(28):
@@ -73,7 +74,8 @@ class AbilityModule:
             elif ballerPropertyExp == needExp:
                 self.currentLevel = level + 1
                 break
-
+        if(ballerPropertyExp >= PowerConfig.PowerConfig[level]["exp"] and self.currentLevel == 0):
+            self.currentLevel = len(PowerConfig.PowerConfig)
         setattr(baller, property, allExp)
         for i in range(len(selectList)):
             itemID = selectList[i]["itemID"]
@@ -82,6 +84,7 @@ class AbilityModule:
 
         # 经验增加不足以升一级
         changeLevel = self.currentLevel
+
         if allExp < PowerConfig.PowerConfig[changeLevel]["exp"]:
             self.client.onBallerCallBack(CardMgrModuleError.Ability_is_sucess)
             return
@@ -96,11 +99,13 @@ class AbilityModule:
                 # 截取从头开始到倒数第三个字符之前
                 Name = property[:-3]
                 self.SetObjectValue(cardId, Name, getattr(baller, Name) + config[Name])
+                if changeLevel == len(PowerConfig.PowerConfig):
+                    self.client.onBallerCallBack(CardMgrModuleError.Ability_is_sucess)
+                    break
             else:
                 self.client.onBallerCallBack(CardMgrModuleError.Ability_is_sucess)
                 break
-
-
+        baller.calcFightValue()
 
 
 

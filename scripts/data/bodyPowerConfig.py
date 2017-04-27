@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-bodyPowerConfig = {1: {'maxBuyTimes': 10, 'recoverTime': 5, 'singleBuyPowerNum': 50, 'maxPower': 120, 'id': 1,
-                       'singleBuyPowerNeedMoney': 5, 'upLevelGive': 120, 'powerLimit': 360, 'resetBuyTime': 5}}
-euroConfig = {1: {'maxBuyTimes': 5, 'singleBuyNum': 10000, 'resetBuyTime': 5, 'id': 1, 'singleBuyNeedMoney': 1}}
+bodyPowerConfig={1: {'powerLimit': 360, 'maxPower': 120, 'maxBuyTimes': 10, 'id': 1, 'resetBuyTime': 5, 'upLevelGive': 120, 'singleBuyPowerNum': 50, 'singleBuyPowerNeedMoney': 5, 'recoverTime': 5}}
+euroConfig={1: {'resetBuyTime': 5, 'id': 1, 'maxBuyTimes': 5, 'singleBuyNum': 10000, 'singleBuyNeedMoney': 1}}
 
 allDatas = {
-    '体力配置': bodyPowerConfig,
-    '美元配置': euroConfig,
+	'体力配置':bodyPowerConfig,
+	'美元配置':euroConfig,
 }

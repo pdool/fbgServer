@@ -1,0 +1,46 @@
+<root>
+	<Implements>
+	</Implements>
+
+	<Properties>
+        <gameShopItemList>
+            <Type>			ARRAY <of> ShopItemInfo  </of>   </Type>
+			<Flags>			BASE				</Flags>
+			<Default>						</Default>
+			<Persistent>		true		</Persistent>
+        </gameShopItemList>
+
+
+	</Properties>
+
+	<BaseMethods>
+        <!--购买商品-->
+        <onClientShopping>
+            <Exposed/>
+            <Arg>	UINT32	</Arg>	<!-- 商品ID -->
+			<Arg>	UINT32	</Arg>	<!-- 数量 -->
+        </onClientShopping>
+
+        <!--请求商城商品-->
+        <onClientGetShopItemInfo>
+            <Exposed/>
+        </onClientGetShopItemInfo>
+	</BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+        <onShopInfoCallBack>
+             <Arg> UINT32 </Arg>
+        </onShopInfoCallBack>
+
+        <onGetShopItemInfo>
+           <Arg> ARRAY <of> ShopItemInfo </of> </Arg>
+        </onGetShopItemInfo>
+
+
+	</ClientMethods>
+</root>
+

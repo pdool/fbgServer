@@ -1,0 +1,29 @@
+<root>
+	<Properties>
+
+
+
+
+    </Properties>
+
+
+    <BaseMethods>
+
+
+    <onCmd>
+         <Arg> STRING </Arg>
+         <Arg> PY_DICT </Arg>
+    </onCmd>
+
+
+
+    </BaseMethods>
+
+	<CellMethods>
+
+	</CellMethods>
+
+
+
+
+</root>

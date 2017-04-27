@@ -1,0 +1,33 @@
+<root>
+	<Properties>
+
+        <!--公会名字-->
+        <guildInfoList>
+            <Type> ARRAY <of> GuildMgr_ItemInfo </of> </Type>
+            <Flags> BASE </Flags>
+            <Default>{}</Default>
+            <Persistent> true </Persistent>
+        </guildInfoList>
+
+
+    </Properties>
+    <BaseMethods>
+
+
+    <onCmd>
+         <Arg> STRING </Arg>
+         <Arg>PY_DICT</Arg>
+    </onCmd>
+
+    </BaseMethods>
+
+	<CellMethods>
+        <!--<setAvatarID>-->
+            <!--<Arg>UINT32</Arg>-->
+        <!--</setAvatarID>-->
+	</CellMethods>
+
+
+
+
+</root>

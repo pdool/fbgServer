@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import TimerDefine
 from KBEDebug import *
-import util
 
 #使用技巧 先放在根级目录。，调好之后拖走，编辑器自动组织引用
 from part.CloneModule import CloneModule
 
 
 class Avatar(KBEngine.Entity,
-             CloneModule):
+             CloneModule,):
+
     """
     角色实体
     """
@@ -47,3 +47,6 @@ class Avatar(KBEngine.Entity,
         for c in cls:
             if hasattr(c, 'onTimer'):
                 c.onTimer(self,tid, userArg)
+
+
+

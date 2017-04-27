@@ -1,12 +1,14 @@
 <root>
+    <Implements>
+	</Implements>
 	<Properties>
 
        <!-- 配置ID -->
-        <monsterID>
+        <configID_B>
             <Type> UINT32 </Type>
              <Flags>			ALL_CLIENTS			</Flags>
             <Default> 0    </Default>
-        </monsterID>
+        </configID_B>
 
         <!--等级-->
             <level>
@@ -84,12 +86,6 @@
                  <Flags>			ALL_CLIENTS			</Flags>
 			</levelPass>
 
-            <!--球场上的坐标-->
-        <coordinate>
-            <Type>UINT32</Type>
-            <Flags>ALL_CLIENTS</Flags>
-        </coordinate>
-        
 
     </Properties>
 

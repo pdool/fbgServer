@@ -362,6 +362,7 @@ class FriendInfoKey:
     fightValue = "fightValue"
     clubName = "clubName"
     onlineState = "onlineState"
+    formation = "formation"
 class FriendOnlineState:
     online  = -1
 

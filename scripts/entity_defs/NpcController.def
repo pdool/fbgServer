@@ -1,0 +1,27 @@
+<root>
+	<Implements>
+
+	</Implements>
+
+	<Properties>
+
+        <baseProp>
+            <Type>PYTHON</Type>
+            <Flags>CELL_PUBLIC</Flags>
+        </baseProp>
+	</Properties>
+
+	<CellMethods>
+
+	</CellMethods>
+
+	<ClientMethods>
+
+
+	</ClientMethods>
+
+
+
+
+</root>
+
