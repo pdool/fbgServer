@@ -188,7 +188,7 @@ class EquipsContainer:
         sql = util.getInsertSql("tbl_ItemEquips", rowValueMap)
         item["state"] = DBState.NoAction
         # ERROR_MSG("Equip  insert DB    " + sql)
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
 
 
@@ -203,13 +203,13 @@ class EquipsContainer:
 
         item["state"] = DBState.NoAction
         sql = util.getUpdateSql("tbl_ItemEquips", setMap, filterMap)
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
 
     def delEquipDB(self, item):
         filterMap = {"roleID": self.databaseID, "UUID": item["UUID"]}
         sql = util.getDelSql("tbl_ItemEquips", filterMap)
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
 
 

@@ -115,8 +115,15 @@ class PiecesContainer:
             playerInfo["defendPercent"] = player.defendPercent
             playerInfo["bench"] = player.bench
             playerInfo["pos"] = player.pos
+            playerInfo["skill1"] = player.skill1
+            playerInfo["skill2"] = player.skill2
+            playerInfo["skill3"] = player.skill3
+            playerInfo["skill4"] = player.skill4
+            playerInfo["skill11"] = player.skill11
+            playerInfo["skill12"] = player.skill12
+            playerInfo["skill13"] = player.skill13
             self.client.onCombineCardInfo(playerInfo)
-        self.addCard(cardID, cb=cb)
+        self.addCard(cardID, -1,0,0, cb=cb)
 
         pass
 
@@ -258,7 +265,7 @@ class PiecesContainer:
 
         sql = util.getInsertSql("tbl_ItemPieces", rowValueMap)
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
         pass
     def updatePieceDB(self,item):
@@ -267,13 +274,13 @@ class PiecesContainer:
         item["state"] = DBState.NoAction
         sql = util.getUpdateSql("tbl_ItemPieces", setMap, filterMap)
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
     def delPieceDB(self,item):
         filterMap = {"roleID": self.databaseID, "UUID":  item["UUID"]}
         sql = util.getDelSql("tbl_ItemPieces", filterMap)
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
 class PiecesItemKeys:
     uuid = "UUID"

@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import importlib
-
+import time
+import datetime
 import util
+from CommonEnum import ActionTypeEnum
 from GMConfig import GMConfig
 from part.guild.GuildModule import GuildModule
-
+import CommonConfig
+import vipConfig
+import gameShopConfig
 from KBEDebug import *
 from part.footballTeam.DiamondContainer import DiamondContainer
 from part.footballTeam.EquipsContainer import EquipsContainer
@@ -36,6 +40,7 @@ from part.LevelUpModule import LevelUpModule
 from part.MoneyModule import MoneyModule
 from part.OfficialModule import OfficialModule
 from part.ArenaModule import ArenaModule
+from part.SkillModule import SkillModule
 from badWords import badWords
 import TimerDefine
 
@@ -73,6 +78,7 @@ class Avatar(KBEngine.Proxy,
              MoneyModule,
              OfficialModule,
              ArenaModule,
+             SkillModule,
              ):
     """
     角色实体
@@ -102,6 +108,10 @@ class Avatar(KBEngine.Proxy,
         self.updateOfficalValueRank()
         # 加入竞技场排行
         self.onAddArenaRank()
+        # 购买竞技次数
+        self.buyArenaTimes = vipConfig.VipConfig[self.vipLevel]["buyArenaTimes"]
+        # 竞技次数
+        self.arenaTimes = CommonConfig.CommonConfig[6]["value"]
     # 上线
     def onEntitiesEnabled(self):
         """
@@ -116,7 +126,7 @@ class Avatar(KBEngine.Proxy,
 
         # 知识点，绑定方法，非绑定方法 父类列表
 
-
+        self.onGetFromLastOutLinesDays()
         DEBUG_MSG("self.roleId---------------------" + str(self.roleId))
         onlineSet = KBEngine.globalData["Onlines"]
         onlineSet.add(self.databaseID)
@@ -207,6 +217,9 @@ class Avatar(KBEngine.Proxy,
         KBEngine method.
         entity丢失了客户端实体
         """
+        self.lastTime = str(datetime.datetime.now().hour) + "," + str(datetime.datetime.now().minute) + "," + str(
+            datetime.datetime.now().second)
+
         DEBUG_MSG("Avatar[%i].onClientDeath:" % self.id)
         # 防止正在请求创建cell的同时客户端断开了， 我们延时一段时间来执行销毁cell直到销毁base
         # 这段时间内客户端短连接登录则会激活entity
@@ -251,6 +264,31 @@ class Avatar(KBEngine.Proxy,
         self.onTimerSaveBag()
         self.destroySelf()
 
+    # 获取离上次下线过了几天
+    def onGetFromLastOutLinesDays(self):
+        if len(self.lastTime) == 0:
+            return
+        hour = self.lastTime.split(",")[0]
+        mintue = self.lastTime.split(",")[1]
+        second = self.lastTime.split(",")[2]
+        offset = 86400 - (int(hour) * 3600 + int(mintue) * 60 + int(second))
+        days = 0
+        period = util.getCurrentTime() - int(self.logoutTime)
+        if period > offset:
+            days = 1 + (period - offset) // 86400
+        if days > 0:
+            for Item in self.gameShopItemList:
+                config = gameShopConfig.gameShopConfig[Item["itemID"]]
+                Item["limitTimes"] = config["limitTimes"]
+            # 购买竞技次数
+            self.buyArenaTimes = int(vipConfig.VipConfig[self.vipLevel]["buyArenaTimes"])
+            # 竞技次数
+            self.arenaTimes = int(CommonConfig.CommonConfig[6]["value"])
+        ERROR_MSG("-------have  "+str(days)+"  days not enter game-------")
+        return days
+
+
+
     def onClientGetCell(self):
         """
         KBEngine method.
@@ -280,9 +318,18 @@ class Avatar(KBEngine.Proxy,
         if gmList[0] == "euro":
             self.rechargeEuro(int(gmList[1]))
             return
-        if gmList[0] == "exp":
-            self.levelUp(int(gmList[1]))
+        if gmList[0] == "blackMoney":
+            self.blackMoney = self.blackMoney + int(gmList[1])
             return
+        if gmList[0] == "level":
+            self.level = int(gmList[1])
+            card = KBEngine.entities.get(self.cardID)
+            card.level = int(gmList[1])
+            self.client.onUpdateCardInfo(self.UpdateBallerInfo(card))
+            self.updateLevelValueRank()
+            return
+        if gmList[0] == "guildFunds":
+            self.guildFunds = self.guildFunds + int(gmList[1])
         if hasattr(self, gmList[0]):
             attrType = type(getattr(self, gmList[0]))
             value = attrType(gmList[1])
@@ -295,13 +342,9 @@ class Avatar(KBEngine.Proxy,
         KBEngine.reloadScript()
 
     def onClientGmAddAll(self):
-
         self.diamond = 99999999
         self.addRmb(99999999)
         self.rechargeEuro(99999999)
-        card = KBEngine.entities.get(self.cardID)
-        card.level = 22
-        self.levelUp(52000)
         for k, v in GMConfig.items():
             self.putItemInBag(k, v["itemCountCount"])
 
@@ -329,7 +372,7 @@ class Avatar(KBEngine.Proxy,
             "vipLevel": avatar.vipLevel,
             "slogan": avatar.slogan,
             "club": avatar.club,
-            "nation": avatar.nation,
+            "camp": avatar.camp,
             "playerName": avatar.name,
             "dbid": avatar.databaseID,
             "offical": avatar.officalPosition,
@@ -345,15 +388,16 @@ class Avatar(KBEngine.Proxy,
                 if wasActive:
                     argMap = {
                         "playerMB": self,
+                        "avatar" : avatar
                     }
-                    avatar.onPlayerMgrCmd("onCmdGetPlayerInfo", argMap)
+                    avatar.onPlayerMgrCmd("onWasActiveFriendInfo", argMap)
                 else:
                     param = {
                         "fightValue": avatar.fightValue,
                         "vipLevel": avatar.vipLevel,
                         "slogan": avatar.slogan,
                         "club": avatar.club,
-                        "nation": avatar.nation,
+                        "camp": avatar.camp,
                         "playerName": avatar.name,
                         "dbid": avatar.databaseID,
                         "offical": avatar.officalPosition,
@@ -366,6 +410,14 @@ class Avatar(KBEngine.Proxy,
                 ERROR_MSG("---------Cannot add unknown player:-------------")
 
         KBEngine.createBaseFromDBID("Avatar", dbid, agreeCB)
+
+    def onRoomEndResult(self,avatarAID,aScore,avatarBID,bScore):
+
+        ERROR_MSG("onRoomEndResult       ============================")
+
+        if self.inClone == ActionTypeEnum.action_clone:
+            self.onCloneRoomEndResult(avatarAID,aScore,avatarBID,bScore)
+
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import KBEngine
+import gc
 from KBEDebug import *
 from common.skill.SkillModuleMain import SkillModuleMain
 
@@ -23,18 +24,12 @@ class Card(KBEngine.Entity,SkillModuleMain):
         self.totalAttackValue = 0.0
         self.totalDefendValue = 0.0
         self.totalControllValue = 0.0
-        # 当前怪的id list
-        self.inTeamcardIDList = []
         # 上一轮的攻击者
         self.preAttackId = -1
         # 当前进攻者ID
         self.curAttackID = -1
         # 上一轮的防守者 列表
         self.preDefIds = -1
-        # 怪的攻击序列
-        self.monsterAttackList = []
-        # 当前防守者list
-        self.curDefIdList = []
         # 上一轮是否完美助攻的射门系数
         self.o1 = 1
 
@@ -46,6 +41,11 @@ class Card(KBEngine.Entity,SkillModuleMain):
         DEBUG_MSG(tid, userArg)
 
     def onDestroy(self):
+
+        # ERROR_MSG("card   onDestroy       " + str(sys.getrefcount(self)))
+        # del gc.garbage[:]
+
+        # ERROR_MSG(gc.get_referrers(self))
         """
         KBEngine method.
         """

@@ -3,10 +3,8 @@ import KBEngine
 import skillConfig
 import skillMainConfig
 import util
-from CommonEnum import PlayerOp
 from KBEDebug import ERROR_MSG
 
-from cardsConfig import cardsConfig
 from common.skill.BufferModule import BufferModule
 from common.skill.SkillConditionModule import SkillConditionModule, ConditionEnum
 from common.skill.SkillEffectModule import SkillEffectModule
@@ -30,9 +28,18 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
         SkillEffectModule.__init__(self)
         BufferModule.__init__(self)
 
+        self.initMatchData()
         self.resetRoundData()
 
-        print(" Skill module")
+    # 初始化全局数据
+    def initMatchData(self):
+        # 无法参与防守(不计算进攻和防守)
+        self.unableDefend = False
+        # 免疫负面状态
+        self.immuneNegativeBuffer = False
+        # 初始怒气10点
+        self.anger = 100
+
 
     # 重置临时数据
     def resetRoundData(self):
@@ -79,52 +86,63 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
         self.yellow = 0
         self.red = 0
 
+        self.shootSucc = False
+
+
 
     # 使用技能（起点）
-    def useSkill(self, skillID,result):
+    def useSkill(self, mainSkillID,skillLevel,result):
 
-        if skillID == 0:
+        ERROR_MSG("mainSkillID     " + str(mainSkillID))
+
+        if mainSkillID == 0:
             # 没配技能
             return
-        skillConMap = skillMainConfig.SkillMain[skillID]
+        skillConMap = skillMainConfig.SkillMain[mainSkillID]
         condition = skillConMap["condition"]
-
+        # 检查主技能的使用条件
         check = self.checkCondition(condition, result)
         ERROR_MSG("   condition  is  " + str(condition) + "  result  is   " + str(result) + "  check is  " + str(check))
         # 验证不通过
         if check is False:
-            return
+            return False
 
-        subSkillTuple = skillConMap["subSkills"]
 
-        ERROR_MSG("subSkills" + subSkillTuple.__str__())
+        if mainSkillID == 1009:
+            self.useSkill1009(skillLevel,result)
+        elif mainSkillID == 1014:
+            self.useSkill1014(skillLevel,result)
+        elif mainSkillID == 1035:
+            self.useSkill1035(result)
+        elif mainSkillID == 1036:
+            self.useSkill1036(result)
 
-        for subSkillID in subSkillTuple:
-            subSkillID = subSkillID * 100 + 1
-            subSkillConMap = skillConfig.SkillConfig[subSkillID]
-            conditon = subSkillConMap["condition"]
-            # 注意修改result 为112
-            if result != conditon:
-                continue
+        else:
 
-            ERROR_MSG("subSkillID    is " + str(subSkillID) + "   " + conditon.__str__())
+            subSkillTuple = skillConMap["subSkills"]
 
-            usePercent = subSkillConMap["triggerPer"]
+            ERROR_MSG("subSkills" + subSkillTuple.__str__())
 
-            if self.checkTriggerPer(usePercent) is False:
-                continue
-            ERROR_MSG("target  type is " + str(subSkillConMap["target"]))
-            targetList = self.filterTarget(subSkillConMap["target"])
-            self.addBuffer(targetList, subSkillID)
+            for subSkillID in subSkillTuple:
+                subSkillID = subSkillID * 100 + skillLevel
+                subSkillConMap = skillConfig.SkillConfig[subSkillID]
+                usePercent = subSkillConMap["triggerPer"]
 
-        #
+                ERROR_MSG("target  type is " + str(subSkillConMap["target"]))
+                targetList = self.filterTarget(subSkillConMap["target"])
+                # 分开单个人触发效果
+                for target in targetList:
+                    if self.checkTriggerPer(usePercent) is False:
+                        continue
+                    self.addBuffer(target, subSkillID)
+
+            #
         return True
 
     # 检查触发的概率
     def checkTriggerPer(self,percent):
 
         p = util.randInHundred()
-        print(p)
         if percent >= p:
             return True
         return False
@@ -132,56 +150,115 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
     def afterRound(self, result):
         if result > ConditionEnum.con_result_None:
             self.bufferEffect(result)
+
+
+
+
+
+    # 直塞身后（协\攻击回合）：中间轮可发动，50%几率接球者将反越位成功，形成单刀机会；50%几率被直接门将破坏
+    def useSkill1009(self,skillLevel,result):
+        if result != ConditionEnum.con_result_None:
+            return
+        if self.checkCondition10(result):
+            p = util.randInHundred()
+            if p < 50:
+            #     单刀
+                room = KBEngine.entities.get(self.roomID)
+                defender = KBEngine.entities.get(room.defenderID)
+                defender.defList[2] = []
+
+                room = KBEngine.entities.get(self.roomID)
+                a = KBEngine.entities.get(room.avatarAID)
+                b = KBEngine.entities.get(room.avatarBID)
+
+                # 单刀
+                if a.typeStr == "Avatar":
+                    a.client.onOneOnOne(10090101)
+                if b.typeStr == "Avatar":
+                    b.client.onOneOnOne()
+            else:
+                self.addEffect23(10090101, 23, None, None,[self.id])
+
+
+
     #
-    # # 队友进攻时可施放，使用后，如果该轮次射门未进，则技能持有者进行一次补射。补射的威力系数固定（公式中的距离威力系数，暂设为0
-    # # .6），且只有守门员一个防守者。
-    # def useSkill1004(self,result):
-    #     if result != ConditionEnum.con_result_shoot_succ:
-    #         return
-    #     room = KBEngine.entities.get(self.roomID)
-    #     # 补射
-    #     room.reShootCardId = self.id
-    #     room.endRound = False
-    #     room.onCmdSelectSkill(PlayerOp.shoot)
-    #     # room.
-    #
-    #     pass
-    #
-    # # 50%几率直接消耗对方一回合，50%几率自己吃到黄牌
-    # def useSkill1014(self,result):
-    #     if result != ConditionEnum.con_result_None:
-    #         return
-    #
-    #     p = util.randInHundred()
-    #     # 消耗对方一个回合
-    #     if p < 50:
-    #         self.addEffect23(None,None,None,[])
-    #     else:
-    #         self.addEffect18(None,None,None,[self.id])
-    # # 门柱保命（主\防守回合）：使用技能的3个防守回合内，未能扑出的球（攻守判定为进球），有n%几率打在门柱上。3回合内击中门柱一次后失效
-    # def useSkill103601(self,result,buffer):
-    #     if result != ConditionEnum.con_result_shoot_succ:
-    #         return
-    #     skillConMap = skillConfig.SkillConfig[1003601]
-    #
-    #     conditonTupe = skillConMap["condition"]
-    #
-    #     for condition in conditonTupe:
-    #         check = self.checkCondition(condition, result)
-    #         ERROR_MSG(
-    #             "   condition  is  " + str(condition) + "  result  is   " + str(result) + "  check is  " + str(check))
-    #         if check is False:
-    #             return
-    #
-    #     usePercent = skillConMap["triggerPer"]
-    #     if self.checkTriggerPer(usePercent) is False:
-    #         return
-    #     # 触发技能
-    #     else:
-    #         # 修改射门结果为失败
-    #         room = KBEngine.entities.get(self.roomID)
-    #         room.roundResult = ConditionEnum.con_result_shoot_fail
-    #         buffer["lastRound"] = 0
+    # 50%几率直接消耗对方一回合，50%几率自己吃到黄牌
+    def useSkill1014(self,skillLevel,result):
+        if result != ConditionEnum.con_result_None:
+            return
+
+        p = util.randInHundred()
+        # 消耗对方一个回合
+        if p < 50:
+            self.addEffect23(10140101,23,None,None,[self.id])
+            ERROR_MSG("useSkill1014    end round "  )
+        else:
+            self.addEffect18(10140101,18,None,None,[self.id])
+
+            ERROR_MSG("useSkill1014    get yellow card ")
+
+
+
+                    #
+    # 战术犯规（协\防守回合）：对方单刀时，进行犯规，根据犯规地点判给对方任意球或点球，自己得到黄牌
+    def useSkill1035(self, result):
+        if result != ConditionEnum.con_result_None:
+            return
+
+        room = KBEngine.entities.get(self.roomID)
+
+        if room.defenderID == self.controllerID:
+            return
+
+        defList = room.getCurRoundDefList(room.curPart)
+
+        if len(defList) != 0:
+            return
+        # 自己得到黄牌
+        self.addEffect18(10350101, 18, None, [self.id])
+
+
+
+    # 门柱保命（主\防守回合）：使用技能的3个防守回合内，未能扑出的球（攻守判定为进球），有n%几率打在门柱上。3回合内击中门柱一次后失效
+    def useSkill1036(self,result,buffer):
+        if result != ConditionEnum.con_result_shoot_succ:
+            return
+        skillConMap = skillConfig.SkillConfig[1003601]
+
+        conditonTupe = skillConMap["condition"]
+
+        for condition in conditonTupe:
+            check = self.checkCondition(condition, result)
+            ERROR_MSG(
+                "   condition  is  " + str(condition) + "  result  is   " + str(result) + "  check is  " + str(check))
+            if check is False:
+                return
+
+        usePercent = skillConMap["triggerPer"]
+        if self.checkTriggerPer(usePercent) is False:
+            return
+        # 触发技能
+        else:
+            # 修改射门结果为失败
+            room = KBEngine.entities.get(self.roomID)
+            room.roundResult = ConditionEnum.con_result_shoot_fail
+            buffer["lastRound"] = 0
+
+            room = KBEngine.entities.get(self.roomID)
+            defender = KBEngine.entities.get(room.defenderID)
+            defender.defList[2] = []
+
+            room = KBEngine.entities.get(self.roomID)
+            a = KBEngine.entities.get(room.avatarAID)
+            b = KBEngine.entities.get(room.avatarBID)
+
+            # 门主报名
+            if a.typeStr == "Avatar":
+                a.client.onGoalPostHelp(1036)
+            if b.typeStr == "Avatar":
+                b.client.onGoalPostHelp(1036)
+
+
 
 
 

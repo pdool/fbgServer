@@ -231,7 +231,7 @@ class FriendModule:
         playerInfo[FriendInfoKey.fightValue] = self.fightValue
         playerInfo[FriendInfoKey.vipLevel] = self.vipLevel
         playerInfo[FriendInfoKey.onlineState] = FriendOnlineState.online
-
+        playerInfo[FriendInfoKey.formation] = self.formation
         param = {"playerInfo":playerInfo}
         reqMb.onPlayerMgrCmd(retMethod,param)
 
@@ -332,6 +332,23 @@ class FriendModule:
             self.applyDBIDList.remove(acceptorDBID)
 
         self.onClientGetFriendList()
+
+    def onWasActiveFriendInfo(self, argMap):
+        playerMB = argMap["playerMB"]
+        avatar = argMap["avatar"]
+        param = {
+            "fightValue": avatar.fightValue,
+            "vipLevel": avatar.vipLevel,
+            "slogan": avatar.slogan,
+            "club": avatar.club,
+            "camp": avatar.camp,
+            "playerName": avatar.name,
+            "dbid": avatar.databaseID,
+            "offical": avatar.officalPosition,
+            "level": avatar.level,
+            "guildName": avatar.guildName,
+        }
+        playerMB.client.onGetPlayerInfo(param)
 
     def onCmdDelYou(self,args):
         delDBID = args["delDBID"]

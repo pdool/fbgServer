@@ -182,6 +182,31 @@ class GuildModuleError:
     # 领袖离线时间不到7天
     Guild_leader_offline_not_enough = 13
 
+    #欧元不足
+    Guild_euro_not_enough = 14
+
+    # 该职位人员已满，请腾出空间再试！
+    Guild_power_is_full = 15
+    # 不能超过公会等级
+    Guild_level_not_enough = 16
+    # 公会资金不足
+    Guild_guildFunds_not_enough = 17
+
+    # 公会上诉曝光道具不足
+    Guild_appeal_not_enough = 18
+    # 上诉公会在保护时间
+    Guild_is_by_prtected = 19
+
+    # 该玩家取消申请
+    Guild_applye_by_cancel= 26
+    # 公会名字拥有非法字符
+    Guild_name_has_illegality = 28
+    # 公会简介拥有非法字符
+    Guild_intro_has_illegality = 29
+    # 上诉曝光失败
+    Guild_appeal_fail = 31
+
+
 class BabyModuleError:
     # 宝贝不存在
     Baby_not_exist = 1
@@ -212,6 +237,12 @@ class SkillModuleError:
     not_match_skill = 1
     # 错误的操作
     worong_op = 2
+    # 教练时间不足
+    coach_time_not_enough = 3
+    # 技能升级成功
+    skill_up_sucess = 4
+    # 技能满级
+    skill_is_max = 5
 
 class GameShopModuleError:
     # 欧元不足
@@ -222,6 +253,8 @@ class GameShopModuleError:
     Black_not_enough = 3
     # 购买成功
     Shopping_sucess = 4
+    # 公会币
+    Guild_not_enough = 5
 
 
 
@@ -236,7 +269,11 @@ class CloneModuleError:
     # 不足三星
     clone_not_enough_3Star = 4
 
-
+class ArenaModuleError:
+    # 次数不足
+    Buy_times_is_not_enough = 1
+    # 购买成功
+    Buy_times_is_Sucess = 2
 
 
 

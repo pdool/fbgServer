@@ -2,7 +2,7 @@
 import KBEngine
 import propChangeFightConfig
 from KBEDebug import ERROR_MSG
-
+import math
 __author__ = 'chongxin'
 
 """
@@ -60,6 +60,10 @@ class Card(KBEngine.Base):
     def destroyCardCell( self ):
         if self.cell is not None:
         # 销毁cell实体
+
+            # ERROR_MSG("      destroyCardCell        " + str(self.id))
+
+
             self.destroyCellEntity()
 
 
@@ -93,29 +97,23 @@ class Card(KBEngine.Base):
         health      = self.health * 800
         keep        = self.keep * 1.5
 
-        string = "shoot   " + str(self.shoot) + "  passball " + str(self.passBall) +" reel " + str(self.reel)
-        string = string + " tech " + str(self.tech) +" controll " + str(self.controll) + " defend "+ str(self.defend)
-        string = string + " trick " + str(self.trick) + " steal " + str(self.steal) + " health " + str(self.health)
-        string = string + " keep " + str(self.keep)
+
 
         formationFight = self.formationValue()
-
-        # ERROR_MSG(string)
-        fightValue = int(shoot + passBall + reel + tech + controll + defend + trick + steal + health + keep) + int(formationFight)
-
-
+        fightValue = math.ceil(shoot + passBall + reel + tech + controll + defend + trick + steal + health + keep + formationFight)
         self.fightValue = fightValue
 
         if self.inTeam == 1:
-            avatar.fightValue = avatar.fightValue - oldFightValue + fightValue
+            if oldFightValue != fightValue:
+                avatar.fightValue = avatar.fightValue - oldFightValue + fightValue
 
 
         avatar.client.onCardFightValueChange(self.id,fightValue)
         avatar.updateFightValueRank()
-        if self.isSelf!=1:
-            card = KBEngine.entities.get(self.id)
-            if card is None:
-                return
+        card = KBEngine.entities.get(self.id)
+        if card is None:
+            return
+        if card.isSelf != 1:
             avatar.updateBallerValueRank(card)
         return  fightValue
 
@@ -150,7 +148,7 @@ class Card(KBEngine.Base):
             for info in formatList:
                 name = info["propName"]
                 value = info["value"]
-                ERROR_MSG("--FormatName--" + str(name) + "--Formatvalue--" + str(value))
+                # ERROR_MSG("--FormatName--" + str(name) + "--Formatvalue--" + str(value))
                 fightValue = fightValue + int(propChangeFight[name] * value)
 
         # ERROR_MSG("-- formatFightAdd--" + str(fightValue)+"--avatar.relatPropContainer--"+str(len(avatar.relatPropContainer)))

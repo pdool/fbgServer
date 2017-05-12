@@ -153,7 +153,7 @@ class GiftContainer:
 
         sql = util.getInsertSql("tbl_ItemGifts", rowValueMap)
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
         pass
     def updateGiftDB(self,item):
@@ -162,12 +162,12 @@ class GiftContainer:
         item["state"] = DBState.NoAction
         sql = util.getUpdateSql("tbl_ItemGifts", setMap, filterMap)
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
     def delGiftDB(self,item):
         filterMap = {"roleID": self.databaseID, "UUID":  item["UUID"]}
         sql = util.getDelSql("tbl_ItemGifts", filterMap)
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
 class GiftItemKeys:
     uuid = "UUID"

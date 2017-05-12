@@ -3,15 +3,49 @@
 	</Implements>
 
 	<Properties>
-       <anger>
-            <Type>			UINT32                   </Type>
-			<Flags>			ALL_CLIENTS             </Flags>
-        </anger>
+        <coachList>
+            <Type> ARRAY <of> coachInfo </of> </Type>
+			<Flags> BASE </Flags>
+			<Persistent> true </Persistent>
+        </coachList>
 
 	</Properties>
 
 	<BaseMethods>
+        <!--客户端请求升级卡牌信息-->
+        <onClientSkillLevelUp>
+            <Exposed/>
+            <Arg> UINT32 </Arg><!--技能ID-->
+             <Arg> UINT32 </Arg><!--技能下标-->
+            <Arg> UINT32 </Arg><!--coachID-->
+        </onClientSkillLevelUp>
 
+        !--解锁教练槽位-->
+        <onClientUnLockCoach>
+            <Exposed/>
+            <Arg> UINT32 </Arg><!--教练-->
+        </onClientUnLockCoach>
+
+        !--提升教练-->
+        <onClientLevelUpCoach>
+            <Exposed/>
+            <Arg> UINT32 </Arg><!--教练ID-->
+            <Arg> UINT32 </Arg><!--ID-->
+        </onClientLevelUpCoach>
+
+        !--提升教练-->
+        <onClientAddCoachTime>
+            <Exposed/>
+            <Arg> UINT32 </Arg><!--itemID-->
+            <Arg> UINT32 </Arg><!--教练ID-->
+        </onClientAddCoachTime>
+
+        !--更换技能-->
+        <onClientSelectSkill>
+            <Exposed/>
+             <Arg>	UINT32	</Arg>	<!-- cardId -->
+             <Arg>	UINT32	</Arg>	<!-- SkillID -->
+        </onClientSelectSkill>
 
 	</BaseMethods>
 
@@ -20,9 +54,72 @@
 	</CellMethods>
 
 	<ClientMethods>
+         <onLevelUpCoachSucess>
+             <Arg>	UINT32	</Arg>
+            <Arg>	UINT64	</Arg>
+        </onLevelUpCoachSucess>
 
+        <onSkillLevelUpSucess>
+             <Arg>	UINT32	</Arg>
+             <Arg>	UINT32	</Arg>
+             <Arg>	UINT32	</Arg>
+        </onSkillLevelUpSucess>
 
+         <onAddCoachTimeSucess>
+             <Arg>	UINT32	</Arg>
+             <Arg>	UINT32	</Arg>
+             <Arg>	UINT32	</Arg>
+        </onAddCoachTimeSucess>
 
+        <onGmSetSkill>
+             <Arg>	UINT32	</Arg>
+        </onGmSetSkill>
+        <!--单刀-->
+        <onOneOnOne>
+            <!--技能ID-->
+            <Arg>	UINT32	</Arg>
+        </onOneOnOne>
+
+        <onUnLockCoach>
+             <Arg>	UINT32	</Arg>
+        </onUnLockCoach>
+        <!--门柱保命-->
+        <onGoalPostHelp>
+             <Arg>	UINT32	</Arg>
+        </onGoalPostHelp>
+
+         <onSelectSkillSucess>
+             <Arg>	UINT32	</Arg>	<!-- cardId -->
+            <Arg>	UINT32	</Arg>	<!-- SkillID -->
+        </onSelectSkillSucess>
+
+        <noticeClientEffect>
+             <Arg>	UINT32	</Arg>	<!-- cardId -->
+            <Arg>	UINT32	</Arg>	<!-- SkillID -->
+            <Arg>	UINT32	</Arg>	<!-- effectType -->
+        </noticeClientEffect>
+
+        <onGetCoachList>
+            <Arg>  ARRAY <of> coachInfo </of> </Arg>
+        </onGetCoachList>
+
+        <onAddBuffer>
+            <Arg>	UINT32	</Arg>	<!-- targetID -->
+            <Arg>	UINT32	</Arg>	<!-- subSkillID -->
+        </onAddBuffer>
+
+        <onDelBuffer>
+             <Arg>	UINT32	</Arg>	<!-- targetID -->
+            <Arg>	UINT32	</Arg>	<!-- subSkillID -->
+        </onDelBuffer>
+        <!--红牌罚下-->
+        <onYellowCard>
+            <Arg>	UINT32	</Arg>	<!-- targetID -->
+        </onYellowCard>
+        <!--黄牌-->
+        <onRedCard>
+            <Arg>	UINT32	</Arg>	<!-- targetID -->
+        </onRedCard>
 	</ClientMethods>
 </root>
 

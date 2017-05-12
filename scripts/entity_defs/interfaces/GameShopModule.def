@@ -10,6 +10,13 @@
 			<Persistent>		true		</Persistent>
         </gameShopItemList>
 
+         <guildShopItemList>
+            <Type>			ARRAY <of> GuildShopItemInfo  </of>   </Type>
+			<Flags>			BASE				</Flags>
+			<Default>						</Default>
+			<Persistent>		true		</Persistent>
+        </guildShopItemList>
+
 
 	</Properties>
 
@@ -35,6 +42,14 @@
         <onShopInfoCallBack>
              <Arg> UINT32 </Arg>
         </onShopInfoCallBack>
+
+        <onGetShopSucess>
+             <Arg> UINT32 </Arg>
+        </onGetShopSucess>
+
+        <onGetGuildShop>
+             <Arg> ARRAY <of> GuildShopItemInfo </of> </Arg>
+        </onGetGuildShop>
 
         <onGetShopItemInfo>
            <Arg> ARRAY <of> ShopItemInfo </of> </Arg>

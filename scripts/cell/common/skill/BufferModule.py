@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 import KBEngine
 import skillConfig
+import util
 from Avatar import Avatar
+from CommonEnum import LastRoundEnmu, ImpactTypeEnum
 from KBEDebug import ERROR_MSG
 from common.skill.SkillConditionModule import ConditionEnum
+from common.skill.SkillEffectModule import EffectEnum
 
 __author__ = 'chongxin'
 
 class BufferModule:
+    insideResult = {ConditionEnum.con_result_pass_succ, ConditionEnum.con_result_perfect_pass,
+                    ConditionEnum.con_result_break_succ}
     def __init__(self):
         self.bufferContainer =[]
-        pass
     # 增加一个buffer
-    def addBuffer(self, targetList, subSkillID):
+    def addBuffer(self, targetID, subSkillID):
 
         subSkillConf = skillConfig.SkillConfig[subSkillID]
         controller = KBEngine.entities.get(self.controllerID)
@@ -24,55 +28,61 @@ class BufferModule:
             "subSkillID"        : subSkillID,
             "condition"          : subSkillConf["condition"]
         }
+        # 免疫负面状态
+        impactType = subSkillConf["impactType"]
+        if self.immuneNegativeBuffer and impactType == ImpactTypeEnum.debuffs:
+            return
+
 
         room = KBEngine.entities.get(self.roomID)
         isAttackRound = False
         if room.controllerID == self.controllerID:
             isAttackRound = True
-        for target in targetList:
-            card = KBEngine.entities.get(target)
-            noticeClient = subSkillConf["noticeClient"]
-            ERROR_MSG("-----------addbuffer-----------targetID-----------------  " + str(target))
+        card = KBEngine.entities.get(targetID)
+        noticeClient = subSkillConf["noticeClient"]
 
-            # if isinstance(controller,Avatar) and noticeClient == 1:
-            #     controller.client.onAddBuffer(target,subSkillID)
-            # 如果是结果型的加进去就行了
-            if subSkillConf["condition"] != ConditionEnum.con_result_None:
+        ERROR_MSG("-----------addbuffer-----------targetID-----------  " + str(targetID) + "   subskillID    " + str(subSkillID))
+        # 如果是结果型的加进去就行了
+        if subSkillConf["condition"] != ConditionEnum.con_result_None:
+            card.bufferContainer.append(buffer)
+
+            ERROR_MSG("card.bufferContainer   cardID is   " +str(card.id)+"       " + card.bufferContainer.__str__())
+            return
+
+        if isinstance(controller, Avatar) and noticeClient == 1:
+            controller.client.onAddBuffer(targetID, subSkillID)
+        # 如果是立即生效的看 startType
+        targetList = [self.id]
+        startType = subSkillConf["startType"]
+
+        if  startType == StartTypeEnmu.cur_round:
+            self.makeEffect(targetList,subSkillID)
+
+            if subSkillConf["lastRound"] > 1:
+                buffer["lastRound"]  = subSkillConf["lastRound"] - 1
                 card.bufferContainer.append(buffer)
-
-                continue
-
-            # 如果是立即生效的看 startType
-            targetList = [self.id]
-            startType = subSkillConf["startType"]
-
-            if  startType == StartTypeEnmu.cur_round:
-                self.makeEffect(targetList,subSkillID)
+        elif startType == StartTypeEnmu.cur_round_and_attack_round:
+            if isAttackRound:
+                self.makeEffect(targetList, subSkillID)
+                if subSkillConf["lastRound"] > 1:
+                    buffer["lastRound"] = subSkillConf["lastRound"] - 1
+                    card.bufferContainer.append(buffer)
+        elif startType == StartTypeEnmu.cur_round_and_defend_round:
+            if not isAttackRound:
+                self.makeEffect(targetList, subSkillID)
 
                 if subSkillConf["lastRound"] > 1:
-                    buffer["lastRound"]  = subSkillConf["lastRound"] - 1
+                    buffer["lastRound"] = subSkillConf["lastRound"] - 1
                     card.bufferContainer.append(buffer)
-            elif startType == StartTypeEnmu.cur_round_and_attack_round:
-                if isAttackRound:
-                    self.makeEffect(targetList, subSkillID)
-                    if subSkillConf["lastRound"] > 1:
-                        buffer["lastRound"] = subSkillConf["lastRound"] - 1
-                        card.bufferContainer.append(buffer)
-            elif startType == StartTypeEnmu.cur_round_and_defend_round:
-                if not isAttackRound:
-                    self.makeEffect(targetList, subSkillID)
+        else:
+            card.bufferContainer.append(buffer)
 
-                    if subSkillConf["lastRound"] > 1:
-                        buffer["lastRound"] = subSkillConf["lastRound"] - 1
-                        card.bufferContainer.append(buffer)
-            else:
-                card.bufferContainer.append(buffer)
+            ERROR_MSG("card.bufferContainer   cardID is   " + str(card.id) + "       " + card.bufferContainer.__str__())
 
 
 
-    # 开始一轮之前
+    # 开始一轮之前(中间步骤也会启动。结束也会启动)
     def bufferEffect(self,result = ConditionEnum.con_result_None):
-        # ERROR_MSG("before round   is   " + str(self.id))
         room = KBEngine.entities.get(self.roomID)
         isAttackRound =False
         if room.controllerID == self.controllerID:
@@ -84,16 +94,102 @@ class BufferModule:
             targetList = [self.id]
             subSkillID = buffer["subSkillID"]
             condition = buffer["condition"]
-            if condition != result:
-                continue
-            if isAttackRound :
-                if statrType == StartTypeEnmu.cur_round_and_attack_round or statrType == StartTypeEnmu.next_round_attack_round or statrType == StartTypeEnmu.cur_round:
-                    self.makeEffect(targetList, subSkillID)
-                    self.bufferAfterUse(i)
+            noticeClient = buffer["noticeClient"]
+            controller = KBEngine.entities.get(self.controllerID)
+            # 1、一轮之前
+            if condition ==  ConditionEnum.con_result_None:
+                if isAttackRound:
+                    if statrType == StartTypeEnmu.cur_round_and_attack_round or statrType == StartTypeEnmu.next_round_attack_round or statrType == StartTypeEnmu.cur_round:
+                        self.makeEffect(targetList, subSkillID)
+                        self.bufferAfterUse(i)
+                else:
+                    if statrType == StartTypeEnmu.cur_round_and_defend_round or statrType == StartTypeEnmu.next_round_defend_round or statrType == StartTypeEnmu.cur_round:
+                        self.makeEffect(targetList, subSkillID)
+                        self.bufferAfterUse(i)
+                pass
+            # 2、一轮之后
             else:
-                if statrType == StartTypeEnmu.cur_round_and_defend_round or statrType == StartTypeEnmu.next_round_defend_round or statrType == StartTypeEnmu.cur_round:
-                    self.makeEffect(targetList, subSkillID)
-                    self.bufferAfterUse(i)
+                ERROR_MSG(" bufferEffect result    is    "+ str(result))
+                if condition == ConditionEnum.con_result_shoot_succ:
+                    # 如果是内部结果直接pass
+                    if result in self.insideResult:
+                        continue
+
+                    if result != condition:
+                        self.bufferContainer.pop(i)
+                    else:
+                        # 激活下次不检查了
+                        buffer["condition"] = ConditionEnum.con_result_None
+                        if isinstance(controller, Avatar) and noticeClient == 1:
+                            controller.client.onAddBuffer(self.id, subSkillID)
+
+                elif condition == ConditionEnum.con_result_shoot_fail:
+                    # 如果是内部结果直接pass
+                    if result in self.insideResult:
+                        continue
+                    if result != condition:
+                        self.bufferContainer.pop(i)
+                    else:
+                        # 激活下次不检查了 TODO:通知另外一个人
+                        buffer["condition"] = ConditionEnum.con_result_None
+
+                        if subSkillID // 1000 == 1004:
+                            self.addEffect28(subSkillID, 28, None,None,[self.id])
+
+                        if isinstance(controller, Avatar) and noticeClient == 1:
+                            controller.client.onAddBuffer(self.id, subSkillID)
+
+                elif condition == ConditionEnum.con_result_be_steal:
+                    # 如果是内部结果直接pass
+                    if result in self.insideResult:
+                        continue
+                    if result != condition:
+                        self.bufferContainer.pop(i)
+                    else:
+                        # 激活下次不检查了
+                        buffer["condition"] = ConditionEnum.con_result_None
+                        if isinstance(controller, Avatar) and noticeClient == 1:
+                            controller.client.onAddBuffer(self.id, subSkillID)
+
+                elif condition == ConditionEnum.con_result_not_shoot_succ:
+                    # 如果是内部结果直接pass
+                    if result in self.insideResult:
+                        continue
+
+                    if result == ConditionEnum.con_result_shoot_fail or result == ConditionEnum.con_result_not_shoot_succ:
+                        # 激活下次不检查了
+                        buffer["condition"] = ConditionEnum.con_result_None
+                        if isinstance(controller, Avatar) and noticeClient == 1:
+                            controller.client.onAddBuffer(self.id, subSkillID)
+                    else:
+                        self.bufferContainer.pop(i)
+
+
+                # 中间结果
+                elif condition == ConditionEnum.con_result_pass_succ:
+                    if result == ConditionEnum.con_result_be_steal:
+                        self.bufferContainer.pop(i)
+                    else:
+                        # 激活下次不检查了
+                        buffer["condition"] = ConditionEnum.con_result_None
+                        if isinstance(controller, Avatar) and noticeClient == 1:
+                            controller.client.onAddBuffer(self.id, subSkillID)
+                elif condition == ConditionEnum.con_result_perfect_pass:
+                    if result != ConditionEnum.con_result_perfect_pass:
+                        self.bufferContainer.pop(i)
+                    else:
+                        # 激活下次不检查了
+                        buffer["condition"] = ConditionEnum.con_result_None
+                        if isinstance(controller, Avatar) and noticeClient == 1:
+                            controller.client.onAddBuffer(self.id, subSkillID)
+                elif condition == ConditionEnum.con_result_break_succ:
+                    if result != ConditionEnum.con_result_be_steal:
+                        # 激活下次不检查了
+                        buffer["condition"] = ConditionEnum.con_result_None
+                        if isinstance(controller, Avatar) and noticeClient == 1:
+                            controller.client.onAddBuffer(self.id, subSkillID)
+                    else:
+                        self.bufferContainer.pop(i)
 
 
     # 使用完之后减少持续轮数
@@ -102,10 +198,34 @@ class BufferModule:
         buffer = self.bufferContainer[i]
         lastRound = buffer["lastRound"]
         # 1、处理轮数
-        if lastRound -1 <= 0:
-            self.bufferContainer.pop(i)
-        else:
-            buffer["lastRound"] = lastRound -1
+
+        if lastRound > 0:
+            if lastRound -1 <= 0:
+                self.delBuffer(i)
+                self.bufferContainer.pop(i)
+                self.delLastEffect(buffer)
+
+            else:
+                buffer["lastRound"] = lastRound -1
+        # TODO:半场全场处理
+        # else:
+        #     if lastRound == LastRoundEnmu.firstHalf:
+        #     pass
+
+
+    def delBuffer(self,i):
+        buffer = self.bufferContainer[i]
+        subSkillID = buffer["subSkillID"]
+        subSkillConf = skillConfig.SkillConfig[subSkillID]
+        controller = KBEngine.entities.get(self.controllerID)
+
+        ERROR_MSG("delBuffer   cardID is " + str(self.id) + "       buffer    "+ buffer.__str__())
+
+        ERROR_MSG(util.printStackTrace("delBuffer      "))
+
+        noticeClient = subSkillConf["noticeClient"]
+        if isinstance(controller, Avatar) and noticeClient == 1:
+            controller.client.onDelBuffer(self.id, subSkillID)
 
 
 class StartTypeEnmu:

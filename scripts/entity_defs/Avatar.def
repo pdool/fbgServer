@@ -23,6 +23,7 @@
         <Interface>    GameShopModule        </Interface><!--游戏商城-->
         <Interface>    ArenaModule           </Interface><!--竞技场-->
         <Interface>    RankModule            </Interface><!--排行榜-->
+        <Interface>    SkillModule            </Interface><!--技能-->
 	</Implements>
 
 	<Properties>
@@ -70,12 +71,7 @@
 			<Flags> BASE_AND_CLIENT </Flags>
 			<Persistent> true </Persistent>
         </club>
-        <!--所属势力-->
-        <nation>
-            <Type> UINT8 </Type>
-			<Flags> BASE_AND_CLIENT </Flags>
-			<Persistent> true </Persistent>
-        </nation>
+
         <!--战斗力-->
         <fightValue>
             <Type> UINT64 </Type>
@@ -121,10 +117,14 @@
 			<Default> 0 </Default>
 		</rmb>
 
-
+        <lastTime>
+            <Type> STRING </Type>
+			<Flags> BASE </Flags>
+			<Persistent> true </Persistent>
+        </lastTime>
 
         <logoutTime>
-            <Type> INT32 </Type>
+            <Type> UINT64 </Type>
 			<Flags> BASE_AND_CLIENT </Flags>
 			<Persistent> true </Persistent>
         </logoutTime>
@@ -171,6 +171,18 @@
     <onClientGmAddAll>
         <Exposed/>
     </onClientGmAddAll>
+
+    <onRoomEndResult>
+         <Arg> UINT32 </Arg>
+         <Arg> UINT32 </Arg>
+         <Arg> UINT32 </Arg>
+         <Arg> UINT32 </Arg>
+    </onRoomEndResult>
+
+
+
+
+
 	</BaseMethods>
 
 	<CellMethods>

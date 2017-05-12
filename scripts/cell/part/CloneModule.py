@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import skillConfig
 from CommonEnum import PlayerOp
 from ErrorCode import SkillModuleError
 from KBEDebug import *
+from cardsConfig import cardsConfig
 from common.RoomFightModule import RoomFightModule
 from common.skill.SkillConditionModule import ConditionEnum
 
@@ -34,7 +34,7 @@ class CloneModule(RoomFightModule):
         print(" avatar  onClientBeginFight -------------------------")
         room.setReadyState(self.id)
 
-
+        self.client.onMyCardIdList(self.inTeamcardIDList)
 
 
     def onClientPlayAnimFinish(self,exposedID):
@@ -44,7 +44,6 @@ class CloneModule(RoomFightModule):
 
         room = KBEngine.entities.get(cloneID)
         room.onCmdPlayAnimFinish()
-        ERROR_MSG("-----------onClientPlayAnimFinish-----------------cardId-----------  ")
 
     def onClientSelectOp(self,exposedID,op ,leftSkillIdList,rightSkillIdList):
         if exposedID != self.id:
@@ -96,19 +95,23 @@ class CloneModule(RoomFightModule):
         #         self.client.onSkillError(SkillModuleError.not_match_skill)
         #         return
 
-        self.skillList = leftSkillIdList
-
         result = ConditionEnum.con_result_None
         succSkillList = []
         for cardId in leftSkillIdList:
             card = KBEngine.entities.get(cardId)
-            skillID = card.skill1_B
-            if card.useSkill(skillID,result) is True:
-                succSkillList.append(card.skill1_B)
+
+            mainSkill = card.skill1_B
+
+            skillLevel =  card.skill1_Level
+
+            ERROR_MSG(" skill1_b  " + str(card.skill1_B))
+
+            card.useSkill(mainSkill,skillLevel,result)
+
+            succSkillList.append(mainSkill)
 
         room.setSelectState(self.id,op)
 
-        ERROR_MSG("       op     result    is " + str(result))
 
 
         #
@@ -117,21 +120,33 @@ class CloneModule(RoomFightModule):
         #     succ = succ + str(ski)
         # ERROR_MSG(succ)
         #
-        # self.client.onSkillSucc(succSkillList)
+        ERROR_MSG("succSkillList        " + succSkillList.__str__())
+        self.client.onSkillSucc(succSkillList)
 
 
     def onCloneGM(self,exposedID,type):
         if exposedID != self.id:
             return
+
+        room = KBEngine.entities.get(self.roomID)
         if type == GmType.no_steal:
-            self.gmNoSteal = True
+            room.gmNoSteal = True
+            ERROR_MSG(" onCloneGM   no steal  ")
         if type == GmType.shoot_fail:
-            self.gmShootFail = True
+            room.gmShootFail = True
+            ERROR_MSG(" onCloneGM   shoot    fail  ")
         if type == GmType.shoot_succ:
-            self.gmShootSucc = True
+            room.gmShootSucc = True
+            ERROR_MSG(" onCloneGM   shoot    succ  ")
 
+    def onGmSetSkill(self,exposedID,skillID):
 
+        for id in self.inTeamcardIDList:
+            card = KBEngine.entities.get(id)
 
+            card.skill1_B = skillID
+
+        ERROR_MSG("  setGmSkillID  " + str(skillID))
 
     def checkPassiveSkill(self):
 
@@ -150,6 +165,7 @@ class GmType:
     no_steal = 1
     shoot_succ = 2
     shoot_fail = 3
+    set_skill = 4
 
 
 

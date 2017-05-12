@@ -20,9 +20,7 @@ Mail_State_Not_Open = 2    # 未读未领取()
 #
 #
 # --------------------------------------------------------------------------------------------
-Mail_Type_Player = 0   # 玩家
-Mail_Type_Guild = 1
-Mail_Type_GM = 2
+
 
 
 class Mails(KBEngine.Base):

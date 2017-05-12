@@ -8,12 +8,12 @@ from part.CloneModule import CloneModule
 
 class Avatar(KBEngine.Entity,
              CloneModule,):
-
+    typeStr = "Avatar"
     """
     角色实体
     """
     def __init__(self):
-
+        isAvatar = True
         KBEngine.Entity.__init__(self)
 
         for k, v in self.baseProp.items():

@@ -138,6 +138,7 @@
             <fightValue>      <Type> UINT32    </Type>     </fightValue><!--fightValue-->
             <clubName>        <Type> UNICODE  </Type>     </clubName><!--clubName-->
             <onlineState>     <Type> INT32   </Type>     </onlineState><!--onlineState-->
+            <formation>       <Type> INT32   </Type>     </formation><!--formation-->
         </Properties>
     </Friend_INFO>
 
@@ -222,6 +223,13 @@
 			<controllPercent>             <Type> FLOAT  </Type>     </controllPercent><!--控球百分比加成-->
 			<shootPercent>             <Type> FLOAT  </Type>     </shootPercent><!--射门百分比加成-->
 			<strikeNeedCost>     <Type> UINT32  </Type>     </strikeNeedCost><!--花费碎片数量-->
+            <skill1>             <Type> UINT32  </Type>     </skill1><!--skill1-->
+			<skill2>             <Type> UINT32  </Type>     </skill2><!--skill2-->
+			<skill3>             <Type> UINT32  </Type>     </skill3><!--skill3-->
+			<skill4>     <Type> UINT32  </Type>     </skill4><!--skill4-->
+            <skill11>     <Type> UINT32  </Type>     </skill11><!--skill4-->
+            <skill12>     <Type> UINT32  </Type>     </skill12><!--skill4-->
+            <skill13>     <Type> UINT32  </Type>     </skill13><!--skill4-->
         </Properties>
     </Card_Info>
 
@@ -312,6 +320,7 @@
             <power>                   <Type> UINT8   </Type>         </power>       <!--公会权利-->
             <offical>                 <Type> UINT8   </Type>         </offical>       <!--官职-->
             <level>                   <Type> UINT32   </Type>         </level>       <!--等级-->
+            <dayDonate>               <Type> UINT32   </Type>         </dayDonate>       <!--每日贡献-->
             <weekDonate>              <Type> UINT32   </Type>         </weekDonate>       <!--本周贡献-->
             <sumDonate>               <Type> UINT32   </Type>         </sumDonate>       <!--累积贡献-->
             <onlineState>             <Type> INT32   </Type>         </onlineState>       <!--状态，离开，在帮会-->
@@ -354,12 +363,22 @@
         </Properties>
     </ShopItemInfo>
 
+    <!--公会商城-->
+    <GuildShopItemInfo>  FIXED_DICT
+        <Properties>
+            <itemID>            <Type> UINT32   </Type>     </itemID><!--itemID-->
+            <limitTimes>        <Type> UINT32   </Type>     </limitTimes><!--限购次数-->
+            <price>        <Type> UINT32   </Type>     </price><!--单价-->
+        </Properties>
+    </GuildShopItemInfo>
+
     <!--公会建筑-->
     <Guild_Build>  FIXED_DICT
         <Properties>
             <id>               <Type> UINT32   </Type>      </id><!--ID-->
             <level>            <Type> UINT32   </Type>     </level> <!--等级-->
-            <endTimes>        <Type> UINT64  </Type>       </endTimes><!--升级结束时间-->
+            <state>            <Type> UINT32   </Type>     </state> <!--状态-->
+            <endTime>        <Type> UINT64  </Type>       </endTime><!--升级结束时间-->
         </Properties>
     </Guild_Build>
 
@@ -423,13 +442,16 @@
     <RankGuildValueItem>  FIXED_DICT
         <Properties>
             <dbid>        <Type> UINT32   </Type>     </dbid><!--dbid-->
-            <name>        <Type> UNICODE   </Type>     </name><!--公会名字-->
+            <guildName>        <Type> UNICODE   </Type>     </guildName><!--公会名字-->
             <camp>        <Type> UINT32   </Type>     </camp><!--阵营-->
             <level>     <Type> UINT32   </Type>     </level><!--公会等级-->
             <leader>        <Type> UNICODE   </Type>     </leader><!--会长-->
             <reputation>        <Type> UINT32   </Type>     </reputation><!--声望-->
+            <guildFunds>        <Type> UINT32   </Type>     </guildFunds><!--资金-->
         </Properties>
     </RankGuildValueItem>
+
+
 
      <!--副本表-->
     <CloneInfo>  FIXED_DICT
@@ -451,7 +473,7 @@
             <level>         <Type> UINT32   </Type>     </level><!--level-->
             <slogan>        <Type> UNICODE   </Type>     </slogan><!--slogan-->
             <club>          <Type> UNICODE   </Type>     </club><!--club-->
-            <nation>        <Type> UINT32   </Type>     </nation><!--nation-->
+            <camp>        <Type> UINT32   </Type>     </camp><!--camp-->
             <offical>        <Type> UINT32   </Type>     </offical><!--offical-->
             <guildName>        <Type> UNICODE   </Type>     </guildName><!--offical-->
         </Properties>
@@ -470,5 +492,26 @@
             <camp>     <Type> UINT32   </Type>     </camp>
         </Properties>
     </ArenaInfo>
+
+     <!--战绩表-->
+    <RecordInfo>  FIXED_DICT
+        <Properties>
+            <type>     <Type> UINT32   </Type>     </type>
+            <isWin>     <Type> UINT32   </Type>     </isWin>
+            <enemyName>        <Type> UNICODE   </Type>     </enemyName><!--敌对名字-->
+        </Properties>
+    </RecordInfo>
+
+    <!--教练表-->
+    <coachInfo>  FIXED_DICT
+        <Properties>
+            <id>           <Type> UINT32   </Type>     </id>
+            <limitTime>   <Type> UINT64   </Type>     </limitTime>
+             <useTime>     <Type> UINT64  </Type>      </useTime>
+             <color>     <Type> UINT32  </Type>      </color>
+             <isLock>     <Type> UINT32  </Type>      </isLock>
+             <cost>     <Type> STRING  </Type>      </cost>
+        </Properties>
+    </coachInfo>
 
 </root>

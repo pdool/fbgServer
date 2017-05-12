@@ -290,16 +290,47 @@
         <!--技能1ID-->
         <skill1>
             <Type>UINT32</Type>
-            <Flags>BASE_AND_CLIENT</Flags>
+            <Flags>BASE</Flags>
             <Persistent>true</Persistent>
         </skill1>
         <!--技能2ID-->
         <skill2>
             <Type>UINT32</Type>
-            <Flags>BASE_AND_CLIENT</Flags>
+            <Flags>BASE</Flags>
             <Persistent>true</Persistent>
         </skill2>
+ <!--技能3ID-->
+        <skill3>
+            <Type>UINT32</Type>
+            <Flags>BASE</Flags>
+            <Persistent>true</Persistent>
+        </skill3>
+        <!--技能4ID-->
+        <skill4>
+            <Type>UINT32</Type>
+            <Flags>BASE</Flags>
+            <Persistent>true</Persistent>
+        </skill4>
 
+        <!--技能ID-->
+        <skill11>
+            <Type>UINT32</Type>
+            <Flags>BASE</Flags>
+            <Persistent>true</Persistent>
+        </skill11>
+
+        <!--技能ID-->
+        <skill12>
+            <Type>UINT32</Type>
+            <Flags>BASE</Flags>
+            <Persistent>true</Persistent>
+        </skill12>
+        <!--技能ID-->
+        <skill13>
+            <Type>UINT32</Type>
+            <Flags>BASE</Flags>
+            <Persistent>true</Persistent>
+        </skill13>
         <!--技能1ID-->
         <skill1_B>
             <Type>UINT32</Type>
@@ -310,14 +341,11 @@
             <Type>UINT32</Type>
             <Flags>CELL_PUBLIC</Flags>
         </skill2_B>
-
-
-        <!--怒气-->
+        
         <anger>
-            <Type>UINT32</Type>
-            <Flags>CELL_PUBLIC</Flags>
+            <Type>			UINT32                   </Type>
+			<Flags>			ALL_CLIENTS             </Flags>
         </anger>
-
 
     </Properties>
 

@@ -155,7 +155,7 @@ class UseContainer:
 
         sql = util.getInsertSql("tbl_ItemUses", rowValueMap)
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
     def updateUseDB(self,item):
         setMap = {"amount": item["amount"]}
@@ -163,12 +163,12 @@ class UseContainer:
         item["state"] = DBState.NoAction
         sql = util.getUpdateSql("tbl_ItemUses", setMap, filterMap)
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
     def delUseDB(self,item):
         filterMap = {"roleID": self.databaseID, "UUID":  item["UUID"]}
         sql = util.getDelSql("tbl_ItemUses", filterMap)
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
 class UseItemKeys:
     uuid = "UUID"

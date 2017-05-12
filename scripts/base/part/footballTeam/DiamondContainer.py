@@ -155,7 +155,7 @@ class DiamondContainer:
 
         sql = util.getInsertSql("tbl_ItemDiamonds", rowValueMap)
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
         pass
     def updateDiamondDB(self,item):
@@ -165,14 +165,14 @@ class DiamondContainer:
         item["state"] = DBState.NoAction
 
         sql = util.getUpdateSql("tbl_ItemDiamonds", setMap, filterMap)
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
     def delDiamondDB(self,item):
         filterMap = {"roleID": self.databaseID, "UUID":  item["UUID"]}
         sql = util.getDelSql("tbl_ItemDiamonds", filterMap)
 
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
 class DiamondItemKeys:
     uuid = "UUID"

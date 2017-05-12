@@ -156,7 +156,7 @@ class MaterialContainer:
 
         sql = util.getInsertSql("tbl_ItemMaterial", rowValueMap)
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
         pass
     def updateMaterialDB(self,item):
@@ -165,12 +165,12 @@ class MaterialContainer:
         item["state"] = DBState.NoAction
         sql = util.getUpdateSql("tbl_ItemMaterial", setMap, filterMap)
 
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
     def delMaterialDB(self,item):
         filterMap = {"roleID": self.databaseID, "UUID":  item["UUID"]}
         sql = util.getDelSql("tbl_ItemMaterial", filterMap)
-        KBEngine.executeRawDatabaseCommand(sql)
+        KBEngine.executeRawDatabaseCommand(sql,None,self.id)
 
 class MaterialItemKeys:
     uuid = "UUID"

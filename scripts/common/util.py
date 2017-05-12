@@ -16,7 +16,7 @@ def printStackTrace(info):
                   co.co_name,
                   f.f_lineno) + retStr
         f = f.f_back
-    return retStr+info
+    return retStr + info
 
 # 获取当前时间 秒级时间戳
 def getCurrentTime():

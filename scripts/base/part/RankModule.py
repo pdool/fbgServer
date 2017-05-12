@@ -159,7 +159,7 @@ class RankModule:
 
     def updateBallerValueRank(self,card):
         param = {
-            "dbid": card.databaseID,
+            "dbid": card.id,
             "name": self.name,
             "camp": self.camp,
             "level": card.level,
@@ -167,7 +167,6 @@ class RankModule:
             "cardConfigID": card.configID,
 
         }
-
         rankMgr = KBEngine.globalData["RankMgr"]
 
         rankMgr.onCmd("onCmdUpdateBallerValueRank", param)

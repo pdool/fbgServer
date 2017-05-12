@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import partial
+
+import guildConfig
 from KBEDebug import INFO_MSG
 import ErrorCode
 from KBEDebug import ERROR_MSG
@@ -17,6 +19,15 @@ class PowerEnmu:
     deacon          = 2 # 执事
     elite           = 1 # 精英
     member          = 0 # 成员
+
+
+class BuildEnmu:
+    Hall       = 1 # 公会大厅
+    Shop       = 2 #公会商城
+    Consultant = 3 #顾问大厅
+    Task       = 4 #任务大厅
+    WorldCup   = 5 #中国梦之世界杯
+
 
 """
 公会管理器
@@ -42,7 +53,6 @@ class GuildMgr(BaseModule):
         def CB( guild, guildDBID, wasActive):
             if guildDBID not in self.dbidToMb:
                 self.dbidToMb[guildDBID] = guild
-
                 guild.onCmd("getGuildInfo",param)
 
         if guildDBID not in self.dbidToMb:
@@ -56,12 +66,17 @@ class GuildMgr(BaseModule):
         playerMB = argMap["playerMB"]
         guildDBID = argMap["guildDBID"]
 
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+                guild.onCmd("getGuildMemberList", playerMB)
+
         if guildDBID not in self.dbidToMb:
-            return
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMb = self.dbidToMb[guildDBID]
+            guildMb.onCmd("getGuildMemberList", playerMB)
 
-        guildMb = self.dbidToMb[guildDBID]
-
-        guildMb.onCmd("getGuildMemberList", playerMB)
 
     #     获取公会副会长和介绍信息
     def onCmdGetGuildViceInfo(self,argMap):
@@ -69,12 +84,17 @@ class GuildMgr(BaseModule):
         playerMB = argMap["playerMB"]
         guildDBID = argMap["guildDBID"]
 
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+                guild.onCmd("getGuildViceIntroduce", playerMB)
+
         if guildDBID not in self.dbidToMb:
-            return
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMb = self.dbidToMb[guildDBID]
+            guildMb.onCmd("getGuildViceIntroduce", playerMB)
 
-        guildMb = self.dbidToMb[guildDBID]
-
-        guildMb.onCmd("getGuildViceIntroduce", playerMB)
 
 
     # 获取公会申请列表
@@ -87,11 +107,16 @@ class GuildMgr(BaseModule):
         if guildPower < PowerEnmu.secondLeader:
             return
 
-        if guildDBID not in self.dbidToMb:
-            return
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+                guild.onCmd("getGuildApplyList", playerMB)
 
-        guildMb = self.dbidToMb[guildDBID]
-        guildMb.onCmd("getGuildApplyList", playerMB)
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMb = self.dbidToMb[guildDBID]
+            guildMb.onCmd("getGuildApplyList", playerMB)
 
 
 
@@ -103,12 +128,8 @@ class GuildMgr(BaseModule):
 
         findItem = []
         for item in self.guildInfoList:
-
             if  item["camp"] == camp:
-
                 findItem.append(item)
-
-        ERROR_MSG("--onCmdGuildList--"+str(len(findItem)))
 
         playerMB.client.onFindCamp(len(findItem),findItem)
 
@@ -147,13 +168,13 @@ class GuildMgr(BaseModule):
                      "camp"          : camp,
                      "level"         : 1,
                      "count"         : 1,
-                     "leader"        : playerName
+                     "leader"        : playerName,
                      }
             # 保存到数据库（自动）
             self.createGuild(value)
             #
             self.dbidToMb[guild.databaseID] = guild
-            guild.updateGuildValueRank()
+
             #    把自己加入公会中
             argMap={
                 "selfDBID"      : playerDBID,
@@ -165,11 +186,12 @@ class GuildMgr(BaseModule):
                 "power"           : PowerEnmu.leader,
                 "playerMB": playerMB
             }
-
-            param = {"playerMB": playerMB}
+            #  公会信息改变刷新
+            guild.updateGuildValueRank()
+            playerMB.guildDBID = guild.databaseID
+            playerMB.guildPower = int(PowerEnmu.leader)
             guild.onCmd("agreeJoin",argMap)
-            guild.onCmd("onCreateGuildBuild",param)
-            guild.onCmd("getGuildInfo", param)
+
 
 
         guild.writeToDB(guildWriteToDB_CB)
@@ -195,7 +217,8 @@ class GuildMgr(BaseModule):
 
         else:
             guildMb = self.dbidToMb[guildDBID]
-            guildMb.applyJoinGuildCB(argMap, guildMb, guildDBID, True)
+            self.applyJoinGuildCB(argMap, guildMb, guildDBID, True)
+
     # 申请加入公会回调
     def applyJoinGuildCB(self,argMap,guild,guildDBID,wasActive):
         playerMB = argMap["playerMB"]
@@ -214,18 +237,57 @@ class GuildMgr(BaseModule):
 
         guildDBID =  argMap["guildDBID"]
         count =  argMap["count"]
-        if guildDBID not in self.dbidToMb:
+
+        if guildDBID not in self.dbidToIndex:
             return
+
+        guildInfo = self.findGuildByDBID(guildDBID)
+        if guildInfo == None :
+            return
+
+        guildInfo["count"] = count
+
+    # 刷新公会名字
+    def refreshGuildName(self,argMap):
+        guildDBID = argMap["guildDBID"]
+        gulldName = argMap["guildName"]
+
+        if guildDBID not in self.dbidToIndex :
+            return
+
+        guildInfo = self.findGuildByDBID(guildDBID)
+
+        if guildInfo == None:
+            return
+        guildInfo["guildName"] = gulldName
+
+     # 刷新公会等级
+    def refreshGuildLevel(self, argMap):
+        guildDBID = argMap["guildDBID"]
+        level = argMap["level"]
 
         if guildDBID not in self.dbidToIndex:
             return
 
         guildInfo = self.findGuildByDBID(guildDBID)
 
-        if guildInfo == None :
+        if guildInfo == None:
+            return
+        guildInfo["level"] = level
+
+     # 刷新公会领袖
+    def refreshGuildLeader(self, argMap):
+        guildDBID = argMap["guildDBID"]
+        leader = argMap["leader"]
+
+        if guildDBID not in self.dbidToIndex :
             return
 
-        guildInfo["count"] = count
+        guildInfo = self.findGuildByDBID(guildDBID)
+
+        if guildInfo == None:
+            return
+        guildInfo["leader"] = leader
 
     # 离开公会
     def onCmdLeaveGuild(self,argMap):
@@ -266,15 +328,24 @@ class GuildMgr(BaseModule):
             playerMB.client.onGuildError(ErrorCode.GuildModuleError.Guild_guild_not_exist)
             return
 
-        if guildDBID in self.dbidToIndex:
-            guildMb = self.dbidToMb[guildDBID]
-            param = {
-                "applyerDBID": applyerDBID,
-                "power": PowerEnmu.member,
-                "selfDBID": argMap["selfDBID"]
-            }
-            guildMb.onCmd("agreeJoin", param)
+        param = {
+            "applyerDBID": applyerDBID,
+            "power": PowerEnmu.member,
+            "selfDBID": argMap["selfDBID"],
+            "playerMB": playerMB
 
+        }
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+                guild.onCmd("agreeJoin", param)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMb = self.dbidToMb[guildDBID]
+            guildMb.onCmd("agreeJoin", param)
 
 
 
@@ -288,11 +359,22 @@ class GuildMgr(BaseModule):
             playerMB.client.onGuildError(ErrorCode.GuildModuleError.Guild_guild_not_exist)
             return
 
-        param = {"applyerDBID": applyerDBID}
+        param = {
+                  "applyerDBID": applyerDBID,
+                   "playerMB":playerMB
+         }
 
-        if guildDBID in self.dbidToIndex:
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+                guild.onCmd("rejectApply", param)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
             guildMb = self.dbidToMb[guildDBID]
-            guildMb.onCmd("rejectApply",param)
+            guildMb.onCmd("rejectApply", param)
+
 
     # 取消申请
     def onCmdCancelApply(self,argMap):
@@ -334,6 +416,43 @@ class GuildMgr(BaseModule):
 
         playerMB.client.onFindCamp(len(findItem),findItem)
 
+    # 清除公会周贡献
+    def onCmdClearWeekDonate(self,argMap):
+
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("clearWeekDonate", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guild = self.dbidToMb[guildDBID]
+            guild.onCmd("clearWeekDonate", argMap)
+
+
+
+
+    # 清除公会日贡献
+    def onCmdClearDayDonate(self,argMap):
+
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("clearDayDonate", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guild = self.dbidToMb[guildDBID]
+            guild.onCmd("clearDayDonate", argMap)
+
+
+
 
     def onCmdSetGuildNum(self,argMap):
         guildDBID = argMap["guildDBID"]
@@ -341,38 +460,291 @@ class GuildMgr(BaseModule):
 
         # for
         # self.guild
-
+    # 修改公会简介和公告
     def onCmdChangeNotice(self,argMap):
         playerMB = argMap["playerMB"]
 
         guildDBID = argMap["guildDBID"]
+        del argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("changeNotice", argMap)
 
         if guildDBID not in self.dbidToMb:
-            return
-        guildMB = self.dbidToMb[guildDBID]
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("changeNotice", argMap)
 
-        del argMap["guildDBID"]
-        guildMB.onCmd("changeNotice",argMap)
 
+
+    # 修改公会名字
     def onCmdChangeGuildName(self,argMap):
         guildDBID = argMap["guildDBID"]
-        if guildDBID not in self.dbidToMb:
-            return
-        guildMB = self.dbidToMb[guildDBID]
-
         del argMap["guildDBID"]
-        guildMB.onCmd("changeGuildName",argMap)
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("changeGuildName", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("changeGuildName", argMap)
+
+
 
     def onCmdKickOut(self,argMap):
         playerDBID = argMap["playerDBID"]
         selfDBID   = argMap["selfDBID"]
         playerMB   = argMap["playerMB"]
         guildDBID  = argMap["guildDBID"]
-        if guildDBID not in self.dbidToMb:
-            return
-        guildMB = self.dbidToMb[guildDBID]
 
-        guildMB.onCmd("kickOut", argMap)
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("kickOut", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("kickOut", argMap)
+
+
+
+    # 退出公会
+    def onCmdQuitGuild(self,argMap):
+        selfDBID = argMap["selfDBID"]
+        playerMB = argMap["playerMB"]
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("quitGuild", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("quitGuild", argMap)
+
+
+
+    #  公会 任命
+    def onCmdAppointPower(self,argMap):
+        playerDBID = argMap["playerDBID"]
+        selfDBID = argMap["selfDBID"]
+        playerMB = argMap["playerMB"]
+        guildDBID  = argMap["guildDBID"]
+
+        power = argMap["power"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("appoinPower", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("appoinPower", argMap)
+
+
+
+
+    #  公会转让
+    def onCmdGuildTransfer(self,argMap):
+
+        playerDBID = argMap["playerDBID"]
+        selfDBID = argMap["selfDBID"]
+        playerMB = argMap["playerMB"]
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("guildTransfer", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("guildTransfer", argMap)
+
+
+
+    # 解散公会
+    def onCmdDismissGuild(self,argMap):
+
+        selfDBID = argMap["selfDBID"]
+        playerMB = argMap["playerMB"]
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("dismissGuild", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("dismissGuild", argMap)
+
+
+
+    # 取消解散公会
+    def onCmdCancelDismiss(self, argMap):
+
+        selfDBID = argMap["selfDBID"]
+        playerMB = argMap["playerMB"]
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("cancelDismiss", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("cancelDismiss", argMap)
+
+
+
+    #  公会捐钱
+    def onCmdGuildDonate(self,argMap):
+
+        selfDBID = argMap["selfDBID"]
+        playerMB = argMap["playerMB"]
+        guildDBID = argMap["guildDBID"]
+        euro = argMap["euro"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("guildDonate", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("guildDonate", argMap)
+
+
+
+
+
+    #  公会建筑升级
+    def onCmdBuildUpgrade(self,argMap):
+
+        playerDBID = argMap["selfDBID"]
+        playerMB = argMap["playerMB"]
+        guildDBID = argMap["guildDBID"]
+        buildID = argMap["buildID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("guildBuildUpgrade", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("guildBuildUpgrade", argMap)
+
+
+
+    # 公会建筑升级加速
+    def onCmdBuildSpeed(self,argMap):
+
+        playerDBID = argMap["selfDBID"]
+        playerMB = argMap["playerMB"]
+        guildDBID = argMap["guildDBID"]
+        buildID = argMap["buildID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("guildBuildSpeed", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("guildBuildSpeed", argMap)
+
+
+
+
+    # 检查公会建筑升级情况
+    def onCmdCheckBuild(self,argMap):
+
+        playerMB = argMap["playerMB"]
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("guildCheckBuildUpgrade", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("guildCheckBuildUpgrade", argMap)
+
+
+
+
+    # 检查公会保护时间
+    def onCmdCheckProtectTime(self,argMap):
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("checkProtectTime", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("checkProtectTime", argMap)
+
+
+
+
+    # 公会解散检查
+    def onCmdCheckGuildDismiss(self,argMap):
+        playerMB = argMap["playerMB"]
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("checkGuildDismiss", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("checkGuildDismiss", argMap)
+
+
+
+        pass
 
     # 成员下线状态
     def onCmdChangeOnlineState(self,argMap):
@@ -385,20 +757,122 @@ class GuildMgr(BaseModule):
 
             guild.onCmd("onChangeOnlineState",argMap)
 
+
         if guildDBID not in self.dbidToMb:
             KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, cancelApplyCB)
         else:
             guildMb = self.dbidToMb[guildDBID]
             guildMb.onCmd("onChangeOnlineState",argMap)
 
+    # 公会上诉曝光
+    def onCmdGuildAppealExposure(self,argMap):
 
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("guildAppealExposure", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("guildAppealExposure", argMap)
+
+
+        pass
+
+    # 公会购买公会保护
+    def onCmdGuildBuyProtect(self,argMap):
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("guildBuyProtect", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("guildBuyProtect", argMap)
+
+
+
+    # 弹劾
     def onCmdImpeach(self,argMap):
         guildDBID = argMap["guildDBID"]
-        if guildDBID not in self.dbidToMb:
-            return
-        guildMB = self.dbidToMb[guildDBID]
 
-        guildMB.onCmd("impeach", argMap)
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("impeach", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("impeach", argMap)
+
+
+        pass
+
+    #公会升级
+    def onCmdGuildUpdate(self,argMap):
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("guiildUpdate", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("guiildUpdate", argMap)
+
+        pass
+
+
+    # GM增加公会资金
+    def onCmdGMAddGuildFunds(self,argMap):
+
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("addGuildFunds", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("addGuildFunds", argMap)
+
+
+        pass
+
+      # GM增加公会声望
+    def onCmdGMAddGuildReputation(self, argMap):
+
+        guildDBID = argMap["guildDBID"]
+
+        def CB(guild, guildDBID, wasActive):
+            if guildDBID not in self.dbidToMb:
+                self.dbidToMb[guildDBID] = guild
+            guild.onCmd("addGuildReputation", argMap)
+
+        if guildDBID not in self.dbidToMb:
+            KBEngine.createBaseAnywhereFromDBID("Guild", guildDBID, CB)
+        else:
+            guildMB = self.dbidToMb[guildDBID]
+            guildMB.onCmd("addGuildReputation", argMap)
+
+
         pass
 
 
@@ -426,6 +900,7 @@ class GuildMgr(BaseModule):
     def createGuild(self,itemInfo):
         dbid = itemInfo["dbid"]
         self.guildInfoList.append(itemInfo)
+        ERROR_MSG("--CreatGUild self.guildInfoList--"+str(len(self.guildInfoList)))
 
         self.dbidToIndex[dbid] = len(self.guildInfoList) -1
     # 移除公会

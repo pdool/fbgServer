@@ -79,7 +79,7 @@ class ChatModule:
 
         messageInfo = self.makeMessageInfo(message)
 
-        KBEngine.globalData["PlayerMgr"].sendAdChat(messageInfo)
+        KBEngine.globalData["PlayerMgr"].sendAdChat(self.databaseID,messageInfo)
 
     # 私聊
     def onClientPrivate(self,dbid,message):
@@ -105,13 +105,13 @@ class ChatModule:
         # if messageInfo[MessageInfoEnum.name] == self.name:
         #     return
 
-        
-        self.client.onWorldChat(messageInfo)
+
+        self.client.onWorldChat(senderDBID,messageInfo)
 
     def onCmdPrivateChat(self,senderDBID,messageInfo):
         if self.checkInBlack(senderDBID) is True:
             return
-        self.client.onPrivateChat(messageInfo)
+        self.client.onPrivateChat(senderDBID,messageInfo)
     # --------------------------------------------------------------------------------------------
     #                              工具函数调用函数
     # --------------------------------------------------------------------------------------------

@@ -68,6 +68,20 @@
             <Persistent> true </Persistent>
         </createTime>
 
+        <!--公会保护时间-->
+        <protectTime>
+			<Type> UINT64 </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</protectTime>
+
+        <!--解散时间-->
+        <dismissTime>
+            <Type> UINT64 </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </dismissTime>
+
         <!--公会成员-->
         <guildMember>
             <Type> ARRAY <of> Guild_MemberInfo </of> </Type>
@@ -96,6 +110,14 @@
             <Flags> BASE </Flags>
             <Persistent> true </Persistent>
         </applyMember>
+
+        <!--公会最大人数-->
+        <maxMemberNum>
+            <Type> UINT32 </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </maxMemberNum>
+
 
 
     </Properties>

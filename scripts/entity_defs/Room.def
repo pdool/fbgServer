@@ -19,9 +19,8 @@
     </BaseMethods>
 
 	<CellMethods>
-        <!--<setAvatarID>-->
-            <!--<Arg>UINT32</Arg>-->
-        <!--</setAvatarID>-->
+        <destroyRoom>
+        </destroyRoom>
 	</CellMethods>
 
 

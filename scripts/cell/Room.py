@@ -29,6 +29,10 @@ class Room(KBEngine.Entity):
         """
         self.avatarAID = -1
         self.avatarBID = -1
+        # 得分
+        self.aScore = 0
+        self.bScore = 0
+
         self.aReady = False
         self.bReady = False
 
@@ -39,6 +43,8 @@ class Room(KBEngine.Entity):
         self.totalAttackTimes = 0
         # 当前进攻序列
         self.curAttackIndex = -1
+
+        self.timePeriodList = []
         # 当前控制者(玩家或者副本)
         self.controllerID = 0
         # 当前防守者的控制者
@@ -105,21 +111,21 @@ class Room(KBEngine.Entity):
 
         return  attack,defend,controll
 
-    # 计算怪的总的攻击系数 和 防守次数 和控球系数
-    def __calMonsterAtkAndDefendAndControllValue(self):
-        attack = 0.0
-        defend = 0.0
-        controll = 0.0
-        for id in self.inTeamcardIDList:
-            monster = KBEngine.entities.get(id)
-            pos = monster.pos
-            posConfig = positionConfig.PositionConfig[pos]
-            if posConfig["attackEnable"] == 1:
-                attack = attack + posConfig["attack"]
-            defend = defend + posConfig["defend"]
-            controll = controll + monster.getControll() * posConfig["controll"]
-
-        return attack,defend,controll
+    # # 计算怪的总的攻击系数 和 防守次数 和控球系数
+    # def __calMonsterAtkAndDefendAndControllValue(self):
+    #     attack = 0.0
+    #     defend = 0.0
+    #     controll = 0.0
+    #     for id in self.inTeamcardIDList:
+    #         monster = KBEngine.entities.get(id)
+    #         pos = monster.pos
+    #         posConfig = positionConfig.PositionConfig[pos]
+    #         if posConfig["attackEnable"] == 1:
+    #             attack = attack + posConfig["attack"]
+    #         defend = defend + posConfig["defend"]
+    #         controll = controll + monster.getControll() * posConfig["controll"]
+    #
+    #     return attack,defend,controll
 
 
     """
@@ -140,7 +146,18 @@ class Room(KBEngine.Entity):
 
         self.totalAttackTimes = aAttackTimes + bAttackTimes
 
-        self.bAttackList = random.sample(range(self.totalAttackTimes), bAttackTimes)
+        timePeriodList =  random.sample(range(5400), self.totalAttackTimes)
+        timePeriodList.sort()
+
+        for i in range(1,len(timePeriodList)):
+            if timePeriodList[i] - timePeriodList[i-1] < 30:
+                timePeriodList[i] = timePeriodList[i-1] + 30
+
+        self.timePeriodList = timePeriodList
+
+        ERROR_MSG("totalAttackTimes  " + str(self.totalAttackTimes) +"  timePeriodList " + timePeriodList.__str__())
+        # TODO:调试默认玩家攻击
+        self.bAttackList = random.sample(range(1,self.totalAttackTimes), bAttackTimes)
     #  判定进攻发起者Atk1Player
     def __calAtkController(self):
         # 默认是玩家
@@ -153,8 +170,8 @@ class Room(KBEngine.Entity):
 
 
     # 计算每个球员的发起进攻值C1
-    def __calcObjAttckValue(self,obj):
-
+    def __calcObjAttckValue(self,id):
+        obj = KBEngine.entities.get(id)
         pos = obj.pos
         posConfig = positionConfig.PositionConfig[pos]
         # 发起进攻值C1 = 球员的控球值 * 球员所处位置的控球系数 + 球员传球值 * 球员所处位置的传球系数
@@ -194,7 +211,7 @@ class Room(KBEngine.Entity):
                 continue
 
             canAttackPos = canAttackPos+"  "  + str(obj.pos)
-            c1 = self.__calcObjAttckValue(obj)
+            c1 = self.__calcObjAttckValue(id)
 
             if part == 2:
                 c1 = c1 * (1+ obj.secondStepAttackSkillPer)
@@ -321,10 +338,9 @@ class Room(KBEngine.Entity):
 
     """
     def __canSteal(self):
-
         avatar = KBEngine.entities.get(self.controllerID)
-        if hasattr(avatar,"gmNoSteal") and avatar.gmNoSteal:
-            return  False
+        if hasattr(self,"gmNoSteal") and self.gmNoSteal:
+            return  -1
         attackID = self.getCurRoundAtkId(self.curPart)
 
         attackObj = KBEngine.entities.get(attackID)
@@ -341,7 +357,7 @@ class Room(KBEngine.Entity):
         # DEBUG_MSG( keyStr)
 
 
-        result = False
+        result = -1
         attackReel = attackObj.getReel() * 0.8
         for id in defList:
             defPlayer = KBEngine.entities.get(id)
@@ -354,8 +370,12 @@ class Room(KBEngine.Entity):
             seed = util.randFunc()
             # DEBUG_MSG("__canSteal  curPart |  " + str(self.curPart) + "| defPlayer | " + str(defPlayer.steal) + "  | defPlayer.health |  " + str(defPlayer.health) + " | p     |  " + str(p) + "  |     seed|  " + str(seed))
             if  seed <= p:
-                result = True
+                result = id
                 break
+        # # TODO:调试用。，必然守门员抢断
+        # if self.curPart == 3:
+        #     defendObj = KBEngine.entities.get(self.defenderID)
+        #     result = defendObj.keeperID
 
         return  result
 
@@ -472,17 +492,20 @@ class Room(KBEngine.Entity):
         if self.reShootCardID != -1:
             L1 = 0.6
         else:
-            coordinate = self.__getCurRoundAtkCoordinate(self.curPart)
+            coordinate = self.getCurRoundAtkCoordinate(self.curPart)
             L1 = positionAttribute.PositionAttribute[coordinate]["powerPer"]
 
         shootValue = attackObj.getShoot()
         keeperKeep = keeperObj.getKeep()
         p = (shootValue * controllerObj.o1 * L1 - defSum) * (1 + attackObj.tech - defHealth) * ( 0.1 * random.random() + 0.95) / keeperKeep
         p = p + attackObj.shootSuccSkillPer
+
         return p
 
     def isShootSucc(self):
-
+        # TODO:如果补射不为空 射门失败
+        if self.reShootCardID != -1:
+            return False
         if self.isShootMiss() is True:
             return False
         p = self.getShootValue()
@@ -492,6 +515,7 @@ class Room(KBEngine.Entity):
         shootSucc = False
         if seed <= p:
             shootSucc = True
+
 
         return  shootSucc
     # 是否射偏
@@ -584,8 +608,9 @@ class Room(KBEngine.Entity):
         # ERROR_MSG( "--------------------------------onCmdSelectSkill--- part ---------" + str(self.curPart) +"       skillId   "+ str(skillId))
         # 补射
         if self.reShootCardID != -1:
-            self.roundResult = self.onCmdShoot()
+            self.onCmdShoot()
             self.reShootCardID = -1
+            self.noticeClientResult()
         else:
             if self.curPart == 1:
                 if op == PlayerOp.passball:
@@ -594,22 +619,35 @@ class Room(KBEngine.Entity):
                 if op == PlayerOp.passball:
                     self.roundResult = self.onCmdPass()
                 elif op == PlayerOp.shoot:
-                    self.roundResult = self.onCmdShoot()
+                     self.onCmdShoot()
             elif self.curPart == 3:
                 if op == PlayerOp.shoot:
-                    self.roundResult = self.onCmdShoot()
+                    self.onCmdShoot()
 
             avatarA = KBEngine.entities.get(self.avatarAID)
             avatarB = KBEngine.entities.get(self.avatarBID)
+            self.noticeClientResult()
+            if self.roundResult == ConditionEnum.con_result_be_keeper_steal:
+                self.roundResult = ConditionEnum.con_result_be_steal
+            if self.roundResult == ConditionEnum.con_result_reshoot_fail:
+                self.roundResult = ConditionEnum.con_result_shoot_fail
 
-            avatarA.afterRound(self.roundResult)
-            avatarB.afterRound(self.roundResult)
+                ERROR_MSG("  onCmdSelectSkill  " + str("  reshoot fail"))
+            if self.roundResult == ConditionEnum.con_result_reshoot_succ:
+                self.roundResult = ConditionEnum.con_result_shoot_succ
+                ERROR_MSG("  onCmdSelectSkill  " + str("  reshoot succ"))
 
-        self.noticeClientResult()
+            avatarA.controllerAfterRound(self.roundResult)
+            avatarB.controllerAfterRound(self.roundResult)
+
+
 
     def noticeClientResult(self):
         avatarA = KBEngine.entities.get(self.avatarAID)
         avatarB = KBEngine.entities.get(self.avatarBID)
+
+        ERROR_MSG("noticeClientResult    " + str(self.roundResult))
+
         if isinstance(avatarA, Avatar.Avatar):
             avatarA.client.onOprateResult(self.curPart, self.roundResult)
 
@@ -629,6 +667,11 @@ class Room(KBEngine.Entity):
                 avatarA.client.onGameOver()
             if isinstance(avatarB, Avatar.Avatar):
                 avatarB.client.onGameOver()
+            # 传送出去结果
+            if avatarA.typeStr == "Avatar":
+                avatarA.base.onRoomEndResult(self.avatarAID,self.aScore,self.avatarBID,self.bScore)
+            if avatarB.typeStr == "Avatar":
+                avatarB.base.onRoomEndResult( self.avatarAID, self.aScore, self.avatarBID, self.bScore)
             return
 
 
@@ -640,9 +683,10 @@ class Room(KBEngine.Entity):
         # 当前攻击的是玩家还是副本
         self.__calAtkController()
 
+        curTime = self.timePeriodList[self.curAttackIndex]
         # ①重置临时数据
-        avatarA.beforeRound()
-        avatarB.beforeRound()
+        avatarA.beforeRound(curTime)
+        avatarB.beforeRound(curTime)
         # 当前序列的第几轮
         self.curPart = 1
         #
@@ -650,8 +694,6 @@ class Room(KBEngine.Entity):
         self.roundResult = -1
         self.aSelect = False
         self.bSelect = False
-
-
 
         controllerObj = KBEngine.entities.get(self.controllerID)
         defObj = KBEngine.entities.get(self.defenderID)
@@ -709,10 +751,15 @@ class Room(KBEngine.Entity):
         # ERROR_MSG(thirdDefListStr)
 
         # ERROR_MSG("-----------------------------defObj.keeperID -------------------  " + str(defObj.keeperID) + "   objID   "+ str(defObj.id))
+
+
+
         if isinstance(avatarA, Avatar.Avatar):
-            avatarA.client.onAtkAndDefID(atkList,atkPosList, firstDefList,secondDefList,thirdDefList,defObj.keeperID)
+            avatarA.client.onAtkAndDefID(curTime,atkList,atkPosList, firstDefList,secondDefList,thirdDefList,defObj.keeperID)
         if isinstance(avatarB, Avatar.Avatar):
-            avatarB.client.onAtkAndDefID(atkList,atkPosList, firstDefList,secondDefList,thirdDefList,defObj.keeperID)
+            avatarB.client.onAtkAndDefID(curTime,atkList,atkPosList, firstDefList,secondDefList,thirdDefList,defObj.keeperID)
+
+        thirdDefList.append(defObj.keeperID)
         # 第一步
         self.__onFirstPart()
 
@@ -723,31 +770,43 @@ class Room(KBEngine.Entity):
         # 副本直接选择传球
         controller = KBEngine.entities.get(self.controllerID)
         defender =  KBEngine.entities.get(self.defenderID)
+        self.addAnger(self.curPart)
+
+        canUseSkillList = controller.selectCanUseSkills()
         # 不是avatar 就调用AI
         if isinstance(controller, Avatar.Avatar):
-            controller.client.onOprateResult(self.curPart, ClientResult.select)
+            controller.client.onSelectSkill(self.curPart, canUseSkillList)
+
+            ERROR_MSG(" __onFirstPart  c  " + canUseSkillList.__str__())
         else:
             # ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
             controller.onAISelect()
-
+        canUseSkillList = defender.selectCanUseSkills()
         if isinstance(defender, Avatar.Avatar):
-            defender.client.onOprateResult(self.curPart, ClientResult.select)
+            defender.client.onSelectSkill(self.curPart, canUseSkillList)
+            ERROR_MSG(" __onFirstPart  d  " + canUseSkillList.__str__())
         else:
             # ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
             defender.onAISelect()
 
+
+
+
+
     def __onSecondPart(self):
         controller = KBEngine.entities.get(self.controllerID)
         defender = KBEngine.entities.get(self.defenderID)
+        self.addAnger(self.curPart)
         # 不是avatar 就调用AI
+        canUseSkillList = controller.selectCanUseSkills()
         if isinstance(controller, Avatar.Avatar):
-            controller.client.onOprateResult(self.curPart, ClientResult.select)
+            controller.client.onSelectSkill(self.curPart, canUseSkillList)
         else:
             # ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
             controller.onAISelect()
-
+        canUseSkillList = defender.selectCanUseSkills()
         if isinstance(defender, Avatar.Avatar):
-            defender.client.onOprateResult(self.curPart, ClientResult.select)
+            defender.client.onSelectSkill(self.curPart, canUseSkillList)
         else:
             # ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
             defender.onAISelect()
@@ -757,38 +816,64 @@ class Room(KBEngine.Entity):
 
         controller = KBEngine.entities.get(self.controllerID)
         defender = KBEngine.entities.get(self.defenderID)
+        self.addAnger(self.curPart)
+
+        canUseSkillList = controller.selectCanUseSkills()
         # 不是avatar 就调用AI
         if isinstance(controller, Avatar.Avatar):
-            controller.client.onOprateResult(self.curPart, ClientResult.select)
+            controller.client.onSelectSkill(self.curPart, canUseSkillList)
         else:
             # ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
             controller.onAISelect()
-
+        canUseSkillList = defender.selectCanUseSkills()
         if isinstance(defender, Avatar.Avatar):
-            defender.client.onOprateResult(self.curPart, ClientResult.select)
+            defender.client.onSelectSkill(self.curPart, canUseSkillList)
         else:
             # ERROR_MSG("-------onOprateResult------player select----------------self.curPart  " + str(self.curPart))
             defender.onAISelect()
 
+
+    def addAnger(self,part):
+
+        attackID = self.getCurRoundAtkId(self.curPart)
+        card = KBEngine.entities.get(attackID)
+        card.anger = card.anger + 15
+
+        defList = self.getCurRoundDefList(self.curPart)
+        for defID in defList:
+            card = KBEngine.entities.get(defID)
+            card.anger = card.anger + 10
+
     def onCmdShoot(self):
-        if self.reShootCardID:
+
+
+        if self.reShootCardID != -1:
             # 补射的时候设置为不可抢断
-            result = False
+            result = -1
         else:
             result = self.__canSteal()
+        ERROR_MSG("onCmdShoot   result is    "+ str(result) + "  reShootCardID  " + str(self.reShootCardID))
+
         self.endRound = True
-        if result is True:
+
+        if result != -1:
             # 抢断成功 通知客户端播放动画
             ERROR_MSG("-------onOprateResult------trickSucc----------------self.curPart  " + str(self.curPart))
+            defendObj = KBEngine.entities.get(self.defenderID)
+            if result == defendObj.keeperID:
 
-            result = ConditionEnum.con_result_be_steal
+                result = ConditionEnum.con_result_be_keeper_steal
+            else:
+                result = ConditionEnum.con_result_be_steal
+            self.roundResult = result
         else:
-            result = self.isShootSucc()
 
+            result = self.isShootSucc()
+            ERROR_MSG("-----------onCmdShoot    " + result.__str__())
             controller = KBEngine.entities.get(self.controllerID)
-            if hasattr(controller,"gmShootFail") and controller.gmShootFail:
+            if hasattr(self,"gmShootFail") and self.gmShootFail:
                 result =   False
-            if hasattr(controller, "gmShootSucc") and controller.gmShootSucc:
+            if hasattr(self, "gmShootSucc") and self.gmShootSucc:
                 result = True
 
             if result is True:
@@ -796,20 +881,30 @@ class Room(KBEngine.Entity):
                 ERROR_MSG("-------onOprateResult------shootSucc 1 ----------------self.curPart  " + str(self.curPart))
                 result = ConditionEnum.con_result_shoot_succ
                 self.roundResult = ConditionEnum.con_result_shoot_succ
+
+                if self.controllerID == self.avatarAID:
+                    self.aScore = self.aScore + 1
+                else:
+                    self.bScore = self.bScore + 1
+
+                if self.reShootCardID != -1:
+                    self.roundResult  = ConditionEnum.con_result_reshoot_succ
             else:
                 # 通知客户端射门失败
                 ERROR_MSG("-------onOprateResult------shootFail----------------self.curPart  " + str(self.curPart))
                 self.roundResult = ConditionEnum.con_result_shoot_fail
                 result = ConditionEnum.con_result_shoot_fail
+                if self.reShootCardID != -1:
+                    ERROR_MSG("-------onOprateResult------reshoot  Fail----------------self.curPart  " + str(self.curPart))
+                    self.roundResult = ConditionEnum.con_result_reshoot_fail
 
-            self.reShootCardID = -1
 
         return  result
 
     # 传球
     def onCmdPass(self):
         result = self.__canSteal()
-        if result is True:
+        if result != -1:
             # 抢断成功 通知客户端播放动画
             ERROR_MSG("-------onOprateResult------trickSucc----------------self.curPart  " + str(self.curPart))
             self.endRound = True
@@ -821,6 +916,8 @@ class Room(KBEngine.Entity):
                 ERROR_MSG("-------onOprateResult------perfectPassBall----------------self.curPart  " + str(self.curPart))
                 result =  ConditionEnum.con_result_perfect_pass
             else:
+
+                ERROR_MSG(util.printStackTrace("passBall"))
                 # 通知客户端普通传球
                 ERROR_MSG("-------onOprateResult------passBall----------------self.curPart  " + str(self.curPart))
                 # self.__onThirdPart()
@@ -832,6 +929,9 @@ class Room(KBEngine.Entity):
     # 获得当前轮的攻击者ID
     def getCurRoundAtkId(self, part):
 
+        if self.reShootCardID != -1:
+            return self.reShootCardID
+
         controllerObj = KBEngine.entities.get(self.controllerID)
 
 
@@ -839,13 +939,13 @@ class Room(KBEngine.Entity):
         try:
             attackId = controllerObj.atkList[part -1]
 
-            ERROR_MSG("------------------------self.curPart - 1    "+str(part-1 )+"   attackID-------------" +str(attackId))
+            # ERROR_MSG("------------------------self.curPart - 1    "+str(part-1 )+"   attackID-------------" +str(attackId))
         except:
             ERROR_MSG("========= list index out of range  self.curPart  =========  " + str(part-1) +"   atklist len   " + str(len(controllerObj.atkList)))
 
         return attackId
     # 获得当前轮的攻击者ID的球场坐标
-    def __getCurRoundAtkCoordinate(self,part):
+    def getCurRoundAtkCoordinate(self, part):
 
         controllerObj = KBEngine.entities.get(self.controllerID)
 
@@ -854,7 +954,7 @@ class Room(KBEngine.Entity):
         try:
             attackCoordinate = controllerObj.atkPosList[part -1]
 
-            ERROR_MSG("------------------------self.curPart - 1    "+str(part-1 )+"   attackCoordinate-------------" +str(attackCoordinate))
+            # ERROR_MSG("------------------------self.curPart - 1    "+str(part-1 )+"   attackCoordinate-------------" +str(attackCoordinate))
         except:
             ERROR_MSG("========= list index out of range  self.curPart  =========  " + str(part-1) +"   atklist len   " + str(len(controllerObj.atkList)))
 
@@ -897,6 +997,8 @@ class Room(KBEngine.Entity):
             self.bSelect = True
         if self.aSelect and self.bSelect:
             self.onCmdSelectSkill(self.curPartOp)
+            self.aSelect = False
+            self.bSelect = False
 
 
     def onDestroy(self):
@@ -923,7 +1025,9 @@ class Room(KBEngine.Entity):
         # 一轮开始之前
 #=========================================================================
 
-
+    def destroyRoom(self):
+        ERROR_MSG(" destroyRoom is called ")
+        self.destroy()
 class ClientResult:
     # 抢断成功
     trickSucc = 1

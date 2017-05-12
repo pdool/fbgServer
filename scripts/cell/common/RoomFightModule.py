@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
+import Avatar
 import KBEngine
+import skillConfig
+import skillMainConfig
+import sys
 from CommonEnum import ActionTypeEnum
-from KBEDebug import DEBUG_MSG
+from KBEDebug import DEBUG_MSG, ERROR_MSG
+from common.skill.SkillConditionModule import ConditionEnum
 
 __author__ = 'chongxin'
 """
@@ -36,7 +41,9 @@ class RoomFightModule:
         # 射门成功
         self.shootSucc = 0
         # 当前轮次使用的技能
-        self.skillList = []
+        self.canUseSkillList = []
+
+
 
         # 初始化room的
     # 设置房间的自己的controllerID
@@ -46,15 +53,49 @@ class RoomFightModule:
 
         # 一轮开始之前
 
-    def beforeRound(self):
+    def beforeRound(self,curTime):
         for id in self.inTeamcardIDList:
             card = KBEngine.entities.get(id)
+            card.anger = card.anger + curTime//40 #40秒恢复1点
             # 重置临时数据
             card.resetRoundData()
             # 附加buffer的效果
             card.bufferEffect()
 
-    def afterRound(self,result):
-        for cardId in self.skillList:
+    def controllerAfterRound(self,result):
+        ERROR_MSG("  afterRound  result  " + str(result))
+        for cardId in self.inTeamcardIDList:
             card = KBEngine.entities.get(cardId)
             card.afterRound(result)
+
+
+
+    def selectCanUseSkills(self):
+
+        self.canUseSkillList = []
+        if not isinstance(self, Avatar.Avatar):
+            return []
+
+        curPart = KBEngine.entities.get(self.roomID).curPart
+        for id in self.inTeamcardIDList:
+            card = KBEngine.entities.get(id)
+            skill = card.skill1_B
+            skillCon = skillMainConfig.SkillMain[skill]
+
+#             1、检查步骤适合
+            if curPart not in skillCon["useStep"]:
+                continue
+#             2、检查怒气
+            if card.anger <100:
+                continue
+#             3、检查condition
+            condition = skillCon["condition"]
+            if not card.checkCondition(condition,ConditionEnum.con_result_None):
+                continue
+
+            self.canUseSkillList.append(id)
+
+        ERROR_MSG("  canUseSkillList  " + self.canUseSkillList.__str__())
+        return self.canUseSkillList
+
+

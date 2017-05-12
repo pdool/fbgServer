@@ -10,53 +10,33 @@ __author__ = 'chongxin'
 """
 
 class SkillConditionModule:
+    # 禁区
+    penaltyArea = (34, 35, 36, 44, 45, 46, 54, 55, 56)
+
     def __init__(self):
-        self.__funcMap = {
-            ConditionEnum.con_self_attack:          self.checkCondition1,
-            ConditionEnum.con_us_attack:            self.checkCondition2,
-            ConditionEnum.con_self_defend:          self.checkCondition3,
-            ConditionEnum.con_enemy_attack:         self.checkCondition4,
-            ConditionEnum.con_us_defend_except_me:  self.checkCondition5,
-            ConditionEnum.con_any:                  self.checkCondition6,
 
-            ConditionEnum.con_one_defend:           self.checkCondition8,
-            ConditionEnum.con_us_first_step:        self.checkCondition9,
-            ConditionEnum.con_us_second_step:       self.checkCondition10,
-            ConditionEnum.con_us_third_step:        self.checkCondition11,
-
-            ConditionEnum.con_score_lead:           self.checkCondition13,
-
-
-            ConditionEnum.con_result_shoot_succ:    self.checkCondition113,
-            ConditionEnum.con_result_shoot_fail:    self.checkCondition114,
-            ConditionEnum.con_result_pass_succ:     self.checkCondition115,
-            ConditionEnum.con_result_perfect_pass:  self.checkCondition116,
-            ConditionEnum.con_result_be_steal:      self.checkCondition117,
-            ConditionEnum.con_result_break_succ:    self.checkCondition118,
-        }
         pass
 
     def checkCondition(self,condition,result):
         return self.fitCondition(condition,result)
 
     def fitCondition(self,condition,result):
+        methodName = "checkCondition" + str(condition)
+        func = getattr(self,methodName)
+        return  func(result)
 
-        if condition in self.__funcMap:
-            func = self.__funcMap[condition]
-            return  func(result)
-        return True
 
     # 1、自己持球时
     def checkCondition1(self,result):
         if result != ConditionEnum.con_result_None:
             return False
 
-        ERROR_MSG("  checkCondition1     result " + str(result))
+        # ERROR_MSG("  checkCondition1     result " + str(result))
         roomID = self.roomID
         clone = KBEngine.entities.get(roomID)
         curAttackID = clone.getCurRoundAtkId(clone.curPart)
 
-        ERROR_MSG("curAttackID   is " + str(curAttackID) +"   myCardId  " + str(self.id))
+        # ERROR_MSG("curAttackID   is " + str(curAttackID) +"   myCardId  " + str(self.id))
 
         if curAttackID != self.id:
             return False
@@ -119,7 +99,7 @@ class SkillConditionModule:
         return True
 
     # 6、比赛中任何回合(不要配就行了)
-    def checkCondition6(self):
+    def checkCondition6(self,result):
         return True
 
 
@@ -207,12 +187,53 @@ class SkillConditionModule:
 
         curPart = room.curPart
 
-        controller = KBEngine.entities.get(self.controllerID)
+        controller = KBEngine.entities.get(room.defenderID)
 
         if len(controller.defList[curPart -1]) == 0:
                 return True
 
         return False
+
+    # 16、禁区外自己持球时
+    def checkCondition16(self, result):
+        if result != ConditionEnum.con_result_None:
+            return False
+
+        ERROR_MSG("  checkCondition1     result " + str(result))
+        roomID = self.roomID
+        clone = KBEngine.entities.get(roomID)
+        curAttackID = clone.getCurRoundAtkId(clone.curPart)
+
+        ERROR_MSG("curAttackID   is " + str(curAttackID) + "   myCardId  " + str(self.id))
+
+        if curAttackID != self.id:
+            return False
+
+        attackCoordinate = clone.getCurRoundAtkCoordinate(clone.curPart)
+        if attackCoordinate in self.penaltyArea:
+            return True
+        return False
+    # 队友进攻时
+    def checkCondition22(self, result):
+        if result != ConditionEnum.con_result_None:
+            return False
+
+        roomID = self.roomID
+        clone = KBEngine.entities.get(roomID)
+        if self.controllerID != clone.controllerID:
+            return False
+
+        attackID = clone.getCurRoundAtkId(clone.curPart)
+
+        if attackID != self.id:
+            return True
+        return False
+
+
+
+
+
+
 
     # 113、射门成功
     def checkCondition113(self,result):
@@ -313,7 +334,14 @@ class ConditionEnum:
     # 单刀
     con_on_on_one = 15
 
+    # 禁区外正面自己持球时
+    con_penaltyArea_self_attack = 16
+
+    # 队友进攻时
+    con_us_except_me_attack = 22
+
     # ==================================================================================================================
+    # 非结果型
     con_result_None = 112
     # 113、射门成功
     con_result_shoot_succ = 113
@@ -329,3 +357,10 @@ class ConditionEnum:
     con_result_break_succ = 118
     # 未射门成功（防守成功）
     con_result_not_shoot_succ = 119
+
+    # 120、被守门员抢断
+    con_result_be_keeper_steal = 120
+    # 121、补射成功
+    con_result_reshoot_succ = 121
+    # 122、补射失败
+    con_result_reshoot_fail = 122

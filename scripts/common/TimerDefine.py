@@ -36,3 +36,16 @@ Timer_reset_baby_fullTime = 10
 Timer_reset_baller_addInfo = 11
 # 重置商城限购次数
 Timer_reset_shop_item = 12
+
+# 重置公会成员周贡献
+Timer_reset_guild_weekDonate = 13
+
+# 重置公会成员日贡献
+Timer_reset_guild_dayDonate = 14
+
+#公会建筑升级
+Timer_guild_build_upgrade=15
+#竞技场奖励
+Timer_arena_reward = 16
+#教练Cd
+Timer_coach_CD = 16

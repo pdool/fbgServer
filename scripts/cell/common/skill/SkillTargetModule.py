@@ -9,35 +9,25 @@ __author__ = 'chongxin'
 (us 己方 enemy 对手  self 自身)
 """
 # 后卫
-guardPos = (2,3,4,5,6,7,11)
+guardPos = (2,3,4,5,6,7,8,9,10,11)
 # 中场
-midfieldPos = (8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20)
+midfieldPos = (8,7,10,12,13,14,15,16,18,19,20)
 # 前锋
-strikerPos = (17,21,22,23,24)
+strikerPos = (17,18,19,20,21,22,23,24)
+
+
+
 class SkillTargetModule:
     def __init__(self):
-
-        self.__funcMap ={
-            TargetEnum.target_self:             self.filterTarget1,
-            TargetEnum.target_enemy_defender:   self.filterTarget2,
-            TargetEnum.target_enemy_attacker:   self.filterTarget3,
-            TargetEnum.target_enemy_keeper:     self.filterTarget4,
-            TargetEnum.target_teammate:         self.filterTarget5,
-            TargetEnum.target_us_keeper:        self.filterTarget6,
-            TargetEnum.target_us_guard:         self.filterTarget7,
-            TargetEnum.target_midfield:         self.filterTarget8,
-            TargetEnum.target_us_striker:       self.filterTarget9,
-            TargetEnum.target_us_next_attacker: self.filterTarget10,
-            TargetEnum.target_all_teammate:     self.filterTarget11,
-            TargetEnum.target_enemy_next_attacker:self.filterTarget10,
-        }
+        pass
 
 
     def filterTarget(self,targetType):
-        if targetType in self.__funcMap:
-            func = self.__funcMap[targetType]
-            return func()
-        return True
+
+        methodName = "filterTarget" + str(targetType)
+        func = getattr(self,methodName)
+        return  func()
+
     # 1、自身
     def filterTarget1(self):
         return (self.id,)
@@ -128,8 +118,8 @@ class SkillTargetModule:
         roomID = self.roomID
         clone = KBEngine.entities.get(roomID)
         # 不是自己攻击的时候下一轮的接球的人还不知道
-        # if self.controllerID != clone.controllerID:
-        #     return None
+        if self.controllerID != clone.controllerID:
+            return ()
         # 如果是第三步的时候没有下一轮
         if clone.curPart == 3:
             return None
@@ -139,6 +129,15 @@ class SkillTargetModule:
     def filterTarget11(self):
         controller = KBEngine.entities.get(self.controllerID)
         return controller.inTeamcardIDList
+
+    # 12、新增：（下一轮）接球的对手球员
+    def filterTarget12(self):
+        roomID = self.roomID
+        clone = KBEngine.entities.get(roomID)
+        if self.controllerID == clone.controllerID:
+            return ()
+        attackId = clone.getCurRoundAtkId(clone.curPart + 1)
+        return (attackId,)
 
 # 目标
 class TargetEnum:

@@ -277,10 +277,10 @@ class PlayerMgr(KBEngine.Base):
         for mb in self.dbidToMailBox.values():
             mb.onCmdWorldChat(senderDbid,messageInfo)
 
-    def sendAdChat(self,messageInfo):
+    def sendAdChat(self,senderDbid,messageInfo):
         for mb in self.dbidToMailBox.values():
             ERROR_MSG("--------------   ad  ------------------")
-            mb.client.onAdChat(messageInfo)
+            mb.client.onAdChat(senderDbid,messageInfo)
 
     def sendPrivateChat(self,toDbid,senderDbid,messageInfo):
         if toDbid in self.dbidToMailBox:

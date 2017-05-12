@@ -13,7 +13,8 @@ __createTime__  = '2017年1月5日'
 
 import util
 from KBEDebug import *
-
+import cardsConfig
+import skillLevelConfig
 class PlayerInfoSelfStatus:
     notSelf = 0
     isSelf = 1
@@ -76,7 +77,6 @@ class CardMgrModule:
             self.benchBallerIDList.append(card.id)
 
         self.cardIDList.append(card.id)
-        card.calcFightValue()
         self.loadNum = self.loadNum + 1
 
         if self.loadNum == len(self.cardDBIDList):
@@ -94,7 +94,6 @@ class CardMgrModule:
     # --------------------------------------------------------------------------------------------
 
     def onClientGetAllCardInfo(self):
-
         playerInfos = []
         for id in self.cardIDList:
             player = KBEngine.entities.get(id)
@@ -141,6 +140,13 @@ class CardMgrModule:
             playerInfo["controllPercent"] = player.controllPercent
             playerInfo["shootPercent"] = player.shootPercent
             playerInfo["defendPercent"] = player.defendPercent
+            playerInfo["skill1"] = player.skill1
+            playerInfo["skill2"] = player.skill2
+            playerInfo["skill3"] = player.skill3
+            playerInfo["skill4"] = player.skill4
+            playerInfo["skill11"] = player.skill11
+            playerInfo["skill12"] = player.skill12
+            playerInfo["skill13"] = player.skill13
             playerInfos.append(playerInfo)
         self.client.onGetAllCardInfo(playerInfos)
 
@@ -232,16 +238,16 @@ class CardMgrModule:
     #                              工具函数调用函数
     # --------------------------------------------------------------------------------------------
 
-    def addCard(self,configID,pos = -1,inTeam = PlayerInfoTeamStatus.notInTeam,isSelf = PlayerInfoSelfStatus.notSelf,cb=None):
+    def addCard(self,configID,pos,inTeam,isSelf,cb=None):
         # 1、判断是否存在
 
-        if configID not in cardsConfig:
+        if configID not in cardsConfig.cardsConfig:
             return
 
         if self.isCardExist(configID) == True:
             return
 
-        config = cardsConfig[configID]
+        config = cardsConfig.cardsConfig[configID]
 
         card = KBEngine.createBaseLocally("Card")
 
@@ -294,10 +300,24 @@ class CardMgrModule:
                 card.tech = card.tech + float(BabyLikingStarConfig.BabyLikingStarConfig[1]["teamTuple"].split(",")[1])
                 card.health = card.health + float(BabyLikingStarConfig.BabyLikingStarConfig[1]["teamTuple"].split(",")[0])
             card.inTeam = inTeam
+            skillConfig = cardsConfig.cardsConfig[configID]
 
-            card.skill1 = config["skill1ID"]
-            card.skill2 = config["skill2ID"]
+            card.skill1 =  skillConfig["skill1ID"] * 100 + 1
+            card.skill11 = skillConfig["skill1ID"] * 100 + 1
+            card.skill12 = skillConfig["skill12ID"] * 100 + 1
+            card.skill13 = skillConfig["skill13ID"] * 100 + 1
 
+            card.skill2 = skillConfig["skill2ID"] * 100 + 1
+            card.skill3 = skillConfig["skill3ID"] * 100 + 1
+            card.skill4 = skillConfig["skill4ID"] * 100 + 1
+
+
+            if card.skill3 != 1:
+                for itemID, Num in  skillLevelConfig.PropSkillLevelConfig[card.skill3]["addvalue"].items():
+                    setattr(card, itemID, getattr(card, itemID) + Num)
+            if card.skill4 != 1:
+                for itemID, Num in skillLevelConfig.PropSkillLevelConfig[card.skill4]["addvalue"].items():
+                    setattr(card, itemID, getattr(card, itemID) + Num)
             if inTeam == PlayerInfoTeamStatus.inTeam and card.id not in self.inTeamcardIDList:
                 self.inTeamcardIDList.append(card.id)
 
@@ -314,6 +334,61 @@ class CardMgrModule:
                 cb(card)
         else:
             DEBUG_MSG("card is not None")
+
+    def UpdateBallerInfo(self, card):
+        card.calcFightValue()
+        playerInfo = {}
+        playerInfo["id"] = card.id
+        playerInfo["configID"] = card.configID
+        playerInfo["star"] = card.star
+        playerInfo["inTeam"] = card.inTeam
+        playerInfo["bench"] = card.bench
+        playerInfo["pos"] = card.pos
+        playerInfo["isSelf"] = card.isSelf
+        playerInfo["brokenLayer"] = card.brokenLayer
+        playerInfo["fightValue"] = card.fightValue
+        playerInfo["level"] = card.level
+        playerInfo["exp"] = card.exp
+        playerInfo["shoot"] = card.shoot
+        playerInfo["shootM"] = card.shootM
+        playerInfo["shootExp"] = card.shootExp
+        playerInfo["defend"] = card.defend
+        playerInfo["defendM"] = card.defendM
+        playerInfo["defendExp"] = card.defendExp
+        playerInfo["pass"] = card.passBall
+        playerInfo["passBallM"] = card.passBallM
+        playerInfo["passBallExp"] = card.passBallExp
+        playerInfo["trick"] = card.trick
+        playerInfo["trickM"] = card.trickM
+        playerInfo["trickExp"] = card.trickExp
+        playerInfo["reel"] = card.reel
+        playerInfo["reelM"] = card.reelM
+        playerInfo["reelExp"] = card.reelExp
+        playerInfo["steal"] = card.steal
+        playerInfo["stealM"] = card.stealM
+        playerInfo["stealExp"] = card.stealExp
+        playerInfo["controll"] = card.controll
+        playerInfo["controllM"] = card.controllM
+        playerInfo["controllExp"] = card.controllExp
+        playerInfo["keep"] = card.keep
+        playerInfo["keepM"] = card.keepM
+        playerInfo["keepExp"] = card.keepExp
+        playerInfo["tech"] = card.tech
+        playerInfo["health"] = card.health
+        playerInfo["strikeNeedCost"] = card.strikeNeedCost
+        playerInfo["keepPercent"] = card.keepPercent
+        playerInfo["controllPercent"] = card.controllPercent
+        playerInfo["shootPercent"] = card.shootPercent
+        playerInfo["defendPercent"] = card.defendPercent
+        playerInfo["skill1"] = card.skill1
+        playerInfo["skill2"] = card.skill2
+        playerInfo["skill3"] = card.skill3
+        playerInfo["skill4"] = card.skill4
+        playerInfo["skill11"] = card.skill11
+        playerInfo["skill12"] = card.skill12
+        playerInfo["skill13"] = card.skill13
+        return playerInfo
+
 
     def __onCardSaved(self, success, card):
 

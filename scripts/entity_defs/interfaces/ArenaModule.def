@@ -10,6 +10,12 @@
 			<Persistent>		true		</Persistent>
         </arenaInitialList>
 
+        <recordList>
+            <Type>			ARRAY <of> RecordInfo  </of>   </Type>
+			<Flags>			BASE				</Flags>
+			<Default>						</Default>
+			<Persistent>		true		</Persistent>
+        </recordList>
 
         <blackMoney>
             <Type>			UINT32    </Type>
@@ -32,10 +38,27 @@
 
         <arenaTimes>
 			<Type> UINT32 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+            <Persistent> true </Persistent>
+		</arenaTimes>
+
+        <updateAreanCd>
+			<Type> UINT64 </Type>
 			<Flags> BASE </Flags>
             <Persistent> true </Persistent>
-            <Default>	5 </Default>
-		</arenaTimes>
+		</updateAreanCd>
+
+        <currentArenaTimes>
+			<Type> UINT32 </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</currentArenaTimes>
+
+         <buyArenaTimes>
+			<Type> UINT32 </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</buyArenaTimes>
 
         <selfDBID>
 			<Type> UINT32 </Type>
@@ -46,12 +69,27 @@
 	</Properties>
 
 	<BaseMethods>
+        <!--请求竞技排行榜玩家信息-->
+        <onClientGetArenaPlayerInfo>
+            <Exposed/>
+            <Arg>UINT32</Arg> <!-- 排名 -->
+        </onClientGetArenaPlayerInfo>
+
+
+        <!--请求倒计时-->
+        <onClientGetUpdateCD>
+            <Exposed/>
+        </onClientGetUpdateCD>
 
         <!--刷新竞技对手排行榜-->
         <onClientUpdateArenaRank>
             <Exposed/>
         </onClientUpdateArenaRank>
 
+        <!--开始P-->
+        <onClientStartArenaPVP>
+            <Exposed/>
+        </onClientStartArenaPVP>
 
 
         <!--请求竞技场排行榜-->
@@ -59,6 +97,16 @@
             <Exposed/>
             <Arg>UINT32</Arg> <!-- 页签 -->
         </onClientGetArenaRank>
+
+        <!--购买挑战次数-->
+        <onClientBuyArenaTimes>
+            <Exposed/>
+        </onClientBuyArenaTimes>
+
+        <!--请求战绩-->
+        <onClientGetRecord>
+            <Exposed/>
+        </onClientGetRecord>
 
 
 	</BaseMethods>
@@ -73,15 +121,28 @@
         <!--推送财竞技场排行榜-->
         <onGetThreeArenaValue>
            <Arg> ARRAY <of> ArenaInfo </of></Arg>
-            <Arg>UINT32</Arg> <!-- 挑战次数 -->
         </onGetThreeArenaValue>
 
         <!--推送财竞技场排行榜-->
         <onGetArenaRankValue>
            <Arg> ARRAY <of> ArenaInfo </of></Arg>
+           <Arg>UINT32</Arg> <!-- 总数量 -->
         </onGetArenaRankValue>
 
+        <!--竞技场回调-->
+        <onArenaCallBack>
+            <Arg>UINT32</Arg> <!-- 挑战次数 -->
+        </onArenaCallBack>
 
+        <!--倒计时-->
+        <onGetUpdateCD>
+            <Arg>UINT32</Arg> <!-- 倒计时 -->
+        </onGetUpdateCD>
+
+        <!--战绩-->
+        <onGetRecord>
+            <Arg> ARRAY <of> RecordInfo </of></Arg>
+        </onGetRecord>
 	</ClientMethods>
 </root>
 

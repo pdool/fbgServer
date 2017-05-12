@@ -57,13 +57,17 @@
             <Exposed/>
             <Arg> UINT32 </Arg>
         </onCloneGM>
+        <onGmSetSkill>
+            <Exposed/>
+            <Arg> UINT32 </Arg>
+        </onGmSetSkill>
 
 	</CellMethods>
 
    <ClientMethods>
        <!--通知客户端进攻者和防守者的id-->
         <onAtkAndDefID>
-
+              <Arg>UINT32 </Arg>
              <Arg>ARRAY <of> UINT64 </of></Arg>
              <Arg>ARRAY <of> UINT32</of></Arg>
              <Arg>ARRAY <of> UINT64 </of></Arg>
@@ -87,6 +91,11 @@
             <Arg>UINT8</Arg>
        </onOprateResult>
 
+       <onSelectSkill>
+            <Arg>UINT8</Arg>
+            <Arg>ARRAY <of> UINT32 </of></Arg>
+       </onSelectSkill>
+
        <!--通知客户端本轮结束-->
        <onRoundEnd>
        </onRoundEnd>
@@ -106,6 +115,14 @@
        <onSkillError>
            <Arg>UINT8</Arg>
        </onSkillError>
+
+
+      <onMyCardIdList>
+          <!--所有卡牌的id-->
+           <Arg>ARRAY <of> UINT32 </of></Arg>
+       </onMyCardIdList>
+
+
 	</ClientMethods>
 </root>
 

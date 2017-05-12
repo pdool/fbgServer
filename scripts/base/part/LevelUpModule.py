@@ -36,6 +36,7 @@ class LevelUpModule:
                 self.exp = currentExp
                 break
         if self.level != currentLevel:
+            self.level = currentLevel
             self.updateLevelValueRank()
 
 

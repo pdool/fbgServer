@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import KBEngine
+from ErrorCode import CardMgrModuleError
 from KBEDebug import ERROR_MSG
 from interfaces.BaseModule import BaseModule
 __author__ = 'chongxin'
@@ -32,7 +33,7 @@ class RankMgr(BaseModule):
         playerItem["name"] = param["name"]
         playerItem["level"] = param["level"]
         playerItem["camp"] = param["camp"]
-        playerItem["guildName"] = param["name"]
+        playerItem["guildName"] = param["guildName"]
         self.updateValueByType(playerItem, "level", param, self.levelRankList)
 
     # 刷新财富排行
@@ -44,7 +45,7 @@ class RankMgr(BaseModule):
         playerItem["name"] = param["name"]
         playerItem["euro"] = param["euro"]
         playerItem["camp"] = param["camp"]
-        playerItem["guildName"] = param["name"]
+        playerItem["guildName"] = param["guildName"]
         self.updateValueByType(playerItem, "euro", param, self.moneyRankList)
 
     # 刷新官职排行
@@ -64,11 +65,12 @@ class RankMgr(BaseModule):
         # 2、查找插入的位置
         playerItem = {}
         playerItem["dbid"] = param["dbid"]
-        playerItem["name"] = param["name"]
+        playerItem["guildName"] = param["guildName"]
         playerItem["camp"] = param["camp"]
         playerItem["level"] = param["level"]
         playerItem["leader"] = param["leader"]
         playerItem["reputation"] = param["reputation"]
+        playerItem["guildFunds"] = param["guildFunds"]
         rankList = self.guildRankList
         findItem = None
         for item in rankList:
@@ -121,7 +123,7 @@ class RankMgr(BaseModule):
         playerItem["level"] = param["level"]
         playerItem["cardFightValue"] = param["cardFightValue"]
         playerItem["cardConfigID"] = param["cardConfigID"]
-        rankList=   self.ballerRankList
+        rankList =  self.ballerRankList
         findItem = None
         for item in rankList:
             if item["dbid"] == playerItem["dbid"]:

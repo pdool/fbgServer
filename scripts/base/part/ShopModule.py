@@ -3,7 +3,7 @@ import TimerDefine
 import util
 import vipConfig
 from KBEDebug import *
-
+import CommonConfig
 import shopConfig
 
 __author__ = 'chongxin'
@@ -41,6 +41,7 @@ class ShopModule:
             self.getSeasonCard(config)
         elif cardType == Shop_type_common:
             self.getCommonCard(config)
+        self.client.onBuyDiamondSucess(1)
 
     # 领取vip礼包
     def onClientGetVipGift(self):
@@ -60,7 +61,7 @@ class ShopModule:
         giveDiamond = config["giveDiamond"]
         rebateTimes = config["rebateTimes"]
 
-        self.diamond = self.diamondCount + diamondCount + giveDiamond
+        self.diamond = self.diamond + diamondCount + giveDiamond
         self.addRmb(rmbPrice)
         self.monthRebateTimes = self.monthRebateTimes + rebateTimes
 
@@ -127,6 +128,17 @@ class ShopModule:
                 break
         if vip != self.vipLevel:
             self.vipLevel = vip
+            if self.vipLevel >= CommonConfig.CommonConfig[10]["value"]:
+                for item in self.coachList:
+                    if item["id"] == 4:
+                        item["isLock"] = 1
+                        break
+            if self.vipLevel >= CommonConfig.CommonConfig[11]["value"]:
+                for item in self.coachList:
+                    if item["id"] == 5:
+                        item["isLock"] = 1
+                        break
+            self.buyArenaTimes = vipConfig.VipConfig[self.vipLevel]["buyArenaTimes"]
 
 
 if __name__ == "__main__":

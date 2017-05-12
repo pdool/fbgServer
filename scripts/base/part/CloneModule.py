@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-import util
+import cardLevelUpgradeConfig
+import  cloneConfig
 from CommonEnum import ActionTypeEnum
 from ErrorCode import CloneModuleError
 from KBEDebug import *
-import  cloneConfig
-import cardLevelUpgradeConfig
+from cardsConfig import cardsConfig
 
 __author__ = 'chongxin'
 __createTime__  = '2017年2月5日'
@@ -23,9 +23,8 @@ class CloneModule:
             self.cloneIDToIndex[cloneID] = index
     # 客户端掉线
     def onClientDeath(self):
-
-        self.onClientLeaveClone()
-        pass
+        if self.inClone:
+            self.onClientLeaveClone()
 
 
     def onClientGetAllCloneInfo(self):
@@ -131,10 +130,12 @@ class CloneModule:
 
         room = KBEngine.entities.get(self.roomID)
         if room is not None:
+            room.cell.destroyRoom()
             room.onCmd("destroyRoom",{})
 
-        if self.npcController is not None:
-            self.npcController.onCmd("destroyNpcController", {})
+        npcController  = KBEngine.entities.get(self.npcControllerID)
+        if npcController is not None:
+            npcController.onCmd("destroyNpcController", {})
 
 
 
@@ -151,7 +152,10 @@ class CloneModule:
         roomID = param["roomID"]
 
         # ==============传送所有的卡牌进去==============================================================================
+        ERROR_MSG("   inTeamcardIDList   " + self.inTeamcardIDList.__str__())
         for inTeamCardId in self.inTeamcardIDList:
+
+
             # 把上阵的卡牌传送进去
             card = KBEngine.entities.get(inTeamCardId)
 
@@ -175,10 +179,12 @@ class CloneModule:
                         "levelPass"     :  levelConfig["levelPassRatio"],
                         "pos"           : card.pos,
                         "configID_B"    : card.configID,
-                        "skill1_B"       : card.skill1,
-                        "skill2_B"       : card.skill2,
-                        "roomID"       : roomMB.id,
-                        "controllerID"  : self.id
+                        "skill1_B"       : card.skill1//100,
+                        "skill1_Level"   : card.skill1%100,
+                        "skill2_B"          : card.skill2 // 100,
+                        "skill2_Level"  : card.skill2 % 100,
+                        "roomID"            : roomMB.id,
+                        "controllerID"      : self.id
                         }
 
             try:
@@ -215,7 +221,24 @@ class CloneModule:
         baseProp = { "roomID": roomMB.id,"actionType":actionType,"cloneID":self.cloneID}
         npcController.cellData["baseProp"] = baseProp
         npcController.createCellEntity(roomMB.cell)
-        self.npcController = npcController
+        self.npcControllerID = npcController.id
+
+
+
+
+    # 副本结束
+    def onCloneRoomEndResult(self,avatarAID,aScore,avatarBID,bScore):
+        result = aScore - bScore
+
+        # 赢了
+        if avatarAID == self.id:
+            ERROR_MSG("you a   "+ str(aScore) +"  bScore  " + str(bScore))
+            self.client.onCloneEndResult(aScore,bScore)
+        #     处理奖励
+        else:
+            # 输了
+            ERROR_MSG("you b   " + str(aScore) + "  bScore  " + str(bScore))
+            self.client.onCloneEndResult(bScore, aScore)
 
 
 

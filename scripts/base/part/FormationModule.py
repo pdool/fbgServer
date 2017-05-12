@@ -24,6 +24,8 @@ class FormationModule:
         self.formationIDList=[]
 
         self.initFormationSys()
+        self.fomationPropContainer = {}
+        self.relatPropContainer={}
 
         pass
 
@@ -463,6 +465,7 @@ class FormationModule:
         proplist=[]
         sysId = sysInfo["id"]
         strongLevel = sysInfo["strongLevel"]
+        WARNING_MSG("--formationSysPropActive-sysId-" + str(sysId)+"---"+str(strongLevel))
 
         formationSysConfig =  formationSystemConfig.FormationSystemConfig[sysId]
         activeCondition = formationSysConfig["activeCondition"]
@@ -477,7 +480,7 @@ class FormationModule:
 
                 index =  i-1
                 if index < 0:
-                    return
+                    continue
 
                 sysInfo["active"] = index
                 propValue = addProp[index]
@@ -487,7 +490,9 @@ class FormationModule:
                 proplist.append(value)
                 break
 
-         # 强化加成
+        WARNING_MSG("--getFormationProp-strongLevel-" + str(strongLevel))
+
+                # 强化加成
         if strongLevel  not in formationSysStrongConfig.FormationSysStrongConfig:
             return
 
@@ -506,7 +511,7 @@ class FormationModule:
 
         self.fomationPropContainer[sysId] = proplist
         self.client.getFormationProp(sysId,proplist)
-
+        WARNING_MSG("--getFormationProp--"+str(sysId)+"---"+str(len(proplist)))
         pass
 
     # 初始化阵型加成属性

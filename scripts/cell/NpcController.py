@@ -11,7 +11,7 @@ from part.CloneModule import CloneModule
 
 
 class NpcController(KBEngine.Entity,RoomFightModule):
-
+    typeStr = "NpcController"
     """
     Npc控制器
     """

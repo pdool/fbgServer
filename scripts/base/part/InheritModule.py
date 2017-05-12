@@ -108,52 +108,7 @@ class InheritModule:
             #                              工具函数调用函数
             # --------------------------------------------------------------------------------------------
 
-    def UpdateBallerInfo(self,inHeriter):
-        inHeriter.calcFightValue()
-        playerInfo = {}
-        playerInfo["id"] = inHeriter.id
-        playerInfo["configID"] = inHeriter.configID
-        playerInfo["star"] = inHeriter.star
-        playerInfo["inTeam"] = inHeriter.inTeam
-        playerInfo["bench"] = inHeriter.bench
-        playerInfo["pos"] = inHeriter.pos
-        playerInfo["isSelf"] = inHeriter.isSelf
-        playerInfo["brokenLayer"] = inHeriter.brokenLayer
-        playerInfo["fightValue"] = inHeriter.fightValue
-        playerInfo["level"] = inHeriter.level
-        playerInfo["exp"] = inHeriter.exp
-        playerInfo["shoot"] = inHeriter.shoot
-        playerInfo["shootM"] = inHeriter.shootM
-        playerInfo["shootExp"] = inHeriter.shootExp
-        playerInfo["defend"] = inHeriter.defend
-        playerInfo["defendM"] = inHeriter.defendM
-        playerInfo["defendExp"] = inHeriter.defendExp
-        playerInfo["pass"] = inHeriter.passBall
-        playerInfo["passBallM"] = inHeriter.passBallM
-        playerInfo["passBallExp"] = inHeriter.passBallExp
-        playerInfo["trick"] = inHeriter.trick
-        playerInfo["trickM"] = inHeriter.trickM
-        playerInfo["trickExp"] = inHeriter.trickExp
-        playerInfo["reel"] = inHeriter.reel
-        playerInfo["reelM"] = inHeriter.reelM
-        playerInfo["reelExp"] = inHeriter.reelExp
-        playerInfo["steal"] = inHeriter.steal
-        playerInfo["stealM"] = inHeriter.stealM
-        playerInfo["stealExp"] = inHeriter.stealExp
-        playerInfo["controll"] = inHeriter.controll
-        playerInfo["controllM"] = inHeriter.controllM
-        playerInfo["controllExp"] = inHeriter.controllExp
-        playerInfo["keep"] = inHeriter.keep
-        playerInfo["keepM"] = inHeriter.keepM
-        playerInfo["keepExp"] = inHeriter.keepExp
-        playerInfo["tech"] = inHeriter.tech
-        playerInfo["health"] = inHeriter.health
-        playerInfo["strikeNeedCost"] = inHeriter.strikeNeedCost
-        playerInfo["keepPercent"] = inHeriter.keepPercent
-        playerInfo["controllPercent"] = inHeriter.controllPercent
-        playerInfo["shootPercent"] = inHeriter.shootPercent
-        playerInfo["defendPercent"] = inHeriter.defendPercent
-        return playerInfo
+
 
 
 
