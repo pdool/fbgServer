@@ -32,6 +32,7 @@ class ArenaModule:
     #                              客户端调用函数
     # --------------------------------------------------------------------------------------------
     def onTimer(self, id, userArg):
+        ERROR_MSG("ontimer" + str(userArg))
         if userArg != TimerDefine.Timer_arena_reward:
             return
         if self.myRank > 5000:

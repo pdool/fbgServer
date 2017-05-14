@@ -9,6 +9,11 @@
 			<Persistent> true </Persistent>
         </coachList>
 
+        <coachLastTime>
+            <Type> UINT64 </Type>
+			<Flags> BASE </Flags>
+			<Persistent> true </Persistent>
+        </coachLastTime>
 	</Properties>
 
 	<BaseMethods>
@@ -47,6 +52,10 @@
              <Arg>	UINT32	</Arg>	<!-- SkillID -->
         </onClientSelectSkill>
 
+        <onClientGetCoachList>
+            <Exposed/>
+        </onClientGetCoachList>
+
 	</BaseMethods>
 
 	<CellMethods>
@@ -83,10 +92,6 @@
         <onUnLockCoach>
              <Arg>	UINT32	</Arg>
         </onUnLockCoach>
-        <!--门柱保命-->
-        <onGoalPostHelp>
-             <Arg>	UINT32	</Arg>
-        </onGoalPostHelp>
 
          <onSelectSkillSucess>
              <Arg>	UINT32	</Arg>	<!-- cardId -->

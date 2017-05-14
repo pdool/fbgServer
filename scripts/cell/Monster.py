@@ -19,6 +19,7 @@ class Monster(KBEngine.Entity,SkillModuleMain):
         KBEngine method.
         引擎回调timer触发
         """
+        ERROR_MSG("ontimer" + str(userArg))
         DEBUG_MSG(tid, userArg)
 
     def onDestroy(self):

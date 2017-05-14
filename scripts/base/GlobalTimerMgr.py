@@ -12,6 +12,7 @@ class GlobalTimerMgr(KBEngine.Base):
         pass
 
     def onTimer(self, tid, userArg):
+        ERROR_MSG("ontimer" + str(userArg))
         pass
 
     """

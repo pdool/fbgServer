@@ -69,8 +69,8 @@ class SkillConditionModule:
 
     # 4、对方进攻时
     def checkCondition4(self,result):
-        if result != ConditionEnum.con_result_None:
-            return False
+        # if result != ConditionEnum.con_result_None:
+        #     return False
         roomID = self.roomID
         clone = KBEngine.entities.get(roomID)
 

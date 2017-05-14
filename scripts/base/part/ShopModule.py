@@ -98,7 +98,7 @@ class ShopModule:
 
 
     def onTimer(self, tid, userArg):
-
+        ERROR_MSG("ontimer" + str(userArg))
         if userArg != TimerDefine.Timer_shop_recover:
             return
         DEBUG_MSG("------------------------ run time")

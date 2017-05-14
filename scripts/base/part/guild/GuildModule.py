@@ -48,6 +48,7 @@ class GuildModule:
 
     # 间隔七天运行
     def onTimer(self, tid, userArg):
+        ERROR_MSG("ontimer" + str(userArg))
         if userArg == TimerDefine.Timer_reset_guild_weekDonate:
             self.clearGuildweekDonate()
         elif userArg == TimerDefine.Timer_reset_guild_dayDonate:

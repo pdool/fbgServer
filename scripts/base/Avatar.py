@@ -151,7 +151,7 @@ class Avatar(KBEngine.Proxy,
         playerInfo[FriendInfoKey.onlineState] = FriendOnlineState.online
         KBEngine.globalData["PlayerMgr"].playerLogin(self, self.databaseID, playerInfo)
 
-        self.addTimer(5, 5, TimerDefine.Time_destroy_avatar)
+
         # --------------------------------------------------------------------------------------------
         #                              属性列表
         # --------------------------------------------------------------------------------------------
@@ -217,6 +217,7 @@ class Avatar(KBEngine.Proxy,
         KBEngine method.
         entity丢失了客户端实体
         """
+        self.addTimer(5, 5, TimerDefine.Time_destroy_avatar)
         self.lastTime = str(datetime.datetime.now().hour) + "," + str(datetime.datetime.now().minute) + "," + str(
             datetime.datetime.now().second)
 

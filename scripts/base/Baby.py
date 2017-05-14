@@ -75,6 +75,7 @@ class Baby(KBEngine.Base):
         pass
 
     def onTimer(self, id, userArg):
+        ERROR_MSG("ontimer" + str(userArg))
         if userArg == TimerDefine.Timer_reset_baby_liking:
             config = CommonConfig.CommonConfig[5]
             liking = config["value"]

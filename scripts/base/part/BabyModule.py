@@ -63,6 +63,7 @@ class BabyModule:
         self.destroy()
 
     def onTimer(self, id, userArg):
+        ERROR_MSG("ontimer" + str(userArg))
         if userArg == TimerDefine.Timer_reset_lottery_free_times:
             baby = KBEngine.entities.get(self.babyID)
             if baby is None:

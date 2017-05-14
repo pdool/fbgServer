@@ -22,25 +22,29 @@ class SkillModule:
                 item["id"] = i
                 item["limitTime"] = coachConfig.coachConfig[i]["limitTime"]
                 item["useTime"] = 0
+                item["periodTime"] = 0
                 item["color"] = coachConfig.coachConfig[i]["color"]
                 item["isLock"] = coachConfig.coachConfig[i]["isLock"]
                 item["cost"] = ""
                 for itemID,Num in coachConfig.coachConfig[i]["cost"].items():
                     item["cost"] = item["cost"] + str(itemID)  +":"+str(Num)+","
                 self.coachList.append(item)
-        period = util.getCurrentTime() - self.logoutTime
-        for item in self.coachList:
-            if item["isLock"] == 0:
-                continue
-            item["useTime"] = item["useTime"] - period
-            if item["useTime"] < 0:
-                item["useTime"] = 0
-        self.client.onGetCoachList(self.coachList)
-        self.addTimer(1, 1, TimerDefine.Timer_coach_CD)
+                self.coachLastTime = util.getCurrentTime()
 
     # --------------------------------------------------------------------------------------------
     #                              客户端调用函数
     # --------------------------------------------------------------------------------------------
+    def onClientGetCoachList(self):
+        period = util.getCurrentTime() - self.coachLastTime
+        self.coachLastTime = util.getCurrentTime()
+        for item in self.coachList:
+            if item["isLock"] == 0:
+                continue
+            if item["useTime"] < period:
+                item["useTime"] = 0
+            else:
+                item["useTime"] = item["useTime"] - period
+        self.client.onGetCoachList(self.coachList)
 
     def onClientSkillLevelUp(self,skillID,skillIndex,cardId):
         if cardId not in self.cardIDList:
@@ -70,6 +74,13 @@ class SkillModule:
         findItem = None
         for item in self.coachList:
             coachID = coachID + 1
+            period = util.getCurrentTime() -  item["periodTime"]
+            item["periodTime"] = util.getCurrentTime()
+            if item["useTime"] < period:
+                item["useTime"] = 0
+            else:
+                item["useTime"] = item["useTime"] - period
+
             if  item["useTime"]  < item["limitTime"] and item["isLock"] == 1:
                 findItem = item
                 break
@@ -117,6 +128,12 @@ class SkillModule:
         findItem = None
         for item in self.coachList:
             if item["id"] == coachID:
+                period = util.getCurrentTime() - item["periodTime"]
+                item["periodTime"] = util.getCurrentTime()
+                if item["useTime"] < period:
+                    item["useTime"] = 0
+                else:
+                    item["useTime"] = item["useTime"] - period
                 findItem = item
                 break
         for itemId, num in coachConfig.coachConfig[coachID]["cost"].items():
@@ -158,13 +175,6 @@ class SkillModule:
     # --------------------------------------------------------------------------------------------
     #                              工具函数调用函数
     # --------------------------------------------------------------------------------------------
-
-    def onTimer(self, id, userArg):
-        if userArg != TimerDefine.Timer_coach_CD:
-            return
-        for item in self.coachList:
-            if item["useTime"] > 0:
-                item["useTime"] = item["useTime"] - 1
 
     def GetSkillByIndex(self,skillID,cardId):
         if cardId not in self.cardIDList:

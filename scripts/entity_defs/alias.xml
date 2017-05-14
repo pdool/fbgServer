@@ -508,6 +508,7 @@
             <id>           <Type> UINT32   </Type>     </id>
             <limitTime>   <Type> UINT64   </Type>     </limitTime>
              <useTime>     <Type> UINT64  </Type>      </useTime>
+             <periodTime>     <Type> UINT64  </Type>      </periodTime>
              <color>     <Type> UINT32  </Type>      </color>
              <isLock>     <Type> UINT32  </Type>      </isLock>
              <cost>     <Type> STRING  </Type>      </cost>

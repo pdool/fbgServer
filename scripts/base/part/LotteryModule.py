@@ -2,7 +2,7 @@
 import ErrorCode
 import TimerDefine
 import util
-from KBEDebug import DEBUG_MSG
+from KBEDebug import DEBUG_MSG, ERROR_MSG
 import lotteryConfig
 
 __author__ = 'chongxin'
@@ -164,6 +164,7 @@ class LotteryModule:
 
 
     def onTimer(self, tid, userArg):
+        ERROR_MSG("ontimer" + str(userArg))
         if userArg != TimerDefine.Timer_reset_lottery_free_times:
             return
 

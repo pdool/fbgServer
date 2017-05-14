@@ -35,12 +35,9 @@ class CardMgrModule:
         pass
 
     def onEntitiesEnabled(self):
-
         self.loadNum = 0
         for cardDBID in self.cardDBIDList:
             KBEngine.createBaseFromDBID("Card", cardDBID, self.loadCardCB)
-        self.addTimer(1, 1, TimerDefine.Timer_reset_baller_addInfo)
-
         pass
 
     """

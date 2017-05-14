@@ -3,6 +3,7 @@ import datetime
 import traceback
 
 import TimerDefine
+import util
 from BagConfig import BagConfig
 from itemsConfig import itemsIndex
 from KBEDebug import *
@@ -252,7 +253,7 @@ class BagModule:
                 self.bagUUIDList.append(uuid)
             else:
                 ERROR_MSG("--------exec  Error  check now!!! -----------")
-                traceback.print_stack()
+                util.printStackTrace("noticeClientBagUpdate   ")
         value = {}
         value["UUID"] = uuid
         value["itemID"] = int(itemId)
@@ -263,6 +264,7 @@ class BagModule:
             self.bagUUIDList.remove(uuid)
 
     def onTimer(self, tid, userArg):
+        ERROR_MSG("ontimer" + str(userArg))
         if userArg != TimerDefine.Time_sync_DB:
             return
 

@@ -112,7 +112,7 @@ class BodyPowerModule:
 
 
     def onTimer(self, tid, userArg):
-
+        ERROR_MSG("ontimer" + str(userArg))
         if userArg == TimerDefine.Timer_body_power_reset_buy_times:
             self.bodyPowerBuyTimes = 0
 

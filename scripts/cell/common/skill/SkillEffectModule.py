@@ -6,6 +6,7 @@ import util
 from Avatar import Avatar
 from CommonEnum import ImpactTypeEnum, PlayerOp
 from KBEDebug import ERROR_MSG
+from common.skill.SkillConditionModule import ConditionEnum
 
 __author__ = 'chongxin'
 
@@ -352,6 +353,44 @@ class SkillEffectModule:
                 room.pop(len(room.bAttackList)-1)
 
         self.noticeClientEffect(subSkillID,self.id,effectType)
+    # 门柱保命
+    def skill1036Effect(self,buffer):
+        roomID = self.roomID
+        clone = KBEngine.entities.get(roomID)
+        # 防守回合
+        if self.controllerID != clone.defenderID:
+            return
+
+        subSkillId = buffer["subSkillID"]
+
+        subConfig = skillConfig.SkillConfig[subSkillId]
+
+        percent = subConfig["triggerPer"]
+
+        p = util.randInHundred()
+        if p < percent:
+    #         触发门柱保命
+
+            if clone.controllerID == clone.avatarAID:
+                clone.aScore = clone.aScore - 1
+            else:
+                clone.bScore = clone.bScore - 1
+
+
+            clone.roundResult = ConditionEnum.con_result_shoot_fail
+            self.bufferContainer.remove(buffer)
+
+            ERROR_MSG(" 1036   trigger  ")
+            self.noticeClientEffect(subSkillId, self.id, EffectEnum.effect_GoalPost_Help)
+
+        else:
+            lastRound = buffer["lastRound"]
+            if lastRound -1 <= 0:
+                self.bufferContainer.remove(buffer)
+            else:
+                buffer["lastRound"] = lastRound -1
+
+
 
 
     # 删除技能效果
@@ -456,7 +495,8 @@ class EffectEnum:
     # 反击
     effect_counterattack = 29
 
-
+    # 门柱保命
+    effect_GoalPost_Help = 30
 
 class ValueTypeEnmu:
     # 数值

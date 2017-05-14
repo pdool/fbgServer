@@ -47,5 +47,3 @@ Timer_reset_guild_dayDonate = 14
 Timer_guild_build_upgrade=15
 #竞技场奖励
 Timer_arena_reward = 16
-#教练Cd
-Timer_coach_CD = 16

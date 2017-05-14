@@ -4,36 +4,24 @@ from _ctypes import *
 import ArenaReward
 import util
 import  guildShopConfig
-class Person:
-    def __init__(self):
-      pass
 
 
-def funcDiamond(mapDict, dctData, chilidDict, data):
-    dic = {}
-    if data == None:
-        return dic
-    for pair in data.split(";"):
-        if pair == "":
-            continue
-        id = int(pair.split(":")[0])
-        content = str(pair.split(":")[1])
-        dic[id] =  tuple([index for index in content.split(',') if index != ''])
-    return dic
-
-def fbqn(x):
-    if x == 0:
-        return 0
-    elif x == 1:
-        return 1
-    else:
-        return  fbqn(x-1)+ fbqn(x-2)
-
+class subMondule():
+    def onTimer(self):
+      print("subModule")
+class  subModule2():
+    def onTimer(self):
+        print("subModule----2")
+class Parent(subModule2,subMondule):
+    def onTimer(self):
+        cls = Parent.__bases__
+        for c in cls:
+            if hasattr(c, 'onTimer'):
+                c.onTimer(self)
 if __name__ == '__main__':
-    n = fbqn(4)
-    print(n)
 
-
+    p = Parent()
+    p.onTimer()
 
 
 

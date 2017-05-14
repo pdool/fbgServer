@@ -114,9 +114,6 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
             self.useSkill1014(skillLevel,result)
         elif mainSkillID == 1035:
             self.useSkill1035(result)
-        elif mainSkillID == 1036:
-            self.useSkill1036(result)
-
         else:
 
             subSkillTuple = skillConMap["subSkills"]
@@ -130,8 +127,13 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
 
                 ERROR_MSG("target  type is " + str(subSkillConMap["target"]))
                 targetList = self.filterTarget(subSkillConMap["target"])
+
+
                 # 分开单个人触发效果
                 for target in targetList:
+                    if subSkillID // 10000 == 1036:
+                        self.addBuffer(target, subSkillID)
+                        continue
                     if self.checkTriggerPer(usePercent) is False:
                         continue
                     self.addBuffer(target, subSkillID)
@@ -217,46 +219,6 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
         # 自己得到黄牌
         self.addEffect18(10350101, 18, None, [self.id])
 
-
-
-    # 门柱保命（主\防守回合）：使用技能的3个防守回合内，未能扑出的球（攻守判定为进球），有n%几率打在门柱上。3回合内击中门柱一次后失效
-    def useSkill1036(self,result,buffer):
-        if result != ConditionEnum.con_result_shoot_succ:
-            return
-        skillConMap = skillConfig.SkillConfig[1003601]
-
-        conditonTupe = skillConMap["condition"]
-
-        for condition in conditonTupe:
-            check = self.checkCondition(condition, result)
-            ERROR_MSG(
-                "   condition  is  " + str(condition) + "  result  is   " + str(result) + "  check is  " + str(check))
-            if check is False:
-                return
-
-        usePercent = skillConMap["triggerPer"]
-        if self.checkTriggerPer(usePercent) is False:
-            return
-        # 触发技能
-        else:
-            # 修改射门结果为失败
-            room = KBEngine.entities.get(self.roomID)
-            room.roundResult = ConditionEnum.con_result_shoot_fail
-            buffer["lastRound"] = 0
-
-            room = KBEngine.entities.get(self.roomID)
-            defender = KBEngine.entities.get(room.defenderID)
-            defender.defList[2] = []
-
-            room = KBEngine.entities.get(self.roomID)
-            a = KBEngine.entities.get(room.avatarAID)
-            b = KBEngine.entities.get(room.avatarBID)
-
-            # 门主报名
-            if a.typeStr == "Avatar":
-                a.client.onGoalPostHelp(1036)
-            if b.typeStr == "Avatar":
-                b.client.onGoalPostHelp(1036)
 
 
 

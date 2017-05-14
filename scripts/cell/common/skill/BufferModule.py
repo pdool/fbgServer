@@ -114,6 +114,11 @@ class BufferModule:
                     # 如果是内部结果直接pass
                     if result in self.insideResult:
                         continue
+                    # 门柱保命
+                    if subSkillID //10000 == 1036:
+                        #     防守回合
+                        self.skill1036Effect(buffer)
+                        continue
 
                     if result != condition:
                         self.bufferContainer.pop(i)

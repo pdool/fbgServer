@@ -98,6 +98,8 @@
 
        <!--通知客户端本轮结束-->
        <onRoundEnd>
+           <Arg>UINT8</Arg> <!--我的得分-->
+           <Arg>UINT8</Arg> <!--对方得分-->
        </onRoundEnd>
         <!--比赛结束-->
        <onGameOver>

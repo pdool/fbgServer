@@ -41,6 +41,7 @@ class Room(BaseModule):
         KBEngine.globalData["RoomMgr"].onRoomGetCell(param)
 
     def onTimer(self, id, userArg):
+        ERROR_MSG("ontimer" + str(userArg))
         """
         KBEngine method.
         使用addTimer后， 当时间到达则该接口被调用

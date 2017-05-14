@@ -586,11 +586,11 @@ class Room(KBEngine.Entity):
 
             avatarA = KBEngine.entities.get(self.avatarAID)
             if isinstance(avatarA, Avatar.Avatar):
-                avatarA.client.onRoundEnd()
+                avatarA.client.onRoundEnd(self.aScore,self.bScore)
 
             avatarB = KBEngine.entities.get(self.avatarBID)
             if isinstance(avatarB, Avatar.Avatar):
-                avatarB.client.onRoundEnd()
+                avatarB.client.onRoundEnd(self.bScore,self.aScore)
             # 进入下一轮
             self.onCmdNextRound()
             return
@@ -626,7 +626,7 @@ class Room(KBEngine.Entity):
 
             avatarA = KBEngine.entities.get(self.avatarAID)
             avatarB = KBEngine.entities.get(self.avatarBID)
-            self.noticeClientResult()
+
             if self.roundResult == ConditionEnum.con_result_be_keeper_steal:
                 self.roundResult = ConditionEnum.con_result_be_steal
             if self.roundResult == ConditionEnum.con_result_reshoot_fail:
@@ -640,6 +640,8 @@ class Room(KBEngine.Entity):
             avatarA.controllerAfterRound(self.roundResult)
             avatarB.controllerAfterRound(self.roundResult)
 
+
+            self.noticeClientResult()
 
 
     def noticeClientResult(self):
