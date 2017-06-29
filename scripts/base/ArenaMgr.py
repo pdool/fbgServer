@@ -55,6 +55,44 @@ class ArenaMgr(BaseModule):
 
         KBEngine.executeRawDatabaseCommand(sql, getPlayerInfo)
 
+    def onCmdGetArenaAllRankValue(self, argMap):
+
+        @util.dbDeco
+        def getRankCount(result, rownum, error):
+            count = int(result[0][0])
+            sql = "select sm_dbid,sm_rank,sm_isRobot from tbl_ArenaRow"
+
+            ERROR_MSG("--onCmdGetArenaAllRankValue--count"+str(count))
+
+            @util.dbDeco
+            def rankResult(result, rownum, error):
+                if result is None:
+                    return
+                param = []
+                for i in range(len(result)):
+                    dbid = int(result[i][0])
+                    rank = int(result[i][1])
+                    isRobot = int(result[i][2])
+
+                    item = {
+                        "dbid": dbid,
+                        "rank": rank,
+                        "isRobot": isRobot,
+                        "count": count
+                    }
+                    param.append(item)
+
+                    argMap["areanList"] = param
+
+
+                leagueMgr = KBEngine.globalData["LeagueMgr"]
+                leagueMgr.onCmd("onCmdAreanRankData", argMap)
+
+            KBEngine.executeRawDatabaseCommand(sql, rankResult)
+
+        sql1 = "select count(*) from tbl_ArenaRow "
+        KBEngine.executeRawDatabaseCommand(sql1, getRankCount)
+
     def onCmdGetArenaRankValue(self, param):
         page = param["page"]
         playerMB = param["playerMB"]
@@ -99,6 +137,7 @@ class ArenaMgr(BaseModule):
         selfRank = param["selfRank"]
         playerMB = param["playerMB"]
         rankNum = 3
+        down = 1000
         if selfRank > 1000:
             down = selfRank - 100
         elif selfRank > 500 and selfRank <= 1000:
@@ -139,19 +178,16 @@ class ArenaMgr(BaseModule):
 
     def onCmdUpdateArenaRank(self,param):
         selfRank = param["selfRank"]
-        selfDBID = param["selfDBID"]
-        enemyDBID = param["enemyDBID"]
         enemyRank = param["enemyRank"]
+        ERROR_MSG("--onCmdUpdateArenaRank--selfRank--"+str(selfRank)+"-enemyRank--"+str(enemyRank))
 
-        setMap= {"rank":selfRank}
-        filterMap = {"dbid":selfDBID}
-        sql1 = util.getUpdateSql("tbl_ArenaRow",setMap,filterMap)
-        KBEngine.executeRawDatabaseCommand(sql1)
+        sql = "update tbl_ArenaRow selfT, tbl_ArenaRow enemy set selfT.sm_dbid = enemy.sm_dbid,enemy.sm_dbid = selfT.sm_dbid ,selfT.sm_isRobot = enemy.sm_isRobot,enemy.sm_isRobot = selfT.sm_isRobot where selfT.sm_rank = " + str(
+            selfRank) + " and enemy.sm_rank =" + str(
+            enemyRank)
 
-        setMap2 = {"rank": enemyRank}
-        filterMap2 = {"dbid": enemyDBID}
-        sql2 = util.getUpdateSql("tbl_ArenaRow", setMap2, filterMap2)
-        KBEngine.executeRawDatabaseCommand(sql2)
+        ERROR_MSG("onCmdUpdateArenaRank  change the rank sql : " + sql)
+
+        KBEngine.executeRawDatabaseCommand(sql)
 
     def onCmdInsertArenaRank(self,param):
         selfDBID = param["selfDBID"]

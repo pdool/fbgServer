@@ -67,7 +67,13 @@ class CardMgrModule:
 
             self.cardID = card.id
             self.level = card.level
-        if card.inTeam == 1:
+        if card.isSelf != 1 and card.inTeam == 1:
+            item = {}
+            item["configID"] = card.configID
+            item["id"] = card.id
+            self.cardConfigIdList.append(item)
+
+        if card.inTeam == 1 and card.configID != self.suspensionBallerId and card.configID != self.notMatchBallerID:
             self.inTeamcardIDList.append(card.id)
 
         if card.bench == 1:
@@ -77,10 +83,9 @@ class CardMgrModule:
         self.loadNum = self.loadNum + 1
 
         if self.loadNum == len(self.cardDBIDList):
-
+            self.initialPermissionInfo()
             self.ballerRelationProp()
 
-        pass
 
     # def onTimer(self, id, userArg):
     #     if userArg == TimerDefine.Timer_reset_baller_addInfo:
@@ -201,7 +206,7 @@ class CardMgrModule:
 
         # 循环
         while (card.level <= maxLevel):
-
+            ERROR_MSG("     onClientLevelUp while           ")
             if card.level + 1 > maxLevel:
                 card.exp = resultExp
                 self.client.onBallerCallBack(CardMgrModuleError.Level_is_sucess)
@@ -408,6 +413,103 @@ class CardMgrModule:
         return False
 
 
+    # 卡牌升级
+    def onCardLevelUp(self,cardID,addExp):
+        # 1、不存在的卡牌
+        if cardID not in self.cardIDList:
+            self.client.onBallerCallBack(CardMgrModuleError.Card_not_exist)
+            return (0, 0)
+        card = KBEngine.entities.get(cardID)
+        # 是否自身
+        isSelf = card.isSelf
+        # 当前等级
+        oldLevel = card.level
+        oldExp = card.exp
+        # 2、最高等级配置
+        maxLevel =  levelIniConfig[0]["maxLevel"]
+        if oldLevel >= maxLevel:
+            self.client.onBallerCallBack(CardMgrModuleError.Card_is_max_level)
+            return (0,0)
+
+        # 3、超过主角卡牌等级
+        if not isSelf and card.level > self.level:
+            self.client.onLevelMax(self.level)
+            return (0,0)
+
+        exp = card.exp + addExp
+
+        # 循环
+        while (card.level <= maxLevel):
+
+
+            # 升级配置
+            levelUpgradeConfig = cardLevelUpgradeConfig[card.level]
+            upExp = levelUpgradeConfig["maxExp"]
+
+            ERROR_MSG("     onCardLevelUp       while        oldExp   " +  str(oldExp) +"   exp  " + str(exp) +"    upExp     " + str(upExp))
+            if card.level + 1 > maxLevel:
+                card.exp = int((exp if exp < upExp else upExp))
+                self.client.onBallerCallBack(CardMgrModuleError.Level_is_sucess)
+                break
+
+            # 不超过主角等级（）
+            if not isSelf :
+                if card.level == self.level:
+                    # 溢出 (处理成最大值)
+
+                    card.exp = int((exp if exp < upExp else upExp))
+                    break
+                # 修正错误
+                elif card.level > self.level:
+                    card.level = self.level
+                    card.exp = int(upExp)
+                    break
+
+            if exp >= upExp:
+                card.level          = card.level + 1
+                levelUpgradeConfig  = cardLevelUpgradeConfig[card.level]
+                card.shoot          = card.shoot + levelUpgradeConfig["shoot"]
+                card.passBall       = card.passBall + levelUpgradeConfig["pass"]
+                card.reel           = card.reel + levelUpgradeConfig["reel"]
+                card.defend         = card.defend + levelUpgradeConfig["defend"]
+                card.trick          = card.trick + levelUpgradeConfig["trick"]
+                card.steal          = card.steal + levelUpgradeConfig["steal"]
+                card.controll       = card.controll + levelUpgradeConfig["controll"]
+                card.keep           = card.keep + levelUpgradeConfig["keep"]
+
+                if isSelf:
+                    self.level = card.level
+            else:
+                card.exp = int(exp)
+                self.client.onBallerCallBack(CardMgrModuleError.Level_is_sucess)
+                break
+
+        self.client.onUpdateCardInfo(self.UpdateBallerInfo(card))
+        card.writeToDB()
+        changeLevel = card.level - oldLevel
+        changeExp = card.exp - oldExp
+        return (changeLevel,changeExp)
+
+    # 降低球员某个属性
+    def reduceBallerInfoByOfficial(self,infoName,avatar = None):
+        playerMB = None
+        if avatar == None:
+            playerMB = self
+        else:
+            playerMB = avatar
+        card = KBEngine.entities.get(playerMB.cardID)
+        value =  getattr(card, infoName)
+        downValue = int(value * 0.1)
+        if infoName == "controll":
+            playerMB.controllDownValue += downValue
+        elif infoName == "defend":
+            playerMB.defendDownValue += downValue
+        elif infoName == "shoot":
+            playerMB.shootDownValue += downValue
+
+        value = value - downValue
+
+        setattr(card, infoName, value)
 
 
 class PlayerInfoKeys:

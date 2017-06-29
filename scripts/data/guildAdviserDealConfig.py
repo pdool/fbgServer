@@ -1,7 +1,23 @@
 # -*- coding: utf-8 -*-
 
-GuildAdviserDealConfig={1: {'succProb': 50, 'id': 1, 'material': {102030: 2}, 'subamity': 0, 'contribute': 100, 'addamity': 200, 'consumeEuro': 100, 'consumefund': 0, 'consumediamond': 0}, 2: {'succProb': 51, 'id': 2, 'material': {102030: 2}, 'subamity': 0, 'contribute': 100, 'addamity': 200, 'consumeEuro': 100, 'consumefund': 0, 'consumediamond': 0}, 3: {'succProb': 52, 'id': 3, 'material': {102030: 2}, 'subamity': 0, 'contribute': 100, 'addamity': 200, 'consumeEuro': 0, 'consumefund': 0, 'consumediamond': 0}, 4: {'succProb': 53, 'id': 4, 'material': {102030: 2}, 'subamity': 0, 'contribute': 100, 'addamity': 200, 'consumeEuro': 0, 'consumefund': 0, 'consumediamond': 0}, 5: {'succProb': 54, 'id': 5, 'material': {102030: 3}, 'subamity': 200, 'contribute': 100, 'addamity': 200, 'consumeEuro': 100, 'consumefund': 0, 'consumediamond': 0}, 6: {'succProb': 55, 'id': 6, 'material': {102030: 3}, 'subamity': 200, 'contribute': 100, 'addamity': 200, 'consumeEuro': 100, 'consumefund': 0, 'consumediamond': 0}, 7: {'succProb': 56, 'id': 7, 'material': {102030: 3}, 'subamity': 200, 'contribute': 100, 'addamity': 200, 'consumeEuro': 0, 'consumefund': 0, 'consumediamond': 0}, 8: {'succProb': 57, 'id': 8, 'material': {102030: 3}, 'subamity': 200, 'contribute': 100, 'addamity': 200, 'consumeEuro': 0, 'consumefund': 0, 'consumediamond': 0}, 9: {'succProb': 58, 'id': 9, 'material': {0: 0}, 'subamity': 200, 'contribute': 100, 'addamity': 200, 'consumeEuro': 0, 'consumefund': 100, 'consumediamond': 100}, 10: {'succProb': 59, 'id': 10, 'material': {0: 0}, 'subamity': 200, 'contribute': 100, 'addamity': 200, 'consumeEuro': 0, 'consumefund': 100, 'consumediamond': 100}}
+GuildAdviserDealConfig = {
+    1: {'material': {102038: 1}, 'type': 1, 'addamity': 10, 'contribute': 20, 'succProb': 100, 'consumeEuro': 0,
+        'subamity': 0, 'consumediamond': 0, 'id': 1},
+    2: {'material': {102038: 1}, 'type': 1, 'addamity': 13, 'contribute': 40, 'succProb': 100, 'consumeEuro': 5000,
+        'subamity': 0, 'consumediamond': 0, 'id': 2},
+    3: {'material': {102038: 1}, 'type': 1, 'addamity': 57, 'contribute': 80, 'succProb': 100, 'consumeEuro': 0,
+        'subamity': 0, 'consumediamond': 50, 'id': 3},
+    4: {'material': {102038: 1}, 'type': 1, 'addamity': 240, 'contribute': 320, 'succProb': 100, 'consumeEuro': 0,
+        'subamity': 0, 'consumediamond': 200, 'id': 4},
+    5: {'material': {102038: 1}, 'type': 2, 'addamity': 6, 'contribute': 20, 'succProb': 75, 'consumeEuro': 0,
+        'subamity': 6, 'consumediamond': 0, 'id': 5},
+    6: {'material': {102038: 1}, 'type': 2, 'addamity': 7, 'contribute': 40, 'succProb': 90, 'consumeEuro': 5000,
+        'subamity': 7, 'consumediamond': 0, 'id': 6},
+    7: {'material': {102038: 1}, 'type': 2, 'addamity': 29, 'contribute': 80, 'succProb': 100, 'consumeEuro': 0,
+        'subamity': 29, 'consumediamond': 50, 'id': 7},
+    8: {'material': {102038: 1}, 'type': 2, 'addamity': 130, 'contribute': 320, 'succProb': 100, 'consumeEuro': 0,
+        'subamity': 130, 'consumediamond': 200, 'id': 8}}
 
 allDatas = {
-	'公会顾问操作配置':GuildAdviserDealConfig,
+    '公会顾问操作配置': GuildAdviserDealConfig,
 }

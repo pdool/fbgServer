@@ -4,7 +4,7 @@
         <onClientUpMentality>
             <Exposed/>
 			<Arg>	UINT32	</Arg>	<!-- cardID -->
-			<Arg>	UINT32	</Arg>	<!-- 低级或高级材料 0--低级 1--高级 -->
+			<Arg>	UINT32	</Arg>	<!-- 低级或高级材料 0 低级 1高级 -->
         </onClientUpMentality>
 
          <!--确定提升-->
@@ -24,7 +24,7 @@
         <onClientUpTenMentality>
             <Exposed/>
 			<Arg>	UINT32	</Arg>	<!-- cardID -->
-			<Arg>	UINT32	</Arg>	<!-- 低级或高级材料 0--低级 1--高级 -->
+			<Arg>	UINT32	</Arg>	<!-- 低级或高级材料 0-低级 1-高级 -->
         </onClientUpTenMentality>
 	</BaseMethods>
 

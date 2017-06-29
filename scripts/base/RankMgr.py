@@ -22,7 +22,7 @@ class RankMgr(BaseModule):
         playerItem["level"] = param["level"]
         playerItem["camp"] = param["camp"]
         playerItem["fightValue"] = param["fightValue"]
-        self.updateValueByType(playerItem, "fightValue", param, self.fightRankList)
+        self.updateValueByType(playerItem, "fightValue", self.fightRankList)
 
     # 刷新等级排行
     def onCmdUpdateLevelValueRank(self, param):
@@ -34,7 +34,7 @@ class RankMgr(BaseModule):
         playerItem["level"] = param["level"]
         playerItem["camp"] = param["camp"]
         playerItem["guildName"] = param["guildName"]
-        self.updateValueByType(playerItem, "level", param, self.levelRankList)
+        self.updateValueByType(playerItem, "level", self.levelRankList)
 
     # 刷新财富排行
     def onCmdUpdateMoneyValueRank(self, param):
@@ -46,7 +46,7 @@ class RankMgr(BaseModule):
         playerItem["euro"] = param["euro"]
         playerItem["camp"] = param["camp"]
         playerItem["guildName"] = param["guildName"]
-        self.updateValueByType(playerItem, "euro", param, self.moneyRankList)
+        self.updateValueByType(playerItem, "euro", self.moneyRankList)
 
     # 刷新官职排行
     def onCmdUpdateOfficalValueRank(self, param):
@@ -58,7 +58,7 @@ class RankMgr(BaseModule):
         playerItem["achievements"] = param["achievements"]
         playerItem["officalPosition"] = param["officalPosition"]
         playerItem["camp"] = param["camp"]
-        self.updateValueByType(playerItem, "officalPosition", param, self.officalRankList)
+        self.updateValueByType(playerItem, "officalPosition", self.officalRankList)
 
     def onCmdUpdateGuildValueRank(self, param):
         # 1、判断是否在榜
@@ -166,7 +166,7 @@ class RankMgr(BaseModule):
 
 
 
-    def updateValueByType(self, playerItem, listName, param, rankList):
+    def updateValueByType(self, playerItem, listName, rankList):
         findItem = None
         for item in rankList:
             if item["dbid"] == playerItem["dbid"]:

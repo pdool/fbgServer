@@ -15,10 +15,8 @@ class SkillEffectModule:
         pass
 
 
-    def makeEffect(self,targetList,subSkillID):
-
-        config = skillConfig.SkillConfig[subSkillID]
-
+    def makeEffect(self,targetList,config):
+        subSkillID = config['id']
         if config["effectType1"] != 0:
             effctType1 = config["effectType1"]
             valueType1 = config["valueType1"]
@@ -28,7 +26,7 @@ class SkillEffectModule:
             func = getattr(self, methodName)
             func(subSkillID,effctType1,valueType1,value1,targetList)
 
-        if config["effectType2"] != 0:
+        if "effectType2" in config and config["effectType2"] != 0:
             effctType2 = config["effectType2"]
             valueType2 = config["valueType2"]
             value2 = config["value2"]
@@ -37,7 +35,7 @@ class SkillEffectModule:
             func = getattr(self, methodName)
             func(subSkillID,effctType2,valueType2, value2, targetList)
 
-        if config["effectType3"] != 0:
+        if "effectType3"in config and config["effectType3"] != 0:
             effctType3 = config["effectType3"]
             valueType3 = config["valueType3"]
             value3 = config["value3"]
@@ -131,7 +129,7 @@ class SkillEffectModule:
 
         for cardId in targetList:
             card = KBEngine.entities.get(cardId)
-            ERROR_MSG("addEffect8  cardID  is  " + str(cardId) + "    value is   " + str(value))
+            ERROR_MSG("addEffect8  cardID  is  " + str(cardId) + "    value is   " + str(value) +" subSkillID  " + str(subSkillID))
             if valueType == ValueTypeEnmu.value:
                 card.keepSkillValue = card.keepSkillValue + value
             elif valueType == ValueTypeEnmu.percent:
@@ -187,8 +185,8 @@ class SkillEffectModule:
 
         for cardId in targetList:
             card = KBEngine.entities.get(cardId)
-            ERROR_MSG("addEffect14  cardID  is  " + str(cardId) + "    value is   " + str(value))
-            card.thirdStepAttackSkillPer = card.thirdStepAttackSkillPer + value /1000.0
+            # ERROR_MSG("addEffect14  cardID  is  " + str(cardId) + "    value is   " + str(value))
+            card.thirdStepAttackSkillPer = card.thirdStepAttackSkillPer  + value /1000.0
             self.noticeClientEffect(subSkillID, cardId, effectType)
 
     # 15、中间者计算得球概率提升
@@ -199,7 +197,7 @@ class SkillEffectModule:
         for cardId in targetList:
             card = KBEngine.entities.get(cardId)
             ERROR_MSG("addEffect15  cardID  is  " + str(cardId) + "    value is   " + str(value))
-            card.secondStepAttackSkillPer = card.secondStepAttackSkillPer + value  /1000.0
+            card.secondStepAttackSkillPer = card.secondStepAttackSkillPer  + value  /1000.0
             self.noticeClientEffect(subSkillID, cardId, effectType)
     # 16、将A属性的值或n % 的值，附加到B的属性上
     def addEffect16(self,subSkillID,effectType,valueType,value,targetList):
@@ -232,16 +230,20 @@ class SkillEffectModule:
             card.yellow = card.yellow + 1
             if a.typeStr == "Avatar":
                 a.client.onYellowCard(cardId)
+                ERROR_MSG("addEffect18  yellow subSkillID   " + str(subSkillID))
             if b.typeStr == "Avatar":
                 b.client.onYellowCard(cardId)
+                ERROR_MSG("addEffect18  yellow subSkillID   " + str(subSkillID))
             if card.yellow == 2:
                 card.red = 1
                 card.yellow = 0
                 controller.inTeamcardIDList.remove(self.id)
                 if a.typeStr == "Avatar":
                     a.client.onRedCard(cardId)
+                    ERROR_MSG("addEffect18  red subSkillID   " + str(subSkillID))
                 if b.typeStr == "Avatar":
                     b.client.onRedCard(cardId)
+                    ERROR_MSG("addEffect18  red subSkillID   " + str(subSkillID))
 
 
 
@@ -280,11 +282,11 @@ class SkillEffectModule:
                 card.passballSkillValue = card.shootSkillValue + value  /1000.0
             self.noticeClientEffect(subSkillID,cardId,effectType)
 
-    # 终止一个回合
+    # 对手越位
     def addEffect23(self,subSkillID,effectType,valueType,value,targetList):
         roomID = self.roomID
-        clone = KBEngine.entities.get(roomID)
-        clone.endRound = True
+        room = KBEngine.entities.get(roomID)
+        room.endRound = True
 
         self.noticeClientEffect(subSkillID, self.id, effectType)
 
@@ -317,7 +319,7 @@ class SkillEffectModule:
                 self.bufferContainer.pop(i)
 
 
-    # 补射
+    # 28、补射
     def addEffect28(self,subSkillID,effectType,valueType, value, targetList):
         room = KBEngine.entities.get(self.roomID)
         # 补射
@@ -327,7 +329,7 @@ class SkillEffectModule:
         ERROR_MSG(util.printStackTrace("addEffect28 reshoot      "))
         room.onCmdSelectSkill(PlayerOp.shoot)
 
-    # 防守反击
+    # 29、防守反击
     def addEffect29(self,subSkillID,effectType,valueType, value, targetList):
         room = KBEngine.entities.get(self.roomID)
         controllerID = room.controllerID
@@ -428,7 +430,6 @@ class SkillEffectModule:
             avatarB.client.noticeClientEffect(cardID,subSkill//10000,effectType)
 
 
-
 # 效果类型
 class EffectEnum:
 
@@ -497,6 +498,13 @@ class EffectEnum:
 
     # 门柱保命
     effect_GoalPost_Help = 30
+
+    # 任意球
+    effect_Free_Kick = 31
+
+
+    # 传控后场：在后卫位置时，也可将自身80%控球属性转化为团队控球值
+    effect2014 = 32
 
 class ValueTypeEnmu:
     # 数值

@@ -17,8 +17,6 @@ class ChatModule:
         pass
 
     def onEntitiesEnabled(self):
-        self.playerMgr = KBEngine.globalData["PlayerMgr"]
-
         self.worldChanelSendTime = 0
         pass
 
@@ -60,7 +58,7 @@ class ChatModule:
         messageInfo = self.makeMessageInfo(message)
         messageInfo[MessageInfoEnum.clubPosition] = "manager"
 
-        # self.playerMgr.sendClubChat(messageInfo)
+        KBEngine.globalData["PlayerMgr"].sendClubChat(messageInfo)
        # TODO: 没有工会。暂时不做
     # 广告
     def onClientAdChat(self,message):

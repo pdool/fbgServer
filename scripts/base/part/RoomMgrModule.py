@@ -29,7 +29,7 @@ class RoomMgrModule:
         actionType = paramDict["actionType"]
         roomID = paramDict["roomID"]
 
-        if actionType == ActionType.action_clone:
+        if actionType == ActionType.action_clone or actionType == ActionType.league_clone:
             # 进入副本
             self.enterClone(paramDict)
 

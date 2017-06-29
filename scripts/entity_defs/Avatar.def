@@ -23,7 +23,10 @@
         <Interface>    GameShopModule        </Interface><!--游戏商城-->
         <Interface>    ArenaModule           </Interface><!--竞技场-->
         <Interface>    RankModule            </Interface><!--排行榜-->
-        <Interface>    SkillModule            </Interface><!--技能-->
+        <Interface>    SkillModule           </Interface><!--技能-->
+        <Interface>    WorldBossModule       </Interface><!--顾问之争-->
+        <Interface>    LeagueModule          </Interface><!--联赛系统-->
+
 	</Implements>
 
 	<Properties>
@@ -123,6 +126,13 @@
 			<Persistent> true </Persistent>
         </lastTime>
 
+
+        <onlineState>
+            <Type> UINT8 </Type>
+			<Flags> BASE </Flags>
+			<Persistent> true </Persistent>
+        </onlineState>
+
         <logoutTime>
             <Type> UINT64 </Type>
 			<Flags> BASE_AND_CLIENT </Flags>
@@ -142,6 +152,20 @@
 			<Flags> BASE_AND_CLIENT </Flags>
 			<Persistent> true </Persistent>
         </camp>
+
+        <!-- 名望 -->
+        <fame>
+            <Type> UINT64 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+			<Persistent> true </Persistent>
+        </fame>
+
+        <!-- 是否在房间里 -->
+        <inRoom>
+            <Type> INT8 </Type>
+			<Flags> BASE </Flags>
+        </inRoom>
+
 	</Properties>
 
 	<BaseMethods>
@@ -171,6 +195,13 @@
     <onClientGmAddAll>
         <Exposed/>
     </onClientGmAddAll>
+
+    <onClientGmAddItem>
+        <Exposed/>
+        <Arg> UINT32 </Arg>
+        <Arg> UINT32 </Arg>
+    </onClientGmAddItem>
+
 
     <onRoomEndResult>
          <Arg> UINT32 </Arg>
@@ -210,6 +241,9 @@
             <Arg> PlayerInfo </Arg>
         </onGetPlayerInfo>
 
+        <onAISelectError>
+
+        </onAISelectError>
 	</ClientMethods>
 
 

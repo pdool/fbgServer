@@ -12,6 +12,7 @@ class RankModule:
 
     def onEntitiesEnabled(self):
         # 刷新排行榜自己的数据
+
         pass
         # --------------------------------------------------------------------------------------------
         #                              客户端调用函数
@@ -149,8 +150,8 @@ class RankModule:
             "dbid": self.databaseID,
             "name": self.name,
             "camp": self.camp,
-            "achievements": self.achievements,
-            "officalPosition": self.officalPosition,
+            "achievements": self.fame,
+            "officalPosition": self.officialPosition,
         }
 
         rankMgr = KBEngine.globalData["RankMgr"]

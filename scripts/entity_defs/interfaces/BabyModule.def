@@ -4,6 +4,18 @@
 
 	<Properties>
 
+            <!--足球宝贝时间ID 用来删除 -->
+            <Timer_reset_baby_liking>
+                <Type> UINT64 </Type>
+                <Flags> BASE </Flags>
+            </Timer_reset_baby_liking>
+
+            <!--足球宝贝时间ID 用来删除 -->
+            <Timer_reset_baby_likingTime>
+                <Type> UINT64 </Type>
+                <Flags> BASE </Flags>
+            </Timer_reset_baby_likingTime>
+
              <!--足球宝贝内存D-->
             <babyID>
                 <Type> UINT64 </Type>

@@ -139,6 +139,12 @@ class SkillTargetModule:
         attackId = clone.getCurRoundAtkId(clone.curPart + 1)
         return (attackId,)
 
+    # 13、新增：持球者
+    def filterTarget13(self):
+        roomID = self.roomID
+        clone = KBEngine.entities.get(roomID)
+        attackId = clone.getCurRoundAtkId(clone.curPart + 1)
+        return (attackId,)
 # 目标
 class TargetEnum:
     # 1、自身

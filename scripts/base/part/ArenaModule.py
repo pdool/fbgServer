@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import CommonConfig
 import TimerDefine
+import cloneConfig
 import util
+from CommonEnum import ActionTypeEnum
 from ErrorCode import ArenaModuleError, GameShopModuleError
 from KBEDebug import *
 import ArenaConfig
@@ -16,6 +18,8 @@ __author__ = 'yangh'
 class ArenaModule:
     def __init__(self):
         self.isFirstEnter = True
+        self.enemyDbid = 0
+        self.enemyRank = 0
         pass
 
     def onEntitiesEnabled(self):
@@ -26,13 +30,12 @@ class ArenaModule:
         self.client.onGetThreeArenaValue(self.arenaInitialList)
         offset = util.getLeftSecsToNextHMS(0, 0, 0)
         self.addTimer(offset, 24 * 60 * 60, TimerDefine.Timer_arena_reward)
-        pass
 
     # --------------------------------------------------------------------------------------------
     #                              客户端调用函数
     # --------------------------------------------------------------------------------------------
     def onTimer(self, id, userArg):
-        ERROR_MSG("ontimer" + str(userArg))
+        # ERROR_MSG("ontimer" + str(userArg))
         if userArg != TimerDefine.Timer_arena_reward:
             return
         if self.myRank > 5000:
@@ -74,6 +77,7 @@ class ArenaModule:
                 config = ArenaConfig.ArenaConfig[dbid]
                 clientResultItem["dbid"] = dbid
                 clientResultItem["rank"] = rank
+                clientResultItem["isRobot"] = 1
                 clientResultItem["name"] = config["playerName"]
                 clientResultItem["club"] = config["clubName"]
                 clientResultItem["formation"] = config["campId"]
@@ -84,6 +88,7 @@ class ArenaModule:
                 continue
             clientResultItem = {}
             clientResultItem["dbid"] = dbid
+            clientResultItem["isRobot"] = 0
             clientResultItem["rank"] = rank
             clientResultItem["name"] = ""
             clientResultItem["club"] = ""
@@ -157,6 +162,7 @@ class ArenaModule:
                 config = ArenaConfig.ArenaConfig[dbid]
                 clientResultItem["dbid"] = dbid
                 clientResultItem["rank"] = rank
+                clientResultItem["isRobot"] = 1
                 clientResultItem["name"] = config["playerName"]
                 clientResultItem["club"] = config["clubName"]
                 clientResultItem["formation"] = config["campId"]
@@ -167,6 +173,7 @@ class ArenaModule:
             clientResultItem = {}
             clientResultItem["dbid"] = dbid
             clientResultItem["rank"] = rank
+            clientResultItem["isRobot"] = 0
             clientResultItem["name"] = ""
             clientResultItem["club"] = ""
             clientResultItem["formation"] = 1
@@ -201,6 +208,7 @@ class ArenaModule:
         sql = "SELECT a.id, a.sm_name, a.sm_club, a.sm_formation, a.sm_fightValue,a.sm_camp FROM tbl_Avatar AS a, tbl_Card AS c WHERE a.id in(" + inStr + ") AND c.sm_inTeam = 1"
         KBEngine.executeRawDatabaseCommand(sql, cb)
 
+
     # 请求玩家信息
     def onClientGetArenaPlayerInfo(self,rank):
         param = {
@@ -231,11 +239,24 @@ class ArenaModule:
                     "offical": config["offical"],
                     "level": config["level"],
                     "guildName": config["guild"],
+                    "isRobot": 1,
                 }
                 self.client.onGetPlayerInfo(param)
 
+    # 战斗结束 返回结果
+    def onArenaEndResult(self, avatarAID, aScore, avatarBID, bScore):
 
+        ERROR_MSG("avatarAID" + str(avatarAID))
+        ERROR_MSG("aScore" + str(aScore))
+        if aScore > bScore:
+            self.onUpdateRank(self.enemyDbid, self.enemyRank)
 
+        self.inActionType = ActionTypeEnum.action_clone
+
+        if hasattr(self, "roomID"):
+            room = KBEngine.entities.get(self.roomID)
+            if room is not None:
+                room.cell.destroyRoom()
 
 
     # 初始化自己的排行
@@ -247,18 +268,37 @@ class ArenaModule:
     # 刷新自己的排行榜
     def onUpdateRank(self,enemyDBID,enemyRank):
         param = {
-            "selfRank": self.myRank,
+            "selfRank": enemyRank,
             "selfDBID": self.databaseID,
             "enemyDBID": enemyDBID,
-            "enemyRank": enemyRank,
+            "enemyRank": self.myRank,
         }
+        self.myRank = enemyRank
         arenaMgr = KBEngine.globalData["ArenaMgr"]
         arenaMgr.onCmd("onCmdUpdateArenaRank",param)
 
-    def onClientStartArenaPVP(self):
+    # 开始挑战
+    def onClientStartArenaPVP(self,cloneID,enemyDbid,enemyRank):
         if self.arenaTimes == 0:
             return
         self.arenaTimes = self.arenaTimes - 1
+        self.enemyDbid = enemyDbid
+        self.enemyRank = enemyRank
+        ERROR_MSG("enemyDbid" + str(self.enemyDbid))
+        ERROR_MSG("enemyRank" + str(self.enemyRank))
+        if self.inActionType == ActionTypeEnum.action_arena:
+            return
+
+        self.inActionType = ActionTypeEnum.action_arena
+        self.cloneID = cloneID
+
+        param = {
+            "roomID": self.id,
+            "avatarMB": self,
+            "actionType": ActionTypeEnum.action_arena
+        }
+
+        KBEngine.globalData["RoomMgr"].onCmd("onCreateRoom", param)
 
     # 请求倒计时
     def onClientGetUpdateCD(self):
@@ -276,6 +316,13 @@ class ArenaModule:
         arenaMgr = KBEngine.globalData["ArenaMgr"]
         arenaMgr.onCmd("onCmdGetArenaRankValue", param)
 
+    # 请求竞技场排行榜
+    def onClientGetAllArenaRank(self):
+        param = {
+            "playerMB": self,
+        }
+        arenaMgr = KBEngine.globalData["ArenaMgr"]
+        arenaMgr.onCmd("onCmdGetArenaAllRankValue", param)
 
     # 刷新竞技对手排行榜
     def onClientUpdateArenaRank(self):

@@ -17,9 +17,10 @@ class Card(KBEngine.Entity,SkillModuleMain):
         # print("Cell::Card.__init__")
 
         # DEBUG_MSG(str(type(self.baseProp)))
-        for k, v in self.baseProp.items():
-            # DEBUG_MSG("card   k  " + str(k) + "       v  " + str(v))
-            self.__setattr__(k, v)
+        if hasattr(self,"baseProp") :
+            for k, v in self.baseProp.items():
+                # DEBUG_MSG("card   k  " + str(k) + "       v  " + str(v))
+                self.__setattr__(k, v)
 
         self.totalAttackValue = 0.0
         self.totalDefendValue = 0.0

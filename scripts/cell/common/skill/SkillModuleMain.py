@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from _ast import Pass
+
 import KBEngine
 import skillConfig
 import skillMainConfig
@@ -9,6 +11,7 @@ from common.skill.BufferModule import BufferModule
 from common.skill.SkillConditionModule import SkillConditionModule, ConditionEnum
 from common.skill.SkillEffectModule import SkillEffectModule
 from common.skill.SkillTargetModule import SkillTargetModule
+from common.skill.PassiveSkillModule import PassiveSkillModule
 
 __author__ = 'chongxin'
 
@@ -20,13 +23,14 @@ __createTime__ = '2017年3月15日'
 """
 
 
-class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule, BufferModule):
+class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule, BufferModule,PassiveSkillModule):
     def __init__(self):
 
         SkillConditionModule.__init__(self)
         SkillTargetModule.__init__(self)
         SkillEffectModule.__init__(self)
         BufferModule.__init__(self)
+        PassiveSkillModule.__init__(self)
 
         self.initMatchData()
         self.resetRoundData()
@@ -86,8 +90,6 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
         self.yellow = 0
         self.red = 0
 
-        self.shootSucc = False
-
 
 
     # 使用技能（起点）
@@ -100,12 +102,13 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
             return
         skillConMap = skillMainConfig.SkillMain[mainSkillID]
         condition = skillConMap["condition"]
-        # 检查主技能的使用条件
-        check = self.checkCondition(condition, result)
-        ERROR_MSG("   condition  is  " + str(condition) + "  result  is   " + str(result) + "  check is  " + str(check))
-        # 验证不通过
-        if check is False:
-            return False
+        if mainSkillID != 1035:
+            # 检查主技能的使用条件
+            check = self.checkCondition(condition, result)
+            ERROR_MSG("   condition  is  " + str(condition) + "  result  is   " + str(result) + "  check is  " + str(check))
+            # 验证不通过
+            if check is False:
+                return False
 
 
         if mainSkillID == 1009:
@@ -131,8 +134,11 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
 
                 # 分开单个人触发效果
                 for target in targetList:
-                    if subSkillID // 10000 == 1036:
+                    skillID = subSkillID // 10000
+                    if skillID == 1036:
                         self.addBuffer(target, subSkillID)
+                        continue
+                    if skillID == 1015 and  not self.check1015Pos():
                         continue
                     if self.checkTriggerPer(usePercent) is False:
                         continue
@@ -143,11 +149,27 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
 
     # 检查触发的概率
     def checkTriggerPer(self,percent):
-
+        if percent >= 100:
+            return True
         p = util.randInHundred()
         if percent >= p:
             return True
         return False
+
+    # 检查可能越位 可能出现从前往后传的情况
+    def check1015Pos(self):
+        room = KBEngine.entities.get(self.roomID)
+        curPart = room.curPart
+        if curPart == 3 or curPart == 1:
+            return False
+        curRoundAtkCoordinate = room.getCurRoundAtkCoordinate(curPart)/10
+        nextRoundAtkCoordinate = room.getCurRoundAtkCoordinate(curPart + 1) /10
+
+        if nextRoundAtkCoordinate >= curRoundAtkCoordinate:
+            return False
+        return True
+
+
 
     def afterRound(self, result):
         if result > ConditionEnum.con_result_None:
@@ -209,15 +231,11 @@ class SkillModuleMain(SkillConditionModule, SkillTargetModule, SkillEffectModule
 
         room = KBEngine.entities.get(self.roomID)
 
-        if room.defenderID == self.controllerID:
+        if room.defenderID != self.controllerID:
             return
 
-        defList = room.getCurRoundDefList(room.curPart)
-
-        if len(defList) != 0:
-            return
         # 自己得到黄牌
-        self.addEffect18(10350101, 18, None, [self.id])
+        self.addEffect18(10350101, 18, None,None, [self.id])
 
 
 

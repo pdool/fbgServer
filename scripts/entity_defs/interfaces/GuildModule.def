@@ -8,6 +8,12 @@
 			<Flags> BASE_AND_CLIENT </Flags>
             <Persistent> true </Persistent>
 		</guildDBID>
+         <!---->
+         <guildLevel>
+			<Type> UINT32 </Type>
+			<Flags> BASE_AND_CLIENT </Flags>
+            <Persistent> true </Persistent>
+		</guildLevel>
 
         <!--个人当前贡献点-->
         <guildDonate>
@@ -36,6 +42,21 @@
 			<Flags> BASE </Flags>
             <Persistent> true </Persistent>
 		</applyGuildList>
+
+        <!--接受任务列表-->
+        <acceptTaskList>
+			<Type> ARRAY <of> GuildTask </of> </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</acceptTaskList>
+
+        <!--已完成任务list-->
+        <taskFinishList>
+			<Type> ARRAY <of> UINT32 </of> </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</taskFinishList>
+
 
         <!--公会名字-->
         <guildName>
@@ -176,17 +197,65 @@
             <Arg> UNICODE </Arg> <!-- 公会新名字-->
         </onClientChangeName>
 
-             <!--公会任命-->
+        <!--公会任命-->
         <onClientAppointPower>
             <Exposed/>
             <Arg> UINT32 </Arg> <!-- 公会DBID-->
             <Arg> UINT32 </Arg> <!-- 公会DBID-->
         </onClientAppointPower>
 
+
+        <!--设置公务顾问目标-->
+        <onClientAdviserTarget>
+            <Exposed/>
+            <Arg> UINT64 </Arg> <!-- 顾问DBID-->
+            <Arg> UINT8 </Arg> <!-- target-->
+        </onClientAdviserTarget>
+
+
         <!--解散公会-->
         <onClientDismissGuild>
             <Exposed/>
         </onClientDismissGuild>
+
+          <!--请求公会保护时间-->
+        <onClientGuildProtectTime>
+            <Exposed/>
+        </onClientGuildProtectTime>
+
+
+        <!--请求顾问公会好友度-->
+        <onClientAdviserGuildList>
+            <Exposed/>
+            <Arg> UINT64 </Arg> <!-- 顾问DBID-->
+        </onClientAdviserGuildList>
+
+        <!--请求顾问数据-->
+        <onClientAdviserList>
+            <Exposed/>
+        </onClientAdviserList>
+
+        <!--讨好挑拨顾问-->
+        <onClientAdviserFriend>
+            <Exposed/>
+            <Arg> UINT64 </Arg> <!-- 顾问DBID-->
+            <Arg> UINT32 </Arg> <!-- 讨好顾问ID-->
+        </onClientAdviserFriend>
+
+           <!--顾问拉拢-->
+        <onClientAdviserRope>
+            <Exposed/>
+            <Arg> UINT64 </Arg> <!-- 顾问DBID-->
+            <Arg> UINT32 </Arg> <!-- 拉拢ID-->
+            <Arg> UINT32 </Arg> <!-- 顾问DBID-->
+        </onClientAdviserRope>
+
+
+         <!--解雇顾问-->
+        <onClientFireAdviser>
+            <Exposed/>
+            <Arg> UINT64 </Arg> <!-- 顾问DBID-->
+        </onClientFireAdviser>
 
         <!--取消解散公会-->
         <onClientCancelDismiss>
@@ -211,6 +280,57 @@
             <Arg> UINT32 </Arg> <!-- 成员ID-->
         </onClientGuildTransfer>
 
+        <!--申请公会顾问好友度-->
+        <onClientGuildAdviser>
+            <Exposed/>
+            <Arg> UINT64 </Arg> <!-- 公会ID-->
+        </onClientGuildAdviser>
+
+
+        <!--公会已发布任务列表-->
+        <onClientTaskIDIssueList>
+            <Exposed/>
+        </onClientTaskIDIssueList>
+
+
+       <!--公会接受任务列表-->
+       <onClientGuildTask>
+           <Exposed/>
+       </onClientGuildTask>
+
+        <!--请求发布任务-->
+        <onClientSetGuildTask>
+            <Exposed/>
+            <Arg> UINT32 </Arg> <!-- 任务ID-->
+        </onClientSetGuildTask>
+
+          <!--请求完成任务-->
+        <onClientFinishTask>
+            <Exposed/>
+            <Arg> UINT32 </Arg> <!-- 任务ID-->
+        </onClientFinishTask>
+
+        <!--请求侦查-->
+        <onClientSpyGuildEvent>
+            <Exposed/>
+            <Arg> UINT32 </Arg> <!-- 侦查Id-->
+        </onClientSpyGuildEvent>
+
+        <!--请求人事事件-->
+        <onClientGuildHREvent>
+            <Exposed/>
+        </onClientGuildHREvent>
+
+        <!--请求顾问事件-->
+        <onClientAdviserEvent>
+            <Exposed/>
+        </onClientAdviserEvent>
+
+        <!--请求政务事件-->
+        <onClientGuildGovernEvent>
+            <Exposed/>
+        </onClientGuildGovernEvent>
+
 
         <setGuildDBID>
             <Arg> PY_DICT </Arg>
@@ -229,7 +349,6 @@
    <ClientMethods>
         <!--查找自己的派系-->
         <onFindCamp>
-
            <Arg> UINT32 </Arg>        <!-- 数量-->
            <Arg> ARRAY <of> GuildMgr_ItemInfo </of></Arg>
        </onFindCamp>
@@ -270,16 +389,27 @@
             <Arg> UINT64 </Arg>        <!-- 公会ID-->
             <Arg> UNICODE </Arg>        <!-- 公会简介-->
             <Arg> UINT64 </Arg>        <!-- 保护时间-->
+            <Arg> UINT8 </Arg>        <!-- 拉拢次数-->
+            <Arg> UINT8 </Arg>        <!-- 已侦查次数-->
             <Arg> ARRAY <of> Guild_Build </of></Arg> <!-- 建筑-->
 
        </onGetGuildInfo>
 
+       <!--更新公会资金-->
+       <onUpdateGuildFunds>
+           <Arg>UINT32</Arg>
+       </onUpdateGuildFunds>
 
        <!--返回公会建筑信息-->
        <onClientGuildBuildInfo>
            <Arg> Guild_Build </Arg>        <!-- 建筑-->
        </onClientGuildBuildInfo>
 
+       <onGetRopeAdviser>
+       </onGetRopeAdviser>
+
+       <onGetFireAdviser>
+       </onGetFireAdviser>
 
        <onGuildError>
            <Arg>UINT8</Arg>
@@ -335,8 +465,110 @@
 
        <!--购买公会保护成功-->
        <onBuyGuildProtectSucc>
-           <Arg> UINT64 </Arg>        <!-- 公会名字-->
+           <Arg> UINT64 </Arg>        <!-- 时间-->
        </onBuyGuildProtectSucc>
+
+       <!--公会保护成功-->
+       <onGuildProtectTime>
+           <Arg> UINT64 </Arg>        <!-- 时间-->
+       </onGuildProtectTime>
+
+
+       <!--处理顾问结果-->
+       <onAdviserError>
+            <Arg> UINT32 </Arg> <!-- 类型-->
+       </onAdviserError>
+
+       <!--返回顾问公会好友度前5-->
+       <onAdviserGuildRank>
+            <Arg> ARRAY <of> AdviserGuild </of>  </Arg> <!-- 类型-->
+       </onAdviserGuildRank>
+
+       <!--更新顾问公会好友度前5-->
+       <onUpdataAdviserGuild>
+            <Arg> AdviserGuild  </Arg> <!-- 类型-->
+       </onUpdataAdviserGuild>
+
+       <!--公会拉拢次数-->
+       <onUpdataRopeTimes>
+            <Arg> UINT8</Arg> <!-- 类型-->
+       </onUpdataRopeTimes>
+
+     <!--顾问列表-->
+       <onAdviserList>
+            <Arg> ARRAY <of> AdviserInfo </of>  </Arg> <!-- 类型-->
+       </onAdviserList>
+
+       <!--更新顾问信息-->
+       <onUpdataAdviser>
+            <Arg> AdviserInfo </Arg> <!-- 类型-->
+       </onUpdataAdviser>
+
+        <!--公会顾问友好度-->
+       <onGuildAdviserList>
+            <Arg> ARRAY <of> GuildAdviser </of>  </Arg> <!-- 类型-->
+       </onGuildAdviserList>
+
+       <!--更新公会顾问友好度-->
+       <onUpdateGuildAdviser>
+            <Arg> GuildAdviser  </Arg> <!-- 类型-->
+       </onUpdateGuildAdviser>
+
+       <!--已经发布的任务列表-->
+       <onTaskIssueList>
+            <Arg> ARRAY <of> UINT32 </of>  </Arg> <!-- 任务ID-->
+       </onTaskIssueList>
+
+       <!--已接受的任务列表-->
+       <onAcceptTaskList>
+            <Arg> ARRAY <of> GuildTask </of>  </Arg> <!-- 任务ID-->
+       </onAcceptTaskList>
+
+       <!--更新发布任务-->
+       <onUpdateTaskIssue>
+            <Arg> UINT32  </Arg> <!-- 任务ID-->
+       </onUpdateTaskIssue>
+
+        <!--已经发布的任务列表-->
+       <onClientTaskIssueList>
+            <Arg> ARRAY <of> GuildTask </of>  </Arg> <!-- 任务-->
+       </onClientTaskIssueList>
+
+       <!--公会更新任务列表-->
+       <onUpdateGuildTask>
+            <Arg> GuildTask </Arg> <!-- 结构-->
+       </onUpdateGuildTask>
+
+       <!--公会任务完成-->
+       <onGuildTaskFinish>
+            <Arg> UINT32 </Arg> <!-- 任务id-->
+            <Arg> UINT32 </Arg> <!-- 公会声望-->
+            <Arg> UINT32 </Arg> <!-- 公会资金-->
+       </onGuildTaskFinish>
+
+       <!--公会人事事件list-->
+       <onGuildHREventList>
+            <Arg> ARRAY <of> HrEvent </of>  </Arg> <!-- HR事件list-->
+       </onGuildHREventList>
+
+        <!--公会顾问事件list-->
+       <onAdviserEventList>
+            <Arg> ARRAY <of> AdviserEvent </of>  </Arg> <!-- 顾问事件list-->
+       </onAdviserEventList>
+
+       <!--公会政务事件list-->
+       <onCovernEventList>
+            <Arg> ARRAY <of> GuildEvent </of>  </Arg> <!-- 顾问事件list-->
+       </onCovernEventList>
+
+
+       <!--公会事件侦查结果-->
+       <onSpyGuildResult>
+            <Arg> UINT32 </Arg> <!-- 已侦查次数-->
+            <Arg> UINT32 </Arg> <!-- 侦查Id-->
+            <Arg> UNICODE </Arg> <!-- 公会名字-->
+       </onSpyGuildResult>
+
 
 	</ClientMethods>
 </root>

@@ -17,6 +17,13 @@
 	</Properties>
 
 	<BaseMethods>
+        <gmSetSkill>
+            <Exposed/>
+             <Arg> UINT32 </Arg><!--技能索引1,2-->
+             <Arg> UINT32 </Arg><!--技能下标-->
+        </gmSetSkill>
+
+
         <!--客户端请求升级卡牌信息-->
         <onClientSkillLevelUp>
             <Exposed/>
@@ -25,27 +32,27 @@
             <Arg> UINT32 </Arg><!--coachID-->
         </onClientSkillLevelUp>
 
-        !--解锁教练槽位-->
+        <!--解锁教练槽位-->
         <onClientUnLockCoach>
             <Exposed/>
             <Arg> UINT32 </Arg><!--教练-->
         </onClientUnLockCoach>
 
-        !--提升教练-->
+        <!--提升教练-->
         <onClientLevelUpCoach>
             <Exposed/>
             <Arg> UINT32 </Arg><!--教练ID-->
             <Arg> UINT32 </Arg><!--ID-->
         </onClientLevelUpCoach>
 
-        !--提升教练-->
+        <!--提升教练-->
         <onClientAddCoachTime>
             <Exposed/>
             <Arg> UINT32 </Arg><!--itemID-->
             <Arg> UINT32 </Arg><!--教练ID-->
         </onClientAddCoachTime>
 
-        !--更换技能-->
+        <!--更换技能-->
         <onClientSelectSkill>
             <Exposed/>
              <Arg>	UINT32	</Arg>	<!-- cardId -->
@@ -74,6 +81,12 @@
              <Arg>	UINT32	</Arg>
         </onSkillLevelUpSucess>
 
+        <onSkillNotUseTime>
+             <Arg>	UINT32	</Arg>
+             <Arg>	UINT32	</Arg>
+             <Arg>	UINT32	</Arg>
+        </onSkillNotUseTime>
+
          <onAddCoachTimeSucess>
              <Arg>	UINT32	</Arg>
              <Arg>	UINT32	</Arg>
@@ -101,7 +114,7 @@
         <noticeClientEffect>
              <Arg>	UINT32	</Arg>	<!-- cardId -->
             <Arg>	UINT32	</Arg>	<!-- SkillID -->
-            <Arg>	UINT32	</Arg>	<!-- effectType -->
+            <Arg>	INT32	</Arg>	<!-- effectType -->
         </noticeClientEffect>
 
         <onGetCoachList>

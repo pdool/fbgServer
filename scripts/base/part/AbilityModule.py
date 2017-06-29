@@ -91,6 +91,7 @@ class AbilityModule:
 
         # 根据经验值重置等级 增加对应属性值
         while (changeLevel < len(PowerConfig.PowerConfig)):
+            ERROR_MSG("    onClientUpAbilityInfo  while    ")
             config = PowerConfig.PowerConfig[changeLevel]
             needExp = config["exp"]
             if allExp >= needExp:

@@ -39,3 +39,7 @@ class GuildNotice:
     guild_cancel_dismiss_success = 17
     # 公会退出成功
     guild_quit_success = 18
+    # 拉拢成功
+    guild_adviser_rope_success = 24
+    # 解雇成功
+    guild_adviser_fire_success = 25

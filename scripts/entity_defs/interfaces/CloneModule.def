@@ -3,6 +3,11 @@
 	</Implements>
 
 	<Properties>
+        <chapterInfo>
+            <Type>			ARRAY <of> CloneChapterInfo	 </of> 		</Type>
+			<Flags>			BASE				</Flags>
+            <Persistent> true </Persistent>
+        </chapterInfo>
 
         <passCloneInfo>
 
@@ -21,6 +26,12 @@
 	</Properties>
 
 	<BaseMethods>
+        <!--获得所有副本信息-->
+        <onClientGetAllCloneInfo>
+            <Exposed/>
+        </onClientGetAllCloneInfo>
+
+        <!--请求进入副本-->
         <onClientReqEnterClone>
             <Exposed/>
            <Arg> UINT32 </Arg>
@@ -31,6 +42,25 @@
             <Exposed/>
         </onClientLeaveClone>
 
+        <!--获得章节奖励-->
+        <onClientGetChapterReward>
+             <Exposed/>
+           <Arg> UINT8 </Arg>  <!--章节ID-->
+            <Arg> UINT8 </Arg> <!--奖励阶段-->
+        </onClientGetChapterReward>
+
+        <onClientSweep>
+             <Exposed/>
+             <Arg> UINT32 </Arg>  <!--副本ID-->
+             <Arg> UINT8 </Arg> <!--扫荡次数-->
+        </onClientSweep>
+
+
+        <!--开启之前的副本-->
+        <onGmOpenClone>
+             <Exposed/>
+             <Arg> UINT32 </Arg>  <!--副本ID-->
+        </onGmOpenClone>
 
 	</BaseMethods>
 
@@ -125,6 +155,41 @@
        </onMyCardIdList>
 
 
+       <onGetAllCloneInfo>
+           <Arg> ARRAY <of> CloneChapterInfo	 </of> </Arg>  <!--章节信息-->
+           <Arg> ARRAY <of> CloneInfo	 </of> </Arg> <!--副本信息信息-->
+       </onGetAllCloneInfo>
+
+        <!--副本挑战失败-->
+       <onCloneFail>
+            <Arg>UINT8 </Arg>  <!--我的得分-->
+            <Arg>UINT8 </Arg> <!--对方得分-->
+       </onCloneFail>
+       <!--副本挑战成功-->
+       <onCloneSucc>
+            <Arg>UINT8 </Arg>  <!--我的得分-->
+            <Arg>UINT8 </Arg> <!--对方得分-->
+            <Arg>UINT8 </Arg> <!--副本星-->
+            <Arg>UINT8 </Arg> <!--章节星-->
+           <Arg> ARRAY <of> UINT32 </of> </Arg> <!--掉落的id-->
+       </onCloneSucc>
+
+
+
+      <onCloneError>
+           <Arg>UINT8 </Arg>  <!--错误码-->
+      </onCloneError>
+
+
+      <onSweepResult>
+           <Arg>UINT8 </Arg>  <!--次数-->
+          <Arg> ARRAY <of> UINT32 </of> </Arg> <!--掉落的itemId-->
+          <Arg> ARRAY <of> UINT32 </of> </Arg> <!--掉落的数量-->
+      </onSweepResult>
+
+       <!--章节奖励领取成功-->
+      <onGetChapterReward>
+      </onGetChapterReward>
 	</ClientMethods>
 </root>
 

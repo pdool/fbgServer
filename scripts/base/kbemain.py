@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 import KBEngine
 import Watcher
+import gc
 from KBEDebug import *
 
 isGuildMgrLoad = False
 isRankMgrLoad = False
 isArenaMgrLoad = False
+isAdviserMgrLoad = False
+isWorldBossMgrLoad = False
+isOfficialMgrLoad = False
+isLeagueMgrLoad = False
 
 def onBaseAppReady(isBootstrap):
     """
@@ -32,9 +37,16 @@ def onBaseAppReady(isBootstrap):
         KBEngine.createBaseLocally("GlobalTimerMgr", {})
 
         KBEngine.createBaseLocally("RoomMgr", {})
+        KBEngine.createBaseLocally("AutoRoomMgr", {})
+
+
+        if isWorldBossMgrLoad is False:
+            worldBossMgr = KBEngine.createBaseLocally("WorldBossMgr", {})
+            worldBossMgr.writeToDB(None, True)
 
         if isGuildMgrLoad is False:
             guildMgr = KBEngine.createBaseLocally("GuildMgr", {})
+            guildMgr.iniNPCGuild()
             guildMgr.writeToDB(None,True)
 
         if isRankMgrLoad is False:
@@ -46,6 +58,20 @@ def onBaseAppReady(isBootstrap):
             arenaMgr.loadFakeData()
             arenaMgr.writeToDB(None, True)
 
+        if isAdviserMgrLoad is False:
+            adviserMgr = KBEngine.createBaseLocally("AdviserMgr", {})
+            adviserMgr.writeToDB(None, True)
+            adviserMgr.initAdviserData()
+
+        if isOfficialMgrLoad is False:
+            officialMgr = KBEngine.createBaseLocally("OfficialMgr", {})
+            officialMgr.writeToDB(None, True)
+
+        if isLeagueMgrLoad is False:
+            leagueMgr = KBEngine.createBaseLocally("LeagueMgr", {})
+            leagueMgr.writeToDB(None, True)
+
+
 def onBaseAppShutDown(state):
     """
     KBEngine method.
@@ -56,6 +82,23 @@ def onBaseAppShutDown(state):
     @type state: int
     """
     INFO_MSG('onBaseAppShutDown: state=%i' % state)
+
+
+    # for entityID, entity in KBEngine.entities.items():
+    #     print("entityID:%i, entity=%s", entityID, entity)
+
+    ERROR_MSG("======== KBEngine.entities.garbages.items() =======" + KBEngine.entities.garbages.items().__str__())
+    KBEngine.entities.garbages.items()
+
+
+
+    gc.collect()
+    for x in gc.garbage:
+        s = str(x)
+        # if len(s) > 80: s = s[:77]+'...'
+        ERROR_MSG(type(s).__name__ + "  " + s)
+
+
 
 def onReadyForLogin(isBootstrap):
     """
@@ -97,7 +140,7 @@ def onAutoLoadEntityCreate(entityType, dbid):
     自动加载的entity创建方法，引擎允许脚本层重新实现实体的创建，如果脚本不实现这个方法
     引擎底层使用createBaseAnywhereFromDBID来创建实体
     """
-    INFO_MSG('onAutoLoadEntityCreate: entityType=%s, dbid=%i' % (entityType, dbid))
+    ERROR_MSG('onAutoLoadEntityCreate: entityType=%s, dbid=%i' % (entityType, dbid))
     KBEngine.createBaseAnywhereFromDBID(entityType, dbid)
 
     if entityType == "GuildMgr":
@@ -114,6 +157,27 @@ def onAutoLoadEntityCreate(entityType, dbid):
         ERROR_MSG("   ArenaMgr is Load  ")
         global  isArenaMgrLoad
         isArenaMgrLoad = True
+
+    if entityType == "AdviserMgr":
+        ERROR_MSG("   AdviseMgr is Load  ")
+        global  isAdviserMgrLoad
+        isAdviserMgrLoad = True
+
+    if entityType == "WorldBossMgr":
+        ERROR_MSG("   WorldBossMgr is Load  ")
+        global isWorldBossMgrLoad
+        isWorldBossMgrLoad = True
+
+    if entityType == "OfficialMgr":
+        ERROR_MSG("   OfficialMgr is Load  ")
+        global isOfficialMgrLoad
+        isOfficialMgrLoad = True
+
+    if entityType == "LeagueMgr":
+        ERROR_MSG("   LeagueMgr is Load  ")
+        global isLeagueMgrLoad
+        isLeagueMgrLoad = True
+
 
 
 def onInit(isReload):

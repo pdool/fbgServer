@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import KBEngine
+import passiveSkillMainConfig
 from KBEDebug import ERROR_MSG
 
 __author__ = 'chongxin'
@@ -16,6 +17,15 @@ class SkillConditionModule:
     def __init__(self):
 
         pass
+
+    def checkPassiveCondition(self,time):
+        skill2 = self.skill2_B
+
+        timeConfig = passiveSkillMainConfig.PassiveSkillMain[skill2]["time"]
+        if timeConfig == time:
+            return True
+        return False
+
 
     def checkCondition(self,condition,result):
         return self.fitCondition(condition,result)
@@ -158,17 +168,15 @@ class SkillConditionModule:
 
     # 13、本方领先
     def checkCondition13(self,result):
-
-        controller = KBEngine.entities.get(self.controllerID)
         roomID = self.roomID
         room = KBEngine.entities.get(roomID)
-        myScore = controller.shootSucc
 
-        enemyID = room.avatarAID
         if room.avatarAID == self.controllerID:
-            enemyID = room.avatarBID
-        enemy =   KBEngine.entities.get(enemyID)
-        enemySocre = enemy.shootSucc
+            myScore = room.aScore
+            enemySocre = room.bScore
+        else:
+            myScore  = room.bScore
+            enemySocre = room.aScore
 
         if myScore > enemySocre:
             return True
@@ -301,6 +309,8 @@ class SkillConditionModule:
                 return True
         return False
 
+# =====================================被动技能条件=====================================================================
+
 
 # 释放条件
 class ConditionEnum:
@@ -364,3 +374,48 @@ class ConditionEnum:
     con_result_reshoot_succ = 121
     # 122、补射失败
     con_result_reshoot_fail = 122
+
+class PassiveSkillCondition:
+    # 两个防守者
+    two_defender = 1
+    # 比赛开始时
+    game_start = 2
+    # 突破时
+    break_start = 3
+    # 上半场
+    first_half = 4
+    # 下半场
+    second_half = 5
+    # 被抢断时
+    be_steal = 6
+    # 小角度射门时
+    small_degree_shoot = 7
+    # 禁区内 射门
+    in_penalty_area = 8
+    # 禁区外 射门
+    out_penalty_area = 9
+    # 边路传中
+    pass_in_wings = 10
+    # 单刀
+    no_defender = 11
+    # 带球时 (防线摧残者：对位者n%概率受伤，防守值、守门值下降n%，直到比赛结束)
+    attacker = 12
+    # 下底传中
+    pass_in_low = 13
+    # 在边路时
+    in_wing = 14
+    # 防守时
+    in_defend = 15
+    # 对位射门者
+    defend_shooter = 16
+    # 射门时
+    shoot = 17
+
+
+
+
+
+
+
+
+

@@ -59,11 +59,9 @@ class BabyModule:
         pass
 
     def destroyBaby(self):
-        self.delTimer(TimerDefine.Timer_reset_baby_fullTime)
         self.destroy()
 
     def onTimer(self, id, userArg):
-        ERROR_MSG("ontimer" + str(userArg))
         if userArg == TimerDefine.Timer_reset_lottery_free_times:
             baby = KBEngine.entities.get(self.babyID)
             if baby is None:
@@ -76,7 +74,7 @@ class BabyModule:
             baby.handIndex = 0
             baby.closeTouch = BabyTouchItemConfig.BabyTouchItemConfig[102034]["times"]
         elif userArg == TimerDefine.Timer_reset_baby_fullTime:
-            self.delTimer(TimerDefine.Timer_reset_baby_fullTime)
+            self.delTimer(id)
             baby.isFullTime = 0
             configs = CommonConfig.CommonConfig[5]
             index = baby.liking // configs["value"]
@@ -87,8 +85,8 @@ class BabyModule:
                 index = index + 1
             baby.likingTime = index * time * 60
             self.client.onFullTimeOver(0, baby.likingTime)
-            baby.addTimer(time * 60, time * 60, TimerDefine.Timer_reset_baby_liking)
-            baby.addTimer(0, 1, TimerDefine.Timer_reset_baby_likingTime)
+            self.Timer_reset_baby_liking = baby.addTimer(time * 60, time * 60, TimerDefine.Timer_reset_baby_liking)
+            self.Timer_reset_baby_likingTime = baby.addTimer(0, 1, TimerDefine.Timer_reset_baby_likingTime)
         elif userArg == TimerDefine.Timer_reset_shop_item:
             for Item in self.gameShopItemList:
                 config = gameShopConfig.gameShopConfig[Item["itemID"]]
@@ -121,8 +119,8 @@ class BabyModule:
         if baby.liking == 0 and baby.likingTime == 0:
             baby.likingTime = time * 60
             baby.liking = baby.liking + liking
-            baby.addTimer(time * 60, time * 60, TimerDefine.Timer_reset_baby_liking)
-            baby.addTimer(1, 1, TimerDefine.Timer_reset_baby_likingTime)
+            self.Timer_reset_baby_liking = baby.addTimer(time * 60, time * 60, TimerDefine.Timer_reset_baby_liking)
+            self.Timer_reset_baby_likingTime = baby.addTimer(1, 1, TimerDefine.Timer_reset_baby_likingTime)
         else:
             if baby.liking >= BabyLikingStarConfig.BabyLikingStarConfig[5]["liking"]:
                 self.client.onBabyCallBack(BabyModuleError.Liking_is_max)
@@ -138,8 +136,8 @@ class BabyModule:
                 baby.periodTime = util.getCurrentTime()
                 baby.isFullTime = 1
                 self.addTimer(6 * 60 * 60, 60 * 60, TimerDefine.Timer_reset_baby_fullTime)
-                baby.delTimer(TimerDefine.Timer_reset_baby_liking)
-                baby.delTimer(TimerDefine.Timer_reset_baby_likingTime)
+                baby.delTimer(self.Timer_reset_baby_liking)
+                baby.delTimer(self.Timer_reset_baby_likingTime)
                 self.client.onFullTimeOver(1, baby.liking, baby.fullTime)
                 return
             tech = 0.0
@@ -242,6 +240,7 @@ class BabyModule:
         firstName = config["firstName"]
         seondName = config["seondName"]
         while (clothesItem["exp"] >= needExp):
+            ERROR_MSG("   onClientClothesLevel    while    ")
             if level == clothesItem["maxLevel"]:
                 self.client.onBabyCallBack(BabyModuleError.Clothes_level_max)
                 break
@@ -445,6 +444,7 @@ class BabyModule:
             self.client.onBabyCallBack(BabyModuleError.Inherit_is_sucess)
             return
         while (currentExp >= needExp):
+            ERROR_MSG(  "onClientInheritClothes   while    ")
             if currentLevel == beInheritItem["maxLevel"]:
                 self.client.onBabyCallBack(BabyModuleError.Clothes_level_max)
                 break

@@ -72,7 +72,7 @@
         <!--请求竞技排行榜玩家信息-->
         <onClientGetArenaPlayerInfo>
             <Exposed/>
-            <Arg>UINT32</Arg> <!-- 排名 -->
+            <Arg> UINT32 </Arg> <!-- 排名 -->
         </onClientGetArenaPlayerInfo>
 
 
@@ -89,6 +89,9 @@
         <!--开始P-->
         <onClientStartArenaPVP>
             <Exposed/>
+            <Arg>UINT32</Arg> <!-- id -->
+            <Arg>UINT64</Arg> <!-- id -->
+            <Arg>UINT64</Arg> <!-- id -->
         </onClientStartArenaPVP>
 
 

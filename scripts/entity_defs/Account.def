@@ -21,8 +21,7 @@
 	</Properties>
 
 	<ClientMethods>
-        <onCreateAvatarFail>
-        </onCreateAvatarFail>
+
 	</ClientMethods>
 
 	<BaseMethods>

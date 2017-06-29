@@ -47,6 +47,9 @@ def splitParam(origin, flag=','):
 def getWeekDay():
     return datetime.datetime.now().weekday() + 1
 
+# 获取当前时间小时
+def getNowHour():
+    return datetime.datetime.now().hour
 
 # print(getWeekDay())
 
@@ -88,6 +91,8 @@ def getLeftSecsToWeekEndHMS(nh, nm, ns):
     else:
         delta_s += 86400 * delta_d
     return delta_s
+
+
 
 
     # 获取本周一的时间
@@ -196,7 +201,7 @@ def getInsertSql(tableName, rowValueMap,hasIndex = True):
 # 获得更新sql
 def getUpdateSql(tableName, setValueMap, filterValueMap,hasIndex=True):
     if setValueMap is None:
-        ERROR_MSG("you setValueMap is None!")
+        KBEDebug.ERROR_MSG("you setValueMap is None!")
         return
     indexStr = ""
     if hasIndex:
@@ -266,6 +271,15 @@ def dbDeco(func):
 
     return __deco
 
+# 打印出函数运行时间
+def methodRunTime(func):
+    def __deco(*args,**kwargs):
+
+        b = getCurrentTime()
+        result = func(*args,**kwargs)
+        KBEDebug.ERROR_MSG(str(func) + "     run time is  " + str(getCurrentTime() - b))
+        return result
+    return __deco
 
 
 

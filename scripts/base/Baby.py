@@ -5,6 +5,7 @@ import ClothesLevelConfig
 import ClothesSlevelConfig
 import CommonConfig
 import TimerDefine
+import gc
 from ErrorCode import CardMgrModuleError
 import BabyLikingStarConfig
 from KBEDebug import ERROR_MSG
@@ -70,8 +71,8 @@ class Baby(KBEngine.Base):
             player.health = health
             self.client.onUpdateCardInfo(self.UpdateBallerInfo(player))
 
-        self.addTimer(self.likingTime % (time * 60), time * 60, TimerDefine.Timer_reset_baby_liking)
-        self.addTimer(1, 1, TimerDefine.Timer_reset_baby_likingTime)
+        avatar.Timer_reset_baby_liking = self.addTimer(self.likingTime % (time * 60), time * 60, TimerDefine.Timer_reset_baby_liking)
+        avatar.Timer_reset_baby_likingTime = self.addTimer(1, 1, TimerDefine.Timer_reset_baby_likingTime)
         pass
 
     def onTimer(self, id, userArg):
@@ -109,9 +110,14 @@ class Baby(KBEngine.Base):
     def destroyBaby(self):
         if util.getCurrentTime() - self.fullTime > 6 * 60 * 60:
             self.periodTime = util.getCurrentTime()
-        self.delTimer(TimerDefine.Timer_reset_baby_liking)
-        self.delTimer(TimerDefine.Timer_reset_baby_likingTime)
         self.destroy()
+
+    def onDestroy( self ):
+
+        # refs = gc.get_referents(self)
+        # ERROR_MSG("  Baby   onDestroy    " + refs.__str__())
+        pass
+
 
     def putItemInfoInBaby(self, suitID, buy):
         for i in range(5):

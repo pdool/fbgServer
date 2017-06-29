@@ -5,8 +5,6 @@ import util
 from KBEDebug import DEBUG_MSG
 # 不需要使用def,继承就可以使用，def可以用来生成数据库的表
 # 如何使用回调
-from PlayerMgr import PlayerMgr
-import sys
 __author__ = 'chongxin'
 """
 意识模块

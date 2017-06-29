@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 __author__ = 'chongxin'
 
+class HalfEnum:
+    first = 0
+    sencond = 1
+
 #邮件类型枚举
 class MailTypeEnum:
     # 玩家私人邮件
@@ -11,8 +15,22 @@ class MailTypeEnum:
     Mail_Type_GM = 2
 
 class ActionTypeEnum:
+    action_none = 0
     # 副本
     action_clone = 1
+    # 世界boss
+    action_world_boss = 2
+    # 官员晋升
+    official_promotion = 3
+    # 玩家对战 官员晋升
+    official_promotion_player = 4
+    # 竞技场
+    action_arena = 5
+    # 联赛玩家和玩家
+    league_player = 6
+    # 联赛玩家和机器人
+    league_clone = 7
+
 
 class PlayerOp:
     defendOp = -1
@@ -49,3 +67,43 @@ class ImpactTypeEnum:
 
     #不可驱散
     notDel = 3
+
+class CloneChapterGiftEnum:
+    # 未领取
+    not_get = 0
+    # 已领取
+    get = 1
+
+
+class AutoControllEnum:
+    # AI控制
+    AI_Controll = 0
+    # 客户端控制
+    Client_Controll = 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

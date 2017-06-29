@@ -16,7 +16,7 @@ PowerConfig = {
 GuildConfig = {1: {'euroPer': 5000, 'dismissTime': 7, 'contributionPer': 50, 'maxMemberNum': 10, 'nameLenMax': 5,
                    'protectPer': 200, 'createNeedDiamond': 500, 'nameLenMin': 2, 'id': 1, 'maxLevel': 8,
                    'impeachTime': 7, 'speedTimeFunds': 100000, 'introductionLen': 50, 'noticeLen': 100,
-                   'changeNameDiamond': 1999}}
+                   'changeNameDiamond': 1999, 'ropeTime': 2, 'fireAdviser': 500, 'taskNum':8,'eventNum':30}}
 
 allDatas = {
     '职位权限': PowerConfig,

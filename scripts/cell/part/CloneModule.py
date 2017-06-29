@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from CommonEnum import PlayerOp
+from CommonEnum import PlayerOp, ActionTypeEnum
 from ErrorCode import SkillModuleError
 from KBEDebug import *
-from cardsConfig import cardsConfig
-from common.RoomFightModule import RoomFightModule
 from common.skill.SkillConditionModule import ConditionEnum
 
 __author__ = 'chongxin'
@@ -12,13 +10,20 @@ __createTime__  = '2017年2月15日'
 副本模块
 """
 
-class CloneModule(RoomFightModule):
+class CloneModule:
 
     def __init__(self):
 
-        print(" avatar clone init -------------------------")
-        RoomFightModule.__init__(self)
-        self.client.onReady()
+        if self.actionType == ActionTypeEnum.action_clone:
+            print(" avatar clone init -------------------------")
+            self.client.onReady()
+        if self.actionType == ActionTypeEnum.official_promotion or self.actionType == ActionTypeEnum.action_arena:
+            print(" avatar clone init -------------------------")
+            self.client.onReady()
+        if self.actionType == ActionTypeEnum.league_clone or self.actionType == ActionTypeEnum.league_player:
+            print(" avatar clone init -------------------------")
+            self.client.onReady()
+
 
 
 
@@ -40,32 +45,47 @@ class CloneModule(RoomFightModule):
     def onClientPlayAnimFinish(self,exposedID):
         if exposedID != self.id:
             return
+
+        WARNING_MSG("onClientPlayAnimFinish")
         cloneID = self.roomID
 
         room = KBEngine.entities.get(cloneID)
-        room.onCmdPlayAnimFinish()
+        room.onCmdPlayAnimFinish(self.id)
 
     def onClientSelectOp(self,exposedID,op ,leftSkillIdList,rightSkillIdList):
         if exposedID != self.id:
             return
-
+        WARNING_MSG("onClientSelectOp   " + str(op))
         for cardId in leftSkillIdList:
             ERROR_MSG("-----------onClientSelectOp-----------------cardId-----------  " + str(cardId))
 
         cloneID = self.roomID
         room = KBEngine.entities.get(cloneID)
+
+        if room.controllerID == self.id and op == PlayerOp.defendOp:
+            self.client.onSkillError(SkillModuleError.worong_op)
+            ERROR_MSG( " self is atcker but op is defend")
+            return
+        elif room.defenderID == self.id and op != PlayerOp.defendOp:
+            self.client.onSkillError(SkillModuleError.worong_op)
+            ERROR_MSG(" self is defender but op not is defend")
+            return
+
         if op != PlayerOp.defendOp:
             # 1、检查基础操作actionType是不是对的
             if room.curPart == 1 and op != PlayerOp.passball:
                 self.client.onSkillError(SkillModuleError.worong_op)
+                WARNING_MSG("onClientSelectOp  1")
                 return
             if room.curPart == 2:
                 if op != PlayerOp.passball and op != PlayerOp.shoot:
                     self.client.onSkillError(SkillModuleError.worong_op)
+                    WARNING_MSG("onClientSelectOp  2")
                     return
 
             if room.curPart == 3 and op != PlayerOp.shoot:
                 self.client.onSkillError(SkillModuleError.worong_op)
+                WARNING_MSG("onClientSelectOp  3")
                 return
 
 
@@ -153,12 +173,12 @@ class CloneModule(RoomFightModule):
         pass
 
 
-
-class ActionTypeEnum:
-
-    passBall = 1
-    shoot = 2
-    any = 3
+#
+# class ActionTypeEnum:
+#
+#     passBall = 1
+#     shoot = 2
+#     any = 3
 
 
 class GmType:

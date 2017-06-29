@@ -192,8 +192,7 @@ class GuildModuleError:
     # 公会资金不足
     Guild_guildFunds_not_enough = 17
 
-    # 公会上诉曝光道具不足
-    Guild_appeal_not_enough = 18
+
     # 上诉公会在保护时间
     Guild_is_by_prtected = 19
 
@@ -203,8 +202,30 @@ class GuildModuleError:
     Guild_name_has_illegality = 28
     # 公会简介拥有非法字符
     Guild_intro_has_illegality = 29
+
+    # 公会上诉曝光道具不足
+    Guild_appeal_not_enough = 30
     # 上诉曝光失败
     Guild_appeal_fail = 31
+    # 拉拢失败
+    Guild_rope_fail = 32
+    # 拉拢次数不足
+    Guild_not_rope_times= 33
+    # 顾问数量已达最大
+    Guild_adviser_num_error=34
+    # 顾问已结被拉拢
+    Guild_adviser_is_by_rope=35
+    # 该顾问不属于该公会
+    Guild_adviser_not_belong=36
+    # 该任务已经发布
+    Guild_already_exit_task=38
+    # 该任务还没有完成
+    Guild_task_not_finish=39
+    # 公会等级不足无法发布
+    Guild_level_not_enough=40
+    # 顾问已经被其他公会拉拢
+    Guild_adviser_already_rope=41
+
 
 
 class BabyModuleError:
@@ -265,9 +286,18 @@ class CloneModuleError:
     clone_not_enough_rest_count = 2
     # 体力不足
     clone_not_enough_power = 3
-
     # 不足三星
     clone_not_enough_3Star = 4
+    # 配置错误
+    clone_config_error = 5
+    # 章节未开启
+    clone_chapter_not_open = 6
+    # 章节奖励已领取
+    clone_chapter_reward_has_got = 7
+    # 章节星不够
+    clone_chapter_reward_not_enough_star = 8
+
+
 
 class ArenaModuleError:
     # 次数不足
@@ -275,6 +305,43 @@ class ArenaModuleError:
     # 购买成功
     Buy_times_is_Sucess = 2
 
+class OfficialModulerror:
+    # 报名成功
+    signUp_sucess = 1
+    # 已经报过名
+    have_signUp = 2
+    # 名望不足
+    fame_is_not_enough = 3
+    # 报名上限
+    signUp_is_max = 4
+    # 晋升失败
+    promotion_fail = 5
+    # 购买行动力成功
+    buy_linePower_sucess = 6
+    # 领取俸禄
+    get_official_reward = 7
+    # 购买行动力次数上限
+    buy_linePower_fail= 8
+    # 行动力不足
+    linePower_is_not_enough = 9
+    # 挑战成功
+    fight_sucess = 10
+    # 挑战失败
+    fight_fail = 11
+    # 废除成功
+    abolition_sucess = 12
+    # 废除失败
+    abolition_fail = 13
+    # 无法挑战
+    cannot_fight_others = 14
+    # 官职高
+    official_cannot_up = 15
+    # 次数不够
+    prmissionInfo_not_times = 16
+    # 有保护的
+    isProtected = 17
+    # 次数上线
+    useTopLimit = 18
 
 
 

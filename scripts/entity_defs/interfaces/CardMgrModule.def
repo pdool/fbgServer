@@ -20,6 +20,18 @@
 			<Persistent> true </Persistent>
         </cardDBIDList>
 
+        <cardConfigIdList>
+            <Type> ARRAY <of> CardConfigIDInfo </of> </Type>
+			<Flags> BASE </Flags>
+			<Persistent> true </Persistent>
+        </cardConfigIdList>
+
+        <loadNum>
+            <Type> UINT64 </Type>
+			<Flags> BASE </Flags>
+			<Persistent> true </Persistent>
+        </loadNum>
+
 
 	</Properties>
 

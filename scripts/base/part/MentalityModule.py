@@ -182,7 +182,7 @@ class MentalityModule:
         card = KBEngine.entities.get(cardId)
         setattr(card, property, number)
 
-        # 球员意识加成到总属性上
+    # 球员意识加成到总属性上
     def UpdateMainInfo(self, cardId, name, number):
         self.SetObjectValue(cardId, name,number + self.GetObjectValue(cardId, name))
         self.SetObjectValue(cardId, name + "M", number + self.GetObjectValue(cardId, name + "M"))

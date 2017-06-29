@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
 import TimerDefine
+from CommonEnum import AutoControllEnum
 from KBEDebug import *
 
 #使用技巧 先放在根级目录。，调好之后拖走，编辑器自动组织引用
+from common.RoomFightModule import RoomFightModule
+from part.AutoFightModule import AutoFightModule
 from part.CloneModule import CloneModule
 
 
 class Avatar(KBEngine.Entity,
+             RoomFightModule,
+             AutoFightModule,
              CloneModule,):
     typeStr = "Avatar"
     """
     角色实体
     """
     def __init__(self):
-        isAvatar = True
         KBEngine.Entity.__init__(self)
-
         for k, v in self.baseProp.items():
             DEBUG_MSG("Avatar   k  " + str(k) + "       v  " + str(v))
 
@@ -38,7 +41,7 @@ class Avatar(KBEngine.Entity,
         KBEngine method.
         引擎回调timer触发
         """
-        ERROR_MSG("ontimer" + str(userArg))
+        # ERROR_MSG("ontimer" + str(userArg))
         #DEBUG_MSG("%s::onTimer: %i, tid:%i, arg:%i" % (self.getScriptName(), self.id, tid, userArg))
         if TimerDefine.Time_destroy_avatar == userArg:
             self.destroySelf()
@@ -50,5 +53,13 @@ class Avatar(KBEngine.Entity,
             if hasattr(c, 'onTimer'):
                 c.onTimer(self,tid, userArg)
 
+
+    def onClientSetAutoControll(self,clienSelectAuto):
+        if clienSelectAuto ==  AutoControllEnum.AI_Controll:
+            self.autoControll = AutoControllEnum.AI_Controll
+        elif clienSelectAuto == AutoControllEnum.Client_Controll:
+            self.autoControll = AutoControllEnum.Client_Controll
+        else:
+            self.client.onAISelectError()
 
 

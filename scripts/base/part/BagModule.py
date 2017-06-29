@@ -31,26 +31,47 @@ class BagModule:
         self.loadUses()
 
         self.addTimer(60,60,TimerDefine.Time_sync_DB)
-        pass
+
+        self.bagLength = 0
 
     # --------------------------------------------------------------------------------------------
     #                              客户端调用函数
     # --------------------------------------------------------------------------------------------
     # 客户端请求背包列表
     def onClientGetItemList(self):
-        retItems = []
-        for uuid in self.bagUUIDList:
-            _,item = self.getItemByUUID(uuid)
-            if item  is None or item["state"] == DBState.Del :
-                continue
-            value = {}
-            value["UUID"] = uuid
-            value["itemID"] = item["itemID"]
-            value["amount"] = item["amount"]
-            retItems.append(value)
+        self.addTimer(0, 1, TimerDefine.Time_get_items)
 
-        ERROR_MSG("onClientGetItemList")
-        self.client.onGetItemList(retItems)
+
+
+    def onTimer(self, id, userArg):
+        if userArg == TimerDefine.Time_sync_DB:
+            self.onTimerSaveBag()
+        elif userArg == TimerDefine.Time_get_items:
+            length = self.bagLength + 50
+            if self.bagLength >= len(self.bagUUIDList):
+                self.bagLength = 0
+                self.delTimer(id)
+                return
+            retItems = []
+            for i in range(self.bagLength,length):
+                if i == len(self.bagUUIDList):
+                    break
+                uuid = self.bagUUIDList[i]
+                _, item = self.getItemByUUID(uuid)
+                if item is None or item["state"] == DBState.Del:
+                    continue
+                value = {}
+                value["UUID"] = uuid
+                value["itemID"] = item["itemID"]
+                value["amount"] = item["amount"]
+                retItems.append(value)
+
+            ERROR_MSG("onClientGetItemList")
+            self.client.onGetItemList(retItems)
+
+            self.bagLength += 50
+
+
 
 
     # 批量出售
@@ -263,13 +284,6 @@ class BagModule:
         if num <= 0:
             self.bagUUIDList.remove(uuid)
 
-    def onTimer(self, tid, userArg):
-        ERROR_MSG("ontimer" + str(userArg))
-        if userArg != TimerDefine.Time_sync_DB:
-            return
-
-        self.onTimerSaveBag()
-
     def onTimerSaveBag(self):
         now = datetime.datetime.now()
 
@@ -281,6 +295,35 @@ class BagModule:
         self.onTimerSyncMaterialDB()
         self.onTimerSyncPieceDB()
         self.onTimerSyncUseDB()
+
+
+    # 是否可以放进背包
+    def canPutInBag(self,itemMap):
+        if itemMap == None:
+            ERROR_MSG("canPutInBag   itemMap  is NOne")
+            return
+        needBagSize = 0
+        for itemID,num in itemMap.items():
+
+            itemID = int(itemID)
+            if itemID not in itemsIndex:
+                return False
+
+            itemIndex = itemsIndex[itemID]
+
+            # 检查背包大小
+            isTogether = itemIndex["isTogether"]
+            # 不堆叠
+            if isTogether <= 0:
+                needBagSize = needBagSize + num
+            else:
+                needBagSize = needBagSize + 1
+
+        if len(self.bagUUIDList) + needBagSize > self.bagSize:
+            return False
+        else:
+            return True
+
 
 class ItemOrderBy:
     byItemType = 1

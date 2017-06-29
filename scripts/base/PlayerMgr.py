@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-from ErrorCode import ChatError
+import TimerDefine
+from ErrorCode import ChatError, OfficialModulerror
 from part.FriendModule import FriendInfoKey, FriendOnlineState
+from part.OfficialModule import Jinsai, Jinyan, Tingsai, Baohu, Tiba, Xiaheijiao, Diubaicai, Rengjidan, Zhangzui, Huibao, \
+    Gudashou, Baifang, Tiaozhan, Feichu
 
 __author__ = 'chongxin'
 
@@ -10,6 +13,7 @@ import util
 from KBEDebug import *
 import friendConfig
 import random
+import officialPermissionConfig
 
 class PlayerMgr(KBEngine.Base):
 
@@ -26,14 +30,6 @@ class PlayerMgr(KBEngine.Base):
         # 初始化离线数据
         self.initOfflineData()
         pass
-
-    @staticmethod
-    def getPlayerMgr():
-        mgr = KBEngine.globalData["PlayerMgr"]
-        if mgr is None:
-            ERROR_MSG("PlayerMgr is None")
-        return mgr
-
 
     # 上线玩家注册
     def playerLogin(self,playerMB,dbID,playerInfo):
@@ -59,10 +55,13 @@ class PlayerMgr(KBEngine.Base):
             del self.dbidToMailBox[dbID]
         self.dbidToOfflinePlayerInfo[dbID] = playerInfo
         if playerInfo not in self.allPlayerInfo:
-            for item in self.allPlayerInfo:
+
+            for i in range(len(self.allPlayerInfo)):
+                item = self.allPlayerInfo[i]
                 if item[FriendInfoKey.DBID] == playerInfo[FriendInfoKey.DBID]:
-                    self.allPlayerInfo.remove(item)
+                    self.allPlayerInfo.pop(i)
                     break
+
             self.allPlayerInfo.append(playerInfo)
             self.allPlayerInfo.sort(key=lambda x: (x[FriendInfoKey.onlineState], x[FriendInfoKey.level]))
 
@@ -79,7 +78,7 @@ class PlayerMgr(KBEngine.Base):
 
     # 初始化离线数据
     def initOfflineData(self):
-        colTuple = ("id", "sm_name", "sm_photoIndex", "sm_level", "sm_club", "sm_fightValue", "sm_vipLevel","sm_logoutTime")
+        colTuple = ("id", "sm_name", "sm_photoIndex", "sm_level", "sm_club", "sm_fightValue", "sm_vipLevel","sm_logoutTime","sm_formation")
         sql = util.getSelectSql("tbl_Avatar", colTuple)
 
         @util.dbDeco
@@ -94,6 +93,7 @@ class PlayerMgr(KBEngine.Base):
                 playerInfo[FriendInfoKey.fightValue] = int(item[5])
                 playerInfo[FriendInfoKey.vipLevel] = int(item[6])
                 playerInfo[FriendInfoKey.onlineState] = int(item[7])
+                playerInfo[FriendInfoKey.formation] = int(item[8])
 
                 self.dbidToOfflinePlayerInfo[playerInfo[FriendInfoKey.DBID]] = playerInfo
 
@@ -292,23 +292,217 @@ class PlayerMgr(KBEngine.Base):
                 mb = self.dbidToMailBox[senderDbid]
                 mb.client.onChatError(ChatError.Chat_player_offline)
 
-if __name__ == "__main__":
-    canSelectList = list(range(0, 2))
-    for i in canSelectList:
-        print(i)
+
+    # --------------------------------------------------------------------------------------------
+    #                              顾问之争模块
+    # --------------------------------------------------------------------------------------------
+    def setPlayerCurrentBossCd(self,dbid,cdTime):
+        if dbid in self.dbidToMailBox:
+            mb = self.dbidToMailBox[dbid]
+            mb.onPlayerMgrCmd("onSetPlayerCurrentBossCd", cdTime)
+
+    def callPlayersBossStart(self):
+        for mb in self.dbidToMailBox.values():
+            param = {
+
+            }
+            mb.onPlayerMgrCmd("onCallPlayersBossStart",param)
+
+    def onSendDefendPeopleValue(self,defendPeople):
+        for mb in self.dbidToMailBox.values():
+            mb.onPlayerMgrCmd("onClientDefendPeopleValue",defendPeople)
+
+    def onSendRobPeopleValue(self,robPeople):
+        for mb in self.dbidToMailBox.values():
+            mb.onPlayerMgrCmd("onClientRobPeopleValue",robPeople)
+
+    def SendRobAndDefendList(self,playerItem):
+        for mb in self.dbidToMailBox.values():
+            mb.onPlayerMgrCmd("onClientSendRobAndDefendPlayerInfo",playerItem)
+
+    def SendNpcList(self, list,dbid):
+        if dbid in self.dbidToMailBox:
+            mb = self.dbidToMailBox[dbid]
+            mb.onPlayerMgrCmd("onClientSendNpcList", list)
+
+    def UpdateBossConfidenceValue(self,confidenceValue):
+        for mb in self.dbidToMailBox.values():
+            mb.onPlayerMgrCmd("onClientUpdateBossConfidenceValue",confidenceValue)
+
+    def UpdateMyRank(self,rankList):
+        for item in rankList:
+            dbid = item["dbid"]
+            if dbid in self.dbidToMailBox:
+                mb = self.dbidToMailBox[dbid]
+                mb.onPlayerMgrCmd("onClientGetMyRank", dbid)
+
+    def onWorldBossIsOver(self,param):
+        robPartyRankList = param["robPartyRankList"]
+        defendersRankList = param["defendersRankList"]
+        for item in robPartyRankList:
+            if item["dbid"] in self.dbidToMailBox:
+                mb = self.dbidToMailBox[item["dbid"]]
+                mb.onPlayerMgrCmd("onClientWorldBossIsOver",param)
+        for item in defendersRankList:
+            if item["dbid"] in self.dbidToMailBox:
+                mb = self.dbidToMailBox[item["dbid"]]
+                mb.onPlayerMgrCmd("onClientWorldBossIsOver",param)
+        robPartyRankList = []
+        defendersRankList = []
+
+    def SendSelfIsRob(self,dbid,selfRob):
+        if dbid in self.dbidToMailBox:
+            mb = self.dbidToMailBox[dbid]
+            mb.onPlayerMgrCmd("onSetSelfIsRob",selfRob)
+
+    def SendSelfIsLeave(self,dbid,isLeave):
+        if dbid in self.dbidToMailBox:
+            mb = self.dbidToMailBox[dbid]
+            mb.onPlayerMgrCmd("onSetIsLeave",isLeave)
+
+    # --------------------------------------------------------------------------------------------
+    #                              官员晋升
+    # --------------------------------------------------------------------------------------------
+    # 更新玩家官职信息
+    def resertPlayerOfficial(self,dbid,officialID):
+        if dbid in self.dbidToMailBox:
+            mb = self.dbidToMailBox[dbid]
+            mb.onPlayerMgrCmd("onResertPlayerOfficial",officialID)
+
+    # 获取好友
+    def getOnlineFriends(self, mydbid,dbList,isOut,canRepeat,usePlayerDbidList,id):
+        playerInfo = []
+        length = 0
+        for dbid in dbList:
+            findItem = None
+            if canRepeat == 0:
+                for item in usePlayerDbidList:
+                    if item["itemID"] == id and item["number"] == dbid:
+                        findItem = item
+                        break
+            if findItem != None:
+                continue
+            length += 1
+            if dbid in self.dbidToMailBox:
+                player = self.dbidToMailBox[dbid]
+                playerInfos = {}
+                playerInfos["photoIndex"] = player.photoIndex
+                playerInfos["dbid"] = dbid
+                playerInfos["name"] = player.name
+                playerInfos["guildName"] = player.guildName
+                playerInfos["camp"] = player.camp
+                playerInfos["level"] = player.level
+                playerInfos["officialPosition"] = player.officialPosition
+                playerInfo.append(playerInfos)
+                if length == len(dbList):
+                    mb = self.dbidToMailBox[mydbid]
+                    mb.onPlayerMgrCmd("onGetPlayers", playerInfo)
+                    break
+            else:
+                if isOut == 1:
+                    def agreeCB(avatar, dbid, wasActive):
+                        if avatar != None:
+                            playerInfos = {}
+                            playerInfos["photoIndex"] = avatar.photoIndex
+                            playerInfos["dbid"] = dbid
+                            playerInfos["name"] = avatar.name
+                            playerInfos["guildName"] = avatar.guildName
+                            playerInfos["camp"] = avatar.camp
+                            playerInfos["level"] = avatar.level
+                            playerInfos["officialPosition"] = avatar.officialPosition
+                            playerInfo.append(playerInfos)
+                            if wasActive == 0:
+                                avatar.destroySelf()
+                            if length == len(dbList):
+                                mb = self.dbidToMailBox[mydbid]
+                                mb.onPlayerMgrCmd("onGetPlayers", playerInfo)
+                    KBEngine.createBaseFromDBID("Avatar", dbid, agreeCB)
+
+    def getOthersList(self,dbid,excludeList, level,isOut,canRepeat,usePlayerDbidList,permissionInfoID):
+        # 推荐数量
+        recommendCount = 10
+        recommendList = []
+        for id in self.dbidToMailBox:
+            if id == dbid or id in excludeList:
+                continue
+            recommendList.append(id)
+            if len(recommendList) >= recommendCount:
+                break
+
+        if dbid in self.dbidToMailBox:
+            mb = self.dbidToMailBox[dbid]
+            param ={
+                "isOut": 0,
+                "recommendList" : recommendList,
+                "canRepeat" : canRepeat,
+                "usePlayerDbidList": usePlayerDbidList,
+                "id": permissionInfoID,
+            }
+            mb.onPlayerMgrCmd("onSenOthersList", param)
+
+    def getPlayerUsePrmissionInfo(self,param):
+        playerID = param["playerID"]
+        def agreeCB(avatar, playerID, wasActive):
+            if avatar != None:
+                # 已经在线了(异步调用)
+                permissionInfoID = param["permissionInfoID"]
+                useTopLimit = officialPermissionConfig.officialPermissionConfig[permissionInfoID]["useTopLimit"]
+                param["avatar"] = avatar
+                param["wasActive"] = wasActive
+                param["useTopLimit"] = useTopLimit
+
+                if permissionInfoID == Jinsai:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo2", param,)
+                elif permissionInfoID == Jinyan:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo3", param,)
+                elif permissionInfoID == Tingsai:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo4", param,)
+                elif permissionInfoID == Baohu:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo5", param,)
+                elif permissionInfoID == Tiba:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo6", param,)
+                elif permissionInfoID == Xiaheijiao:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo7", param,)
+                elif permissionInfoID == Diubaicai:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo8", param,)
+                elif permissionInfoID == Rengjidan:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo9", param,)
+                elif permissionInfoID == Zhangzui:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo10", param,)
+                elif permissionInfoID == Feichu:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo11", param,)
+                elif permissionInfoID == Huibao:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo12", param,)
+                elif permissionInfoID == Gudashou:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo13", param,)
+                elif permissionInfoID == Baifang:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo14", param,)
+                elif permissionInfoID == Tiaozhan:
+                    avatar.onPlayerMgrCmd("usePrmissionInfo15", param,)
+            else:
+                ERROR_MSG("---------Cannot add unknown player:-------------")
+
+        KBEngine.createBaseAnywhereFromDBID("Avatar", playerID, agreeCB)
 
 
-    p = PlayerMgr()
+    def onGetCardLevelUp(self,dbid):
+        if dbid in self.dbidToMailBox:
+            mb = self.dbidToMailBox[dbid]
+            param ={
 
-    p.allPlayerInfo =[]
+            }
+            mb.onPlayerMgrCmd("onCmdGetCardLevelUp", param)
 
-    p.allPlayerInfo.append({"level": 1, "dbid": 1})
-    p.allPlayerInfo.append({"level" : 1,"dbid" : 2})
+    def onAddPower(self,dbid):
+        if dbid in self.dbidToMailBox:
+            mb = self.dbidToMailBox[dbid]
+            param ={
 
-    excludeList = [12]
+            }
+            mb.onPlayerMgrCmd("onCmdAddPower", param)
 
-
-    l = p.getRecommendList(excludeList,1,None,None)
-
-    for x in l:
-        print(x)
+    def getFootBallFeast(self,param,dbid,footBallFeast):
+        if dbid in self.dbidToMailBox:
+            mb = self.dbidToMailBox[dbid]
+            param["footBallFeast"] = footBallFeast
+            mb.onPlayerMgrCmd("getIsInFootBallFeast", param)

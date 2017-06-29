@@ -61,6 +61,20 @@
             <Persistent> true </Persistent>
         </reputation>
 
+        <!--公会-->
+        <configID>
+            <Type> UINT32 </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </configID>
+
+        <!--是否是NPC公会1 是 0 不是-->
+        <isGuildNPC>
+            <Type> UINT8 </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </isGuildNPC>
+
         <!--创建时间-->
         <createTime>
             <Type> UINT64 </Type>
@@ -74,6 +88,20 @@
 			<Flags> BASE </Flags>
             <Persistent> true </Persistent>
 		</protectTime>
+
+         <!--拉拢次数-->
+        <ropeTimes>
+			<Type> UINT8 </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</ropeTimes>
+
+        <!-- 侦查次数-->
+        <spyTimes>
+			<Type> UINT8 </Type>
+			<Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+		</spyTimes>
 
         <!--解散时间-->
         <dismissTime>
@@ -111,12 +139,50 @@
             <Persistent> true </Persistent>
         </applyMember>
 
+        <!--公会顾问-->
+        <adviserList>
+            <Type> ARRAY <of> GuildAdviser </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </adviserList>
+
+
         <!--公会最大人数-->
         <maxMemberNum>
             <Type> UINT32 </Type>
             <Flags> BASE </Flags>
             <Persistent> true </Persistent>
         </maxMemberNum>
+
+
+        <!--公会已发布任务-->
+        <taskIssueIDList>
+            <Type> ARRAY <of> UINT32 </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </taskIssueIDList>
+
+
+        <!--公会人事事件列表-->
+        <hrEventList>
+            <Type> ARRAY <of> HrEvent </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </hrEventList>
+
+        <!--公会顾问事件列表-->
+        <adviserEventList>
+            <Type> ARRAY <of> AdviserEvent </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </adviserEventList>
+
+        <!--公会事件列表-->
+        <guildEventList>
+            <Type> ARRAY <of> GuildEvent </of> </Type>
+            <Flags> BASE </Flags>
+            <Persistent> true </Persistent>
+        </guildEventList>
 
 
 

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import random
+
 import TimerDefine
 import util
 from ErrorCode import SkillModuleError, CardMgrModuleError
@@ -7,6 +9,7 @@ import coachConfig
 import  cardsConfig
 import skillLevelConfig
 import CommonConfig
+
 __author__ = 'yanghao'
 
 
@@ -52,6 +55,7 @@ class SkillModule:
             return
         skillName = ""
         card = KBEngine.entities.get(cardId)
+
         if card.isSelf == 1 and skillIndex == 1:
             if skillID == card.skill11 // 100:
                 skillName = "skill11"
@@ -70,6 +74,7 @@ class SkillModule:
             self.client.onSkillError(SkillModuleError.skill_is_max)
             return
         levelConfig = skillLevelConfig.SkillUpTimeConfig[int(currentLevel)]
+
         coachID = 0
         findItem = None
         for item in self.coachList:
@@ -87,7 +92,22 @@ class SkillModule:
         if findItem == None:
             self.client.onSkillError(SkillModuleError.coach_time_not_enough)
             return
-        findItem["useTime"] = findItem["useTime"] + levelConfig["upTime"] * 60
+        commonIndex = 0
+        if findItem["color"] == 4:
+            commonIndex = 14
+        elif findItem["color"] == 5:
+            commonIndex = 15
+        if commonIndex != 0:
+            rate = CommonConfig.CommonConfig[commonIndex]["value"]
+            isUseTime = random.randint(0, 100)
+            if isUseTime > rate:
+                findItem["useTime"] = findItem["useTime"] + levelConfig["upTime"] * 60
+                self.client.onSkillLevelUpSucess(currentLevel + 1, findItem["useTime"], coachID)
+            else:
+                self.client.onSkillNotUseTime(currentLevel + 1, findItem["useTime"], coachID)
+        else:
+            findItem["useTime"] = findItem["useTime"] + levelConfig["upTime"] * 60
+            self.client.onSkillLevelUpSucess(currentLevel + 1, findItem["useTime"], coachID)
         self.SetObjectValue(cardId, skillName, skillID * 100 + (currentLevel + 1))
         if card.isSelf == 1 and skillIndex == 1:
             self.SetObjectValue(cardId, "skill1", skillID * 100 + (currentLevel + 1))
@@ -96,7 +116,6 @@ class SkillModule:
             for itemID,Num in config["addvalue"].items():
                 addValue = self.GetObjectValue(cardId, itemID) + Num
                 self.SetObjectValue(cardId, itemID, addValue)
-        self.client.onSkillLevelUpSucess(currentLevel + 1,findItem["useTime"],coachID)
         self.client.onUpdateCardInfo(self.UpdateBallerInfo(card))
 
 
@@ -192,3 +211,14 @@ class SkillModule:
             return "skill4"
         else:
             return ""
+
+
+    def gmSetSkill(self,index,skillID):
+        ERROR_MSG("SkillModule   index   "+ str(index) +"   skillID   " + str(skillID) )
+
+        for cardId in self.cardIDList:
+            card = KBEngine.entities.get(cardId)
+            if index == 1:
+                card.skill1 = skillID
+            if index == 2:
+                card.skill2  = skillID

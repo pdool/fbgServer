@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
+import random
+
 import TimerDefine
+import guildAdviserDealConfig
+import guildAdviserRopeConfig
 import guildAppealConfig
 from CommonEnum import MailTypeEnum
 from ErrorCode import GuildModuleError
 import guildConfig
 import util
+from GuildMgr import PowerEnmu, GuildTaskType
 from KBEDebug import *
 
 __author__ = 'chongxin'
@@ -19,14 +24,17 @@ class GuildModule:
         # 刷新在线状态
         self.changeOnlineState(1)
 
-        offset = util.getLeftSecsToWeekEndHMS(24, 0, 0)
+        offset = util.getLeftSecsToWeekEndHMS(0, 0, 0)
         self.addTimer(offset, 7 * 24 * 60 * 60, TimerDefine.Timer_reset_guild_weekDonate)
 
-        dayOffset = util.getLeftSecsToNextHMS(24,0,0)
+        dayOffset = util.getLeftSecsToNextHMS(0,0,0)
         self.addTimer(dayOffset,  24 * 60 * 60, TimerDefine.Timer_reset_guild_dayDonate)
 
         buildOffset = util.getLeftSecsToNextMins(1)
         self.addTimer(buildOffset,60, TimerDefine.Timer_guild_build_upgrade)
+
+        # guildMgr = KBEngine.globalData["GuildMgr"]
+        # guildMgr.autoNPCGuildBehavior()
 
 
 
@@ -48,11 +56,16 @@ class GuildModule:
 
     # 间隔七天运行
     def onTimer(self, tid, userArg):
-        ERROR_MSG("ontimer" + str(userArg))
+        # ERROR_MSG("ontimer" + str(userArg))
         if userArg == TimerDefine.Timer_reset_guild_weekDonate:
             self.clearGuildweekDonate()
         elif userArg == TimerDefine.Timer_reset_guild_dayDonate:
+
+            WARNING_MSG("--TimerDefine.Timer_reset_guild_dayDonate--")
             self.clearGuildDayDonate()
+            self.refreshGuildRopeTimes()
+            self.refreshGuildTask()
+
         elif userArg == TimerDefine.Timer_guild_build_upgrade:
             self.checkBuildUpgrade()
             self.checkGuildProtectTime()
@@ -110,7 +123,7 @@ class GuildModule:
             "playerMB"          : self,
             "playerDBID"        : self.databaseID,
             "playerLevel"       : self.level,
-            "officalPosition"   : self.officalPosition,
+            "officalPosition"   : self.officialPosition,
             "playerName"        : self.name,
             "camp"               : self.camp,
             "guildName"         : guildName,
@@ -197,7 +210,7 @@ class GuildModule:
             "guildDBID"         :  guildDBID,
             "playerDBID"        : self.databaseID,
             "playerLevel"       : self.level,
-            "officalPosition"   : self.officalPosition,
+            "officalPosition"   : self.officialPosition,
             "playerName"        : self.name,
             "camp"               : self.camp,
         }
@@ -370,6 +383,10 @@ class GuildModule:
         guildMgr = KBEngine.globalData["GuildMgr"]
         guildMgr.onCmd("onCmdGuildDonate", argMap)
 
+        self.onUpdateGuildTask(GuildTaskType.Donate)
+
+
+
     # 建筑升级
     def onClientBuildUpgrade(self,buildId):
 
@@ -437,6 +454,34 @@ class GuildModule:
         guildMgr.onCmd("onCmdClearDayDonate", argMap)
         pass
 
+    # 刷新公会每日拉拢次数
+    def refreshGuildRopeTimes(self):
+        argMap = {
+            "playerMB": self,
+            "guildDBID": self.guildDBID
+        }
+        if self.guildDBID == 0:
+            return
+        guildMgr = KBEngine.globalData["GuildMgr"]
+
+        guildMgr.onCmd("onCmdRefreshRopeTimes", argMap)
+        pass
+
+    # 刷新公会任务
+    def refreshGuildTask(self):
+
+        argMap = {
+            "playerMB": self,
+            "guildDBID": self.guildDBID
+        }
+
+        self.acceptTaskList = []
+        self.taskFinishList = []
+
+        self.client.onAcceptTaskList(self.acceptTaskList)
+
+        pass
+
     # 检查公会解散时间
     def checkGuildDismiss(self):
         argMap = {
@@ -471,6 +516,17 @@ class GuildModule:
         }
         guildMgr = KBEngine.globalData["GuildMgr"]
         guildMgr.onCmd("onCmdCheckProtectTime",argMap)
+
+    # 请求公会保护时间
+    def onClientGuildProtectTime(self):
+        if self.guildDBID == 0:
+            return
+        argMap = {
+            "playerMB": self,
+            "guildDBID": self.guildDBID
+        }
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdGuildProtectTime", argMap)
 
     # 退出公会
     def onClientQuitGuild(self):
@@ -598,17 +654,25 @@ class GuildModule:
 
     def setGuildDBID(self,argMap):
 
-        guildDBID = argMap["guildDBID"]
-        guildPower = argMap["power"]
-        # 设置公会ID
-        self.guildDBID = guildDBID
-        self.guildPower = guildPower
+        if "guildDBID" in argMap:
+            guildDBID = argMap["guildDBID"]
+            self.guildDBID = guildDBID
+
+        if "power" in argMap:
+            guildPower = argMap["power"]
+            self.guildPower = guildPower
+
+        if "guildLevel" in argMap:
+            self.guildLevel = argMap["guildLevel"]
+
+        if "guildShopLevel" in argMap:
+            self.guildShopLevel = argMap["guildShopLevel"]
+
+        if "guildName" in argMap:
+            self.guildName = argMap["guildName"]
 
         self.applyGuildList=[]
 
-        if "guildShopLevel" in argMap:
-            guildShopLevel = argMap["guildShopLevel"]
-            self.guildShopLevel = guildShopLevel
 
     #设置申请玩家的申请公会ID列表
     def setApplyGuildDBIDList(self,argMap):
@@ -660,7 +724,7 @@ class GuildModule:
                   "guildDBID": guildID,
                   "playerMB": self,
                   "appeadID":appeadID,
-
+                  "guildName" : self.guildName
                   }
         guildMgr = KBEngine.globalData["GuildMgr"]
         guildMgr.onCmd("onCmdGuildAppealExposure", argMap)
@@ -688,6 +752,306 @@ class GuildModule:
 
         guildMgr = KBEngine.globalData["GuildMgr"]
         guildMgr.onCmd("onCmdGuildBuyProtect", argMap)
+
+
+    #公会顾问处理
+    def onClientAdviserFriend(self,adviserID,id):
+
+        if self.guildDBID == 0:
+            return
+        dealInfo = guildAdviserDealConfig.GuildAdviserDealConfig[id]
+        adviserMgr = KBEngine.globalData["AdviserMgr"]
+
+        id = adviserMgr.dbidAdviserToMb[adviserID]
+        adviserMB = KBEngine.entities.get(id)
+
+        if adviserMB.guildDBID == self.guildDBID and dealInfo["type"] == 2:
+            self.client.onGuildError(GuildModuleError.Guild_adviser_is_by_rope)
+            return
+
+        argMap={
+            "guildDBID": self.guildDBID,
+            "playerMB": self,
+            "adviserDBID" :adviserID,
+            "dealId" :id,
+            "amity":dealInfo["addamity"],
+
+        }
+
+
+        # 钻石判断
+        needDiamond = dealInfo["consumediamond"]
+        if self.diamond < needDiamond:
+            self.client.onGuildError(GuildModuleError.Guild_diamond_not_enough)
+            return
+
+        # 欧元判断
+        needEuro = dealInfo["consumeEuro"]
+        if needEuro > self.euro :
+            self.client.onGuildError(GuildModuleError.Guild_euro_not_enough)
+            return
+
+        # 判断道具是否满足
+        material =dealInfo["material"]
+        for itemId, num in material.items():
+            if itemId == 0 :
+                continue
+            have = self.getItemNumByItemID(itemId)
+            if have < num:
+                self.client.onGuildError(GuildModuleError.Guild_appeal_not_enough)
+                return
+
+        for itemId, num in material.items():
+            if itemId == 0:
+                continue
+            self.decItem(itemId, num)
+
+        self.diamond = self.diamond - needDiamond
+        self.euro = self.euro - needEuro
+
+        # 更新任务
+        if dealInfo["type"] == 1:
+            self.onUpdateGuildTask(GuildTaskType.Ingratiate)
+        elif dealInfo["type"] == 2:
+            self.onUpdateGuildTask(GuildTaskType.Instigate)
+
+
+
+        # 概率判断
+        succProb =dealInfo["succProb"]
+        ran_num = random.randint(0, 100)
+        WARNING_MSG("---onClientAdviserFriend--"+str(ran_num))
+        if ran_num > succProb and succProb != 0:
+            self.client.onAdviserError(id)
+            return
+
+        contribute = dealInfo["contribute"]
+        self.guildDonate =  self.guildDonate + contribute
+
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdGuildAdvieserDeal", argMap)
+
+        adviserMgr = KBEngine.globalData["AdviserMgr"]
+
+        # 公会顾问事件
+        if dealInfo["type"] == 1:
+
+            adviserInfo = {
+                "guildDBID": self.guildDBID,
+                "playerName":self.name,
+                "adviserId": adviserMgr.dbidAdbiserToID[adviserID],
+                "type": dealInfo["type"],
+                "friendliness": dealInfo["addamity"],
+            }
+
+            guildMgr.onCmd("onCmdAdviserEvent", adviserInfo)
+
+
+
+        # 攻击归属公会
+        if  dealInfo["subamity"] <=0 :
+            return
+
+        param={
+            "adviserDBID": adviserID,
+            "subamity": dealInfo["subamity"],
+            "playerMB": self,
+            "guildDBID": self.guildDBID,
+        }
+
+        adviserMgr.onCmd("onCmdSubFriend", param)
+
+        pass
+
+    # 能否拉拢
+    def canRopleAdviser(self,adviserID,ropeID,guildDBIDBelong):
+        ERROR_MSG("--canRopleAdviser--")
+
+        param = {
+            "guildDBID": self.guildDBID,
+            "playerMB": self,
+            "adviserDBID": adviserID,
+            "ropeID": ropeID,
+            "guildDBIDBelong":guildDBIDBelong
+        }
+        adviserMgr = KBEngine.globalData["AdviserMgr"]
+
+        adviserMgr.onCmd("onCmdAdviserRope", param)
+
+
+    # 拉拢顾问
+    def onClientAdviserRope(self,adviserID,ropeID,guildDBIDBelong):
+
+        if self.guildDBID == 0:
+            return
+        param = {
+            "playerMB": self,
+            "adviserID": adviserID,
+            "ropeID": ropeID,
+            "guildDBIDBelong":guildDBIDBelong
+        }
+        worldBossMgr = KBEngine.globalData["WorldBossMgr"]
+        worldBossMgr.onCmd("onCmdRopeAdviser", param)
+
+        pass
+
+    # 是否开除解除顾问
+    def canFireAdviser(self,adviserID):
+
+        if self.guildDBID == 0:
+            return
+
+        if self.guildPower != PowerEnmu.leader:
+            self.client.onGuildError(GuildModuleError.Guild_not_has_the_power)
+            return
+
+        param = {
+            "guildDBID": self.guildDBID,
+            "playerMB": self,
+            "adviserDBID": adviserID,
+        }
+
+        adviserMgr = KBEngine.globalData["AdviserMgr"]
+        adviserMgr.onCmd("onCmdFireAdviser", param)
+
+        pass
+
+    # 解雇顾问
+    def onClientFireAdviser(self,adviserID):
+
+        if self.guildDBID == 0:
+            return
+
+        param = {
+            "playerMB": self,
+            "adviserDBID": adviserID,
+        }
+        worldBossMgr = KBEngine.globalData["WorldBossMgr"]
+        worldBossMgr.onCmd("onCmdFireAdviser", param)
+        pass
+
+    # 请求顾问公会好友度信息
+    def onClientAdviserGuildList(self,adviserID):
+
+        if self.guildDBID == 0:
+            return
+
+        param = {
+            "playerMB": self,
+            "adviserDBID": adviserID,
+        }
+        adviserMgr = KBEngine.globalData["AdviserMgr"]
+        adviserMgr.onCmd("onCmdAdviserGuildList", param)
+
+    # 请求顾问信息
+    def onClientAdviserList(self):
+        param = {
+            "playerMB": self,
+        }
+        adviserMgr = KBEngine.globalData["AdviserMgr"]
+        adviserMgr.onCmd("onCmdAdviserList", param)
+
+
+    # 请求公会顾问好友度信息
+    def onClientGuildAdviser(self,guildDBID):
+        if self.guildDBID == 0:
+            return
+        param = {
+            "playerMB": self,
+            "guildDBID":self.guildDBID
+        }
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdGuildAdvieser", param)
+
+    # 设置公会顾问目标
+    def onClientAdviserTarget(self,adviserID,target):
+
+        if self.guildDBID == 0:
+            return
+
+        param = {
+            "playerMB": self,
+            "guildDBID": self.guildDBID,
+            "adviserDBID": adviserID,
+            "target" : target
+
+        }
+
+        adviserMgr = KBEngine.globalData["AdviserMgr"]
+        id = adviserMgr.dbidAdviserToMb[adviserID]
+        adviserMB = KBEngine.entities.get(id)
+
+        if adviserMB.guildDBID == self.guildDBID:
+            self.client.onGuildError(GuildModuleError.Guild_adviser_is_by_rope)
+            return
+
+
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdAdvieserTarget", param)
+
+
+    # 请求公会人事事件
+    def onClientGuildHREvent(self):
+
+        if self.guildDBID == 0:
+            return
+
+        param = {
+            "playerMB": self,
+            "guildDBID": self.guildDBID,
+        }
+
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdGuildHrEvent", param)
+
+        pass
+
+    # 请求 公会顾问事件
+    def onClientAdviserEvent(self):
+
+        if self.guildDBID == 0:
+            return
+        param = {
+            "playerMB": self,
+            "guildDBID": self.guildDBID,
+        }
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdGuildAdviserEvent", param)
+        pass
+
+    # 请求 公会政事事件
+    def onClientGuildGovernEvent(self):
+
+        if self.guildDBID == 0:
+            return
+
+
+        param = {
+            "playerMB": self,
+            "guildDBID": self.guildDBID,
+        }
+
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdGuildGovernEvent", param)
+
+        pass
+
+
+    # 公会事件侦查
+    def onClientSpyGuildEvent(self,spyId):
+
+        if self.guildDBID == 0:
+            return
+
+        param = {
+            "playerMB": self,
+            "guildDBID": self.guildDBID,
+            "spyId": spyId,
+        }
+
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdSpyGuildEvent", param)
+
 
 
     # GM 增加公会资金

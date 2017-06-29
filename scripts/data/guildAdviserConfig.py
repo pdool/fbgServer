@@ -1,7 +1,41 @@
 # -*- coding: utf-8 -*-
 
-GuildAdviserConfig={1: {'addProp': 'shoot', 'id': 1, 'value': 100, 'star': 1, 'iniFriend': 1000, 'initBelong': 1}, 2: {'addProp': 'shoot', 'id': 2, 'value': 200, 'star': 2, 'iniFriend': 1001, 'initBelong': 1}, 3: {'addProp': 'shoot', 'id': 3, 'value': 300, 'star': 3, 'iniFriend': 1002, 'initBelong': 1}, 4: {'addProp': 'shoot', 'id': 4, 'value': 400, 'star': 4, 'iniFriend': 1003, 'initBelong': 1}}
+GuildAdviserConfig = {
+    1: {'initBelong': 9999998, 'guildName': 'helloGy', 'addProp': 'shootPercent', 'iniFriend': 6000, 'value': 0.106,
+        'id': 1, 'confidenceValue': 1000},
+    2: {'initBelong': 9999999, 'guildName': 'superMan', 'addProp': 'defendPercent', 'iniFriend': 6000, 'value': 0.106,
+        'id': 2, 'confidenceValue': 1000},
+    3: {'initBelong': 9999999, 'guildName': 'superMan', 'addProp': 'shoot', 'iniFriend': 2000, 'value': 600.0, 'id': 3,
+        'confidenceValue': 1000},
+    4: {'initBelong': 9999998, 'guildName': 'helloGy', 'addProp': 'defend', 'iniFriend': 2000, 'value': 300.0, 'id': 4,
+        'confidenceValue': 1000},
+    5: {'initBelong': 9999998, 'guildName': 'helloGy', 'addProp': 'keepPercent', 'iniFriend': 4800, 'value': 0.106,
+        'id': 5, 'confidenceValue': 1000},
+    6: {'initBelong': 9999999, 'guildName': 'superMan', 'addProp': 'keep', 'iniFriend': 2000, 'value': 450.0, 'id': 6,
+        'confidenceValue': 1000},
+    7: {'initBelong': 9999998, 'guildName': 'helloGy', 'addProp': 'pass', 'iniFriend': 2400, 'value': 600.0, 'id': 7,
+        'confidenceValue': 1000},
+    8: {'initBelong': 9999999, 'guildName': 'superMan', 'addProp': 'reel', 'iniFriend': 2400, 'value': 600.0, 'id': 8,
+        'confidenceValue': 1000},
+    9: {'initBelong': 9999999, 'guildName': 'superMan', 'addProp': 'trick', 'iniFriend': 2400, 'value': 600.0, 'id': 9,
+        'confidenceValue': 1000},
+    10: {'initBelong': 9999998, 'guildName': 'helloGy', 'addProp': 'steal', 'iniFriend': 2400, 'value': 600.0, 'id': 10,
+         'confidenceValue': 1000},
+    11: {'initBelong': 9999999, 'guildName': 'superMan', 'addProp': 'controllPercent', 'iniFriend': 6000,
+         'value': 0.105, 'id': 11, 'confidenceValue': 1000},
+    12: {'initBelong': 9999999, 'guildName': 'superMan', 'addProp': 'controll', 'iniFriend': 2400, 'value': 900.0,
+         'id': 12, 'confidenceValue': 1000},
+    13: {'initBelong': 9999998, 'guildName': 'helloGy', 'addProp': 'tech', 'iniFriend': 4800, 'value': 0.075, 'id': 13,
+         'confidenceValue': 1000},
+    14: {'initBelong': 9999999, 'guildName': 'superMan', 'addProp': 'health', 'iniFriend': 4800, 'value': 0.075,
+         'id': 14, 'confidenceValue': 1000},
+    15: {'initBelong': 9999998, 'guildName': 'helloGy', 'addProp': 'skill0', 'iniFriend': 3600, 'value': 3.0, 'id': 15,
+         'confidenceValue': 1000},
+    16: {'initBelong': 9999999, 'guildName': 'superMan', 'addProp': 'skill1', 'iniFriend': 3600, 'value': 1.0, 'id': 16,
+         'confidenceValue': 1000},
+    17: {'initBelong': 9999998, 'guildName': 'helloGy', 'addProp': 'tech', 'iniFriend': 5000, 'value': 0.08, 'id': 17,
+         'confidenceValue': 1000}}
 
 allDatas = {
-	'公会顾问配置':GuildAdviserConfig,
+    '公会顾问配置': GuildAdviserConfig,
 }

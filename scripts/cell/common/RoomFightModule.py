@@ -4,7 +4,7 @@ import KBEngine
 import skillConfig
 import skillMainConfig
 import sys
-from CommonEnum import ActionTypeEnum
+from CommonEnum import ActionTypeEnum, AutoControllEnum
 from KBEDebug import DEBUG_MSG, ERROR_MSG
 from common.skill.SkillConditionModule import ConditionEnum
 
@@ -14,10 +14,12 @@ avatar 的子模块
 """
 class RoomFightModule:
     def __init__(self):
-        if self.actionType == ActionTypeEnum.action_clone:
-            self.__initCloneProp()
+        # if self.actionType == ActionTypeEnum.action_clone:
+        self.__initCloneProp()
 
         self.setRoomControllerID()
+
+        self.autoControll = AutoControllEnum.AI_Controll
     # 初始化副本战斗信息
     def __initCloneProp(self):
 
@@ -38,8 +40,6 @@ class RoomFightModule:
         # 技术统计
         # 被抢断
         self.beTrick = 0
-        # 射门成功
-        self.shootSucc = 0
         # 当前轮次使用的技能
         self.canUseSkillList = []
 
@@ -59,11 +59,15 @@ class RoomFightModule:
             card.anger = card.anger + curTime//40 #40秒恢复1点
             # 重置临时数据
             card.resetRoundData()
+            #
+            card.passiveBufferEffectBeforeRound()
+
+
             # 附加buffer的效果
             card.bufferEffect()
 
     def controllerAfterRound(self,result):
-        ERROR_MSG("  afterRound  result  " + str(result))
+        ERROR_MSG( type(self).__str__(self)+ "  afterRound  result  " + str(result))
         for cardId in self.inTeamcardIDList:
             card = KBEngine.entities.get(cardId)
             card.afterRound(result)
@@ -90,12 +94,20 @@ class RoomFightModule:
                 continue
 #             3、检查condition
             condition = skillCon["condition"]
-            if not card.checkCondition(condition,ConditionEnum.con_result_None):
-                continue
+            if skill != 1035:
+                if not card.checkCondition(condition,ConditionEnum.con_result_None):
+                    continue
 
             self.canUseSkillList.append(id)
 
-        ERROR_MSG("  canUseSkillList  " + self.canUseSkillList.__str__())
+        ERROR_MSG("selectCanUseSkills  canUseSkillList  " + self.canUseSkillList.__str__())
         return self.canUseSkillList
 
+
+
+
+    def usePassiveSkill(self,time):
+        for id in self.inTeamcardIDList:
+            card = KBEngine.entities.get(id)
+            card.usePassive(time)
 

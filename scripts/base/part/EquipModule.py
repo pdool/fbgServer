@@ -382,6 +382,9 @@ class EquipModule:
         retItems = []
 
         while self.euro>0:
+
+            ERROR_MSG("     onClientEquipOneKeyUPStrong       while           ")
+
             equip_strong_key = str(equip_info["star"]) + "_" + str(equip_next_strong)
 
             if equip_strong_key not in equipStrongConfig.EquipStrongConfig:
@@ -791,14 +794,14 @@ class EquipModule:
             add_prop = suit_prop[0]
 
             prop = add_prop.split("_")[0]
-            value = add_prop.split("_")[1]
+            value = int(add_prop.split("_")[1])
+
 
             if type == 1:
                 add_value = getattr(card, prop) + value
             elif type == 2 :
                 add_value = getattr(card, prop) - value
 
-            ERROR_MSG("---suitprop---" + str(prop) + "---value---" + str(value) + "---addvalue---" + str(add_value))
             setattr(card, prop, add_value)
 
 

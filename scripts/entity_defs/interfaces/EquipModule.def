@@ -46,28 +46,28 @@
             <Arg>UINT64</Arg>
         </onClientEquipUpStrongLv>
 
-         !--客户端请求装备一键升级-->
+         <!--客户端请求装备一键升级-->
         <onClientEquipOneKeyUPStrong>
           <Exposed/>
             <Arg>UINT32</Arg>
             <Arg>UINT64</Arg>
         </onClientEquipOneKeyUPStrong>
 
-         !--客户端请求穿戴装备-->
+         <!--客户端请求穿戴装备-->
         <onClientPutOnEquip>
           <Exposed/>
             <Arg>UINT32</Arg>
             <Arg>UINT64</Arg>
         </onClientPutOnEquip>
 
-       !--客户端请求脱掉装备-->
+       <!--客户端请求脱掉装备-->
         <onClientTakeOffEquip>
           <Exposed/>
             <Arg>UINT32</Arg>
             <Arg>UINT32</Arg>
         </onClientTakeOffEquip>
 
-        !--客户端请求镶嵌宝石-->
+        <!--客户端请求镶嵌宝石-->
         <onClientInsetGem>
           <Exposed/>
             <Arg>UINT32</Arg>
@@ -76,7 +76,7 @@
             <Arg>UINT32</Arg>
         </onClientInsetGem>
 
-       !--客户端请求卸下宝石-->
+       <!--客户端请求卸下宝石-->
         <onClentTakeOffGem>
           <Exposed/>
             <Arg>UINT32</Arg>
@@ -84,7 +84,7 @@
             <Arg>UINT64</Arg>
         </onClentTakeOffGem>
 
-       !--客户端请求宝石开槽-->
+       <!--客户端请求宝石开槽-->
         <onClientGemOpen>
           <Exposed/>
             <Arg>UINT32</Arg>
@@ -92,7 +92,7 @@
             <Arg>UINT64</Arg>
         </onClientGemOpen>
 
-        !--客户端请求装备传承-->
+        <!--客户端请求装备传承-->
         <onClientEqupInherit>
           <Exposed/>
             <Arg>UINT32</Arg>
@@ -100,7 +100,7 @@
             <Arg>UINT64</Arg>
         </onClientEqupInherit>
 
-      !--客户端请求宝石合成-->
+      <!--客户端请求宝石合成-->
         <onClientGemCompound>
           <Exposed/>
             <Arg>UINT64</Arg>
@@ -178,7 +178,6 @@
 
         <!--返回装备错误信息-->
         <onEquipError>
-            <Exposed/>
             <Arg>UINT32</Arg>
         </onEquipError>
 

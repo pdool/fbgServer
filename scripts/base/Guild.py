@@ -2,15 +2,20 @@
 import random
 
 import KBEngine
+import gc
+import guildAdviserConfig
+import guildAdviserDealConfig
+import guildAdviserRopeConfig
 import guildAppealConfig
 import guildConfig
+import guildTaskConfig
 import guildUpCouConfig
 import guildUpHallConfig
 import guildUpShopConfig
 import guildUpTaskConfig
 import util
 from ErrorCode import GuildModuleError
-from GuildMgr import  PowerEnmu, BuildEnmu
+from GuildMgr import  PowerEnmu, BuildEnmu, GuildTaskType
 from KBEDebug import ERROR_MSG, WARNING_MSG
 from guildBuildConfig import GuildBuildConfig
 from guildUpgradeConfig import GuildUpgradeConfig
@@ -31,6 +36,10 @@ class Guild(BaseModule):
         self.buildBDToIndex = {}
         self.creatBuildBDIndex()
 
+        self.adviserToIndex={}
+        self.adviserIndex()
+
+
     # 获取公会信息
     def getGuildInfo(self,applyInfo):
         playerMB = applyInfo["playerMB"]
@@ -45,6 +54,8 @@ class Guild(BaseModule):
             self.databaseID,
             self.introduction,
             self.protectTime,
+            self.ropeTimes,
+            self.spyTimes,
             self.guildBuild
         )
 
@@ -120,6 +131,7 @@ class Guild(BaseModule):
 
     # 同意加入
     def agreeJoin(self,argMap):
+        ERROR_MSG("-------agreeJoin--")
         applyerDBID = argMap["applyerDBID"]
         power = argMap["power"]
         # 判断自己的权利
@@ -162,7 +174,7 @@ class Guild(BaseModule):
                 param = {
                     "playerName": avatar.name,
                     "dbid": avatar.databaseID,
-                    "offical": avatar.officalPosition,
+                    "offical": avatar.officialPosition,
                     "level": avatar.level,
                     "power": power,
                     "playerMB":playerMB
@@ -184,6 +196,7 @@ class Guild(BaseModule):
                         "guildMB"   : self,
                         "guildDBID" : self.databaseID,
                         "power": power,
+                        "guildLevel" : self.level
                     }
                     param["onlineState"] = 1
                     avatar.onPlayerMgrCmd("setGuildDBID",argMap)
@@ -191,6 +204,7 @@ class Guild(BaseModule):
                     if isJoin == False:
                         avatar.guildDBID = self.databaseID
                         avatar.guildPower = power
+                        avatar.guildLevel = self.level
                         avatar.applyGuildList=[]
                         param["onlineState"] = avatar.logoutTime
                     avatar.destroy()
@@ -251,12 +265,22 @@ class Guild(BaseModule):
         guildMgr = KBEngine.globalData["GuildMgr"]
         guildMgr.onCmd("onCmdRefreshGuildCount",param)
 
+        # 人事事件
+        eventInfo ={
+            "type" : 1,
+            "playerName":argMap["playerName"],
+            "executor":'',
+
+        }
+        self.guildHrEvent(eventInfo)
+
         def onLookUpCB(applyerAvatar):
             # 在线
             if type(applyerAvatar) is not bool:
                 applyerAvatar.client.onResponse(GuildNotice.GuildNotice.guild_jion_success)
-                self.onCreateGuildBuild()
                 param = {"playerMB": applyerAvatar}
+                applyerAvatar.guildName = self.name
+                applyerAvatar.guildLevel = 1
                 self.getGuildInfo(param)
 
         KBEngine.lookUpBaseByDBID("Avatar",applyerDBID,onLookUpCB)
@@ -292,7 +316,7 @@ class Guild(BaseModule):
 
 
     # 创建公会建筑
-    def onCreateGuildBuild(self):
+    def onCreateGuildBuild(self,argMap):
 
         for id,build in GuildBuildConfig.items():
             ERROR_MSG("--GuildBuildConfig--" + str(id))
@@ -313,6 +337,7 @@ class Guild(BaseModule):
         for item in self.applyMember:
             if item["dbid"] == applyerDBID:
                 self.applyMember.remove(item)
+                ERROR_MSG("--cancelApply--" + str(applyerDBID) + "--" + str(len(self.applyMember)))
                 return
 
     #   修改公告和简介
@@ -341,7 +366,17 @@ class Guild(BaseModule):
             self.notice = notice
 
         playerMB.client.onResponse(GuildNotice.GuildNotice.change_notice_success)
-        playerMB.client.onChangeNoticeSucc(self.notice,self.introduction)
+
+        for item in self.guildMember:
+            playerID = item["dbid"]
+
+            def onLookUpCB(applyerAvatar):
+                # 在线
+                if type(applyerAvatar) is not bool:
+                    applyerAvatar.client.onChangeNoticeSucc(self.notice, self.introduction)
+
+            KBEngine.lookUpBaseByDBID("Avatar", playerID, onLookUpCB)
+
 
     # 申请数据是否存在
     def isExitApplyInfo(self,applyID):
@@ -370,15 +405,22 @@ class Guild(BaseModule):
             return
 
         self.name =guildName
+        playerMB.guildName = guildName
         # 刷新列表公会名字
         param = {
             "guildDBID": self.databaseID,
-            "guildName": guildName
+            "guildName": guildName,
+            "playerMB" : playerMB
         }
         guildMgr = KBEngine.globalData["GuildMgr"]
         guildMgr.onCmd("refreshGuildName",param)
-
         playerMB.client.onChangeNameSucc(self.name)
+
+        adviserMgr = KBEngine.globalData["AdviserMgr"]
+        adviserMgr.onCmd("refreshGuildName",param)
+
+        self.updateGuildValueRank()
+
 
 
 
@@ -416,7 +458,6 @@ class Guild(BaseModule):
         guildMgr = KBEngine.globalData["GuildMgr"]
         guildMgr.onCmd("onCmdRefreshGuildCount", param)
 
-
         def kictOutSucc(avatar, dbid, wasActive):
             if avatar != None:
                 # 已经在线了(异步调用)
@@ -425,7 +466,8 @@ class Guild(BaseModule):
                         "guildDBID": 0,
                         "power": 0,
                         "guildShopLevel":0,
-                        "guildName":''
+                        "guildName":'',
+                        "guildLevel": 0,
                     }
                     avatar.onPlayerMgrCmd("setGuildDBID", argMap)
                     avatar.client.onResponse(GuildNotice.GuildNotice.guild_kick_success)
@@ -433,10 +475,17 @@ class Guild(BaseModule):
                     avatar.guildPower = 0
                     avatar.guildDBID = 0
                     avatar.guildShopLevel=0
+                    avatar.guildLevel = 0
                     avatar.guildName = ''
                     avatar.destroy()
-                playerMB.client.onResponse(GuildNotice.GuildNotice.guild_kick_success)
 
+                # 人事事件
+                eventInfo = {
+                    "type": 3,
+                    "playerName": avatar.name,
+                    "executor": playerMB.name,
+                }
+                self.guildHrEvent(eventInfo)
 
             else:
                 ERROR_MSG("---------Cannot add unknown player:-------------")
@@ -460,6 +509,7 @@ class Guild(BaseModule):
         playerMB.guildDBID = 0
         playerMB.guildPower = 0
         playerMB.guildShopLevel = 0
+        playerMB.guildLevel = 0
         playerMB.guildName = ''
 
         param = {
@@ -468,6 +518,15 @@ class Guild(BaseModule):
         }
         guildMgr = KBEngine.globalData["GuildMgr"]
         guildMgr.onCmd("onCmdRefreshGuildCount", param)
+
+        # 人事事件
+        eventInfo = {
+            "type": 2,
+            "playerName": playerMB.name,
+            "executor": '',
+
+        }
+        self.guildHrEvent(eventInfo)
 
         playerMB.client.onResponse(GuildNotice.GuildNotice.guild_quit_success)
 
@@ -623,35 +682,62 @@ class Guild(BaseModule):
         appeadID = argMap["appeadID"]
         playerMB = argMap["playerMB"]
 
-        isProtect = guildAppealConfig.GuildAppealConfig[appeadID]["isProtect"]
+        attackIsNPC = 0
+        if "attackIsNPC" in argMap:
+            attackIsNPC = argMap["attackIsNPC"]
+
+        WARNING_MSG("--guildAppealExposure-attackIsNPC-"+str(attackIsNPC))
+
+        appealInfo = guildAppealConfig.GuildAppealConfig[appeadID]
+
+        if appeadID not in  guildAppealConfig.GuildAppealConfig:
+            return
+
+        isProtect =appealInfo["isProtect"]
 
         # 能否保护
         if isProtect==1 and self.protectTime > 0:
-            playerMB.client.onGuildError(GuildModuleError.Guild_is_by_prtected)
+            if playerMB != None :
+                playerMB.client.onGuildError(GuildModuleError.Guild_is_by_prtected)
             return
 
         # 判断道具是否满足
-        material = guildAppealConfig.GuildAppealConfig[appeadID]["material"]
-        for itemId, num in material.items():
-            have = playerMB.getItemNumByItemID(itemId)
-            if have < num:
-                ERROR_MSG(
-                    "--------- num bu zu------- have   " + str(have) + "   need  " + str(num) + "   " + str(itemId))
-                playerMB.client.onGuildError(GuildModuleError.Guild_appeal_not_enough)
-                return
 
-        for itemId, num in material.items():
-            playerMB.decItem(itemId, num)
+        if attackIsNPC == 0 :
+            material = appealInfo["material"]
+            for itemId, num in material.items():
+                have = playerMB.getItemNumByItemID(itemId)
+                if have < num:
+                    ERROR_MSG(
+                        "--------- num bu zu------- have   " + str(have) + "   need  " + str(num) + "   " + str(itemId))
+                    playerMB.client.onGuildError(GuildModuleError.Guild_appeal_not_enough)
+                    return
 
-        subFunds = guildAppealConfig.GuildAppealConfig[appeadID]["subGuildFunds"]
-        subReputation = guildAppealConfig.GuildAppealConfig[appeadID]["subReputation"]
-        rewardDonate = guildAppealConfig.GuildAppealConfig[appeadID]["rewardDonate"]
+            for itemId, num in material.items():
+                playerMB.decItem(itemId, num)
+
+
+        subFunds = appealInfo["subGuildFunds"]
+        subReputation = appealInfo["subReputation"]
+        rewardDonate =appealInfo["rewardDonate"]
+
+        # 更新任务
+        if  appealInfo["type"] == 1:
+            value = appealInfo["subGuildFunds"]
+
+            if playerMB != None :
+                playerMB.onUpdateGuildTask(GuildTaskType.Appeal)
+
+        elif appealInfo["type"] == 2:
+            value = appealInfo["subReputation"]
+            if playerMB != None:
+                playerMB.onUpdateGuildTask(GuildTaskType.Exposure)
 
         # 概率判断
         succProb = guildAppealConfig.GuildAppealConfig[appeadID]["succProb"]
         ran_num = random.randint(0, 100)
         ERROR_MSG("---guildAppealExposure--ran_num-"+str(ran_num))
-        if ran_num > succProb :
+        if  playerMB != None and ran_num > succProb :
             playerMB.client.onGuildError(GuildModuleError.Guild_appeal_fail)
             return
 
@@ -665,9 +751,32 @@ class Guild(BaseModule):
         else:
             self.reputation = 0
 
+        self.updateGuildValueRank()
 
-        playerMB.guildDonate = playerMB.guildDonate + rewardDonate
-        playerMB.client.onResponse(GuildNotice.GuildNotice.guild_appealExposure_success)
+        if playerMB != None :
+            playerMB.guildDonate = playerMB.guildDonate + rewardDonate
+            playerMB.client.onResponse(GuildNotice.GuildNotice.guild_appealExposure_success)
+
+
+       #公会政务事件
+        event = {
+            "type" : appealInfo["type"],
+            "value": value,
+            "adviserId":0,
+            "guildDBID": argMap["guildDBID"],
+            "guildName":argMap["guildName"],
+            "playerName":''
+        }
+
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdGuildEvent", event)
+
+
+
+    # 公会保护时间
+    def guildProtectTime(self,argMap):
+        playerMB = argMap["playerMB"]
+        playerMB.client.onGuildProtectTime(self.protectTime)
 
 
     # 购买保护时间
@@ -678,7 +787,16 @@ class Guild(BaseModule):
 
         self.protectTime = self.protectTime + hour*60*60
 
-        playerMB.client.onBuyGuildProtectSucc(self.protectTime)
+        for item in self.guildMember:
+            playerID = item["dbid"]
+            def onLookUpCB(applyerAvatar):
+                # 在线
+                if type(applyerAvatar) is not bool:
+                    applyerAvatar.client.onBuyGuildProtectSucc(self.protectTime)
+
+            KBEngine.lookUpBaseByDBID("Avatar", playerID, onLookUpCB)
+
+        # playerMB.client.onBuyGuildProtectSucc(self.protectTime)
         pass
 
 
@@ -802,10 +920,13 @@ class Guild(BaseModule):
 
         buildData["state"] = 1
         self.guildFunds = self.guildFunds -  buildInfo["needFunds"]
+        WARNING_MSG("---guildBuildUpgrade--needTime-"+str(buildInfo["needTime"]))
 
         endTime = util.getCurrentTime() + buildInfo["needTime"]*60*60
         buildData["endTime"] = endTime
         playerMB.client.onClientGuildBuildInfo(buildData)
+        playerMB.client.onUpdateGuildFunds(self.guildFunds)
+
 
 
     # 检查公会解散时间
@@ -834,13 +955,18 @@ class Guild(BaseModule):
                         argMap = {
                             "guildDBID": 0,
                             "power": 0,
+                            "guildLevel":0,
+                            "guildShopLevel":0
                         }
                         avatar.onPlayerMgrCmd("setGuildDBID", argMap)
+                        avatar.client.onResponse(GuildNotice.GuildNotice.guild_dismiss_success)
+
                     else:
                         avatar.guildDBID = 0
                         avatar.guildPower = 0
+                        avatar.guildLevel = 0
+                        avatar.guildShopLevel = 0
                         avatar.destroy()
-                    avatar.client.onResponse(GuildNotice.GuildNotice.guild_dismiss_success)
                 else:
                     ERROR_MSG("---------Cannot add unknown player:-------------")
 
@@ -869,12 +995,29 @@ class Guild(BaseModule):
                 endTime = build["endTime"]
                 leftTime = endTime - util.getCurrentTime()
                 if util.getCurrentTime() >= endTime :
-
                     build["level"] =  build["level"] + 1
                     build["state"] = 0
                     build["endTime"] = 0
                     playerMB.guildShopLevel = build["level"]
                     playerMB.client.onClientGuildBuildInfo(build)
+
+                    # 公会大厅升级完成
+                    if build["id"] == BuildEnmu.Hall:
+                        self.guildHallUpgardeSucc(build,playerMB)
+        pass
+
+    # 公会大厅升级成功处理
+    def guildHallUpgardeSucc(self,buildDate,playerMB):
+
+        buildHallConfig = self.buildConfigInfo(BuildEnmu.Hall, buildDate["level"])
+        addReputation = buildHallConfig["reputation"]
+        param={
+            "playerMB" :playerMB
+        }
+        self.reputation = self.reputation + addReputation
+        self.guiildUpdate(param)
+
+
         pass
 
     # 检查公会保护时间
@@ -949,11 +1092,15 @@ class Guild(BaseModule):
             buildData["endTime"] = 0
             playerMB.guildShopLevel = buildData["level"]
 
+            # 公会大厅升级完成
+            if buildData["id"] == BuildEnmu.Hall:
+                self.guildHallUpgardeSucc(buildData,playerMB)
+
         playerMB.client.onClientGuildBuildInfo(buildData)
         playerMB.client.onClientGuildFunds(self.guildFunds)
 
 
-    def updateGuildValueRank(self):
+    def updateGuildValueRank(self,argMap={}):
         param = {
             "dbid": self.databaseID,
             "guildName": self.name,
@@ -968,17 +1115,29 @@ class Guild(BaseModule):
         rankMgr.onCmd("onCmdUpdateGuildValueRank", param)
 
 
-
     # 清除公会成员周贡献
-    def clearWeekDonate(self):
+    def clearWeekDonate(self,argMap):
         for member in self.guildMember:
             member["weekDonate"] = 0
 
 
     # 清除公会成员日贡献
-    def clearDayDonate(self):
+    def clearDayDonate(self,argMap):
         for member in self.guildMember:
             member["dayDonate"] = 0
+
+    # 刷新每日拉拢次数
+    def refreshRopeTimes(self,argMap):
+        playerMB = argMap["playerMB"]
+
+        self.ropeTimes = guildConfig.GuildConfig[1]["ropeTime"]
+        playerMB.client.onUpdataRopeTimes(self.ropeTimes)
+
+        self.taskIssueIDList=[]
+
+        self.spyTimes = 0
+
+        playerMB.client.onClientTaskIssueList(self.taskIssueIDList)
 
     # 公会捐钱
     def guildDonate(self,argMap):
@@ -1013,7 +1172,7 @@ class Guild(BaseModule):
 
             KBEngine.lookUpBaseByDBID("Avatar", playerID, onLookUpCB)
 
-
+        self.updateGuildValueRank()
 
 
 
@@ -1030,15 +1189,20 @@ class Guild(BaseModule):
         needReputation = guildUpgrade["needReputation"]
 
         if self.reputation < needReputation :
+            playerMB.client.onGuildUpgradeSucc(self.level, self.reputation)
             return
 
         while(self.reputation >= needReputation and self.level < maxLevel) :
-            self.reputation = self.reputation - guildUpgrade["needReputation"]
+
+            ERROR_MSG("  guiildUpdate  while ")
+
+            # self.reputation = self.reputation - guildUpgrade["needReputation"]
+
             self.level = self.level + 1
-            guildUpgrade = GuildUpgradeConfig[level]
+            guildUpgrade = GuildUpgradeConfig[self.level]
             needReputation = guildUpgrade["needReputation"]
 
-        playerMB.client.onGuildUpgradeSucc(self.level,self.reputation)
+        # playerMB.client.onGuildUpgradeSucc(self.level,self.reputation)
       # 刷新列表公会名字
         param = {
             "guildDBID": self.databaseID,
@@ -1046,6 +1210,571 @@ class Guild(BaseModule):
         }
         guildMgr = KBEngine.globalData["GuildMgr"]
         guildMgr.onCmd("refreshGuildLevel",param)
+
+
+        self.updateGuildValueRank()
+
+        for member in self.guildMember:
+            playerDBID = member["dbid"]
+
+            def CBSucc(avatar, dbid, wasActive):
+                if avatar != None:
+                    # 已经在线了(异步调用)
+                    if wasActive:
+                        argMap = {
+                            "guildLevel": self.level,
+                        }
+                        avatar.onPlayerMgrCmd("setGuildDBID", argMap)
+                        avatar.client.onGuildUpgradeSucc(self.level, self.reputation)
+
+                    else:
+                        avatar.guildLevel = self.level
+                        avatar.destroy()
+                else:
+                    ERROR_MSG("---------Cannot add unknown player:-------------")
+
+            KBEngine.createBaseFromDBID("Avatar", playerDBID, CBSucc)
+
+    # 创建公会顾问信息
+    def onCreatGuildAdviser(self,argMap):
+        param = {
+            "guildMB":self,
+            "configID":self.configID,
+            "isGuildNPC":self.isGuildNPC
+        }
+        self.adviserList = []
+        adviserMgr = KBEngine.globalData["AdviserMgr"]
+        adviserMgr.onCmd("onCmdCreateAdviser", param)
+        pass
+
+    # 创建公会顾问信息完成
+    def onCmdAddAdviserList(self,argMap):
+
+        adviserList = argMap["adviserList"]
+        self.adviserList = adviserList
+
+
+    #  刷新顾问好友度
+    def updateAdviserFrend(self, argMap):
+
+        friendlness = argMap["friendlness"]
+        adviserDBID = argMap["adviserDBID"]
+        guildDBID = argMap["guildDBID"]
+
+        if self.isGuildNPC == 1:
+            guildDBID = self.configID
+
+        param = {
+            "playerMB": argMap["playerMB"],
+            "guildDBID": guildDBID,
+            "guildName":self.name,
+            "friendliness": friendlness,
+            "adviserDBID": adviserDBID,
+        }
+
+        adviserMgr = KBEngine.globalData["AdviserMgr"]
+        adviserMgr.onCmd("onCmdUpdateFriend", param)
+
+        pass
+
+    # 更新公会顾问好友度
+    def upDateGuildAdviser(self,argMap):
+
+        playerMB = argMap["playerMB"]
+        adviserDBID = argMap["adviserDBID"]
+        amity = argMap["amity"]
+
+        friendValue = 0
+        for adviser in self.adviserList:
+            if adviserDBID == adviser["dbid"]:
+                friendValue =  adviser["friendliness"] + amity
+                if friendValue > 0:
+
+                    adviser["friendliness"] = friendValue
+                else:
+                    adviser["friendliness"] = 0
+
+                if self.isGuildNPC == 0 and  playerMB.guildDBID == self.databaseID  :
+                    playerMB.client.onUpdateGuildAdviser(adviser)
+                    break
+
+        util.printStackTrace("upDateGuildAdviser")
+        # ERROR_MSG("--upDateGuildAdviser--"+str(adviserDBID)+"---"+str(friendValue)+"--"+str(self.databaseID))
+
+        argMap["friendlness"] =  friendValue
+        self.updateAdviserFrend(argMap)
+
+
+
+        pass
+
+    # 公会拉拢顾问
+    def adviserRope(self,argMap):
+
+        playerMB =  argMap["playerMB"]
+        adviserDBID = argMap["adviserDBID"]
+        ropeId = argMap["ropeID"]
+        friendlness = argMap["friendlness"]
+        adviserMB = argMap["adviserMB"]
+        hasNum = argMap["hasNum"]
+
+        totalNum = 0
+        # 概率计算
+        addProb = 0
+        if BuildEnmu.Consultant in self.buildBDToIndex:
+            buildData = self.guildBuild[self.buildBDToIndex[BuildEnmu.Consultant]]
+            buildConsultantConfig = self.buildConfigInfo(BuildEnmu.Consultant, buildData["level"])
+            addProb = buildConsultantConfig["preSucc"]
+            totalNum =  buildConsultantConfig["counselorNum"]
+
+        if hasNum>=totalNum:
+            playerMB.client.onGuildError(GuildModuleError.Guild_adviser_num_error)
+
+            return
+
+        if self.ropeTimes<=0:
+            playerMB.client.onGuildError(GuildModuleError.Guild_not_rope_times)
+            return
+
+        rolpData = guildAdviserRopeConfig.GuildAdviserRopeConfig[ropeId]
+        # 钻石判断
+        needDiamond = rolpData["consumediamond"]
+        if playerMB.diamond < needDiamond:
+            playerMB.client.onGuildError(GuildModuleError.Guild_diamond_not_enough)
+            return
+
+        needFunds =  rolpData["consumefund"]
+        if self.guildFunds < needFunds :
+            playerMB.client.onGuildError(GuildModuleError.Guild_guildFunds_not_enough)
+            return
+
+        self.guildFunds = self.guildFunds - needFunds
+        playerMB.diamond = playerMB.diamond - needDiamond
+
+        self.ropeTimes = self.ropeTimes - 1
+
+        playerMB.client.onUpdataRopeTimes(self.ropeTimes)
+
+
+        adviserInfo = self.adviserInfo(adviserDBID)
+        selfFriendLness = adviserInfo["friendliness"]
+
+        if friendlness > 0 :
+            prob = 3 * 100 * max((selfFriendLness - friendlness), 0) / min(friendlness, 200000) + addProb
+            succProb = min(100, prob)
+        else:
+            succProb = 100
+
+        ran_num = random.randint(0, 100)
+        ERROR_MSG("--adviserRope-succProb-:"+str(succProb)+"--ran_num-"+str(ran_num))
+        if ran_num > succProb :
+            playerMB.client.onGuildError(GuildModuleError.Guild_rope_fail)
+            return
+
+        param={
+          "adviserDBID" :adviserDBID,
+          "amity": rolpData["addamity"],
+          "guildDBID":self.databaseID,
+           "playerMB":playerMB,
+        }
+        self.upDateGuildAdviser(param)
+
+
+        param1 = {
+            "playerMB": playerMB,
+            "guildDBID": adviserMB.guildDBID,
+            "friendliness":  adviserMB.friendliness,
+            "adviserDBID": adviserMB.databaseID,
+            "amity": -  rolpData["subamity"]
+        }
+
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdGuildAdvieserDeal", param1)
+
+        adviserInfo["target"] = 0
+
+        adviserMB.guildDBID =  self.databaseID
+        adviserMB.guildName = self.name
+        adviserMB.friendliness = selfFriendLness + rolpData["addamity"]
+
+        values = {}
+        values["dbid"] = adviserMB.databaseID
+        values["configID"] = adviserMB.configID
+        values["guidDBID"] = self.databaseID
+        values["guildName"] =  self.name
+        values["friendliness"] = selfFriendLness + rolpData["addamity"]
+        values["confidenceValue"] = adviserMB.confidenceValue
+
+        playerMB.client.onUpdataAdviser(values)
+        playerMB.client.onUpdateGuildFunds(self.guildFunds)
+        playerMB.client.onResponse(GuildNotice.GuildNotice.guild_adviser_rope_success)
+
+        #顾问事件
+        adviserInfo = {
+            "playerName": playerMB.name,
+            "adviserId":adviserMB.configID,
+            "type": 2,
+            "friendliness":0,
+            "guildName":self.name
+        }
+        self.saveAdviserEvent(adviserInfo)
+
+        #顾问被拉拢事件
+        eventInfo={
+            "playerName": '',
+            "adviserId": adviserMB.configID,
+            "type": 3,
+            "friendliness": 0,
+            "guildDBID":param1["guildDBID"],
+            "guildName": self.name
+
+        }
+        guildMgr.onCmd("onCmdAdviserEvent", eventInfo)
+
+
+
+
+    #   设置归属顾问友好度
+    def advieserFriend(self,argMap):
+
+        playerMB =  argMap["playerMB"]
+        adviserDBID = argMap["adviserDBID"]
+        adviserMB = argMap["adviserMB"]
+
+        adviserInfo = self.adviserInfo(adviserDBID)
+        if adviserInfo != None :
+            adviserMB.friendliness = adviserInfo["friendliness"]
+        else:
+            adviserMB.friendliness = 0
+
+
+        values = {}
+        values["dbid"] = adviserDBID
+        values["configID"] = adviserMB.configID
+        values["guidDBID"] = adviserMB.guildDBID
+        values["guildName"] = adviserMB.guildName
+        values["friendliness"] = adviserMB.friendliness
+        values["confidenceValue"] = adviserMB.confidenceValue
+
+        playerMB.client.onUpdataAdviser(values)
+
+        pass
+
+
+    # 获取自己的公会顾问好友度
+    def adviserInfo(self,adviserDBID):
+        for adviser in self.adviserList:
+            if adviserDBID == adviser["dbid"]:
+                return  adviser
+
+
+    # 公会顾问好友度
+    def guildAdviser(self,argMap):
+        playerMB =  argMap["playerMB"]
+        playerMB.client.onGuildAdviserList(self.adviserList)
+
+    # 设置顾问目标
+    def advieserTarget(self,argMap):
+        adviserDBID = argMap["adviserDBID"]
+        playerMB =  argMap["playerMB"]
+        target =  argMap["target"]
+        adviser = self.adviserInfo(adviserDBID)
+        if adviser == None :
+            return
+        adviser["target"] = target
+        playerMB.client.onUpdateGuildAdviser(adviser)
+
+        pass
+
+    # 已发布任务列表
+    def taskIdIssueList(self,argMap):
+        playerMB =  argMap["playerMB"]
+        playerMB.client.onTaskIssueList(self.taskIssueIDList)
+
+
+    # 发布公会任务
+    def setTask(self,argMap):
+        playerMB =  argMap["playerMB"]
+        taskId = argMap["taskId"]
+
+        if taskId in self.taskIssueIDList:
+            playerMB.client.onGuildError(GuildModuleError.Guild_already_exit_task)
+            return
+
+        taskInfo = guildTaskConfig.GuildTaskConfig[taskId]
+        if taskInfo["needLevel"] > self.level :
+            playerMB.client.onGuildError(GuildModuleError.Guild_level_not_enough)
+            return
+
+        buildData =  self.guildBuild[self.buildBDToIndex[BuildEnmu.Task]]
+        buildTask = self.buildConfigInfo(BuildEnmu.Task, buildData["level"])
+
+        maxNum = buildTask["addNum"]
+
+        if len(self.taskIssueIDList) == maxNum :
+            WARNING_MSG("----MaxIssueTaskNum---")
+            return
+
+        self.taskIssueIDList.append(taskId)
+        playerMB.client.onUpdateTaskIssue(taskId)
+        pass
+
+
+    # 初始化公会任务
+    def guildTask(self,argMap):
+
+        playerMB =  argMap["playerMB"]
+        for id in self.taskIssueIDList:
+
+            if id in playerMB.taskFinishList:
+                continue
+
+            isExit = False
+
+            for task in playerMB.acceptTaskList:
+                if task["id"] == id:
+                    isExit=True
+                    break
+
+            if isExit == True :
+                continue
+
+            taskInfo = guildTaskConfig.GuildTaskConfig[id]
+
+            values={
+                "id" :id,
+                "type":taskInfo["type"],
+                "proceed":0
+            }
+            WARNING_MSG("--guildTask--id-"+str(id))
+
+            playerMB.acceptTaskList.append(values)
+
+        playerMB.client.onAcceptTaskList(playerMB.acceptTaskList)
+
+    # 公会任务完成
+    def guildTaskFinish(self,argMap):
+
+        playerMB =  argMap["playerMB"]
+        funds = argMap["funds"]
+        reputation = argMap["reputation"]
+        taskId = argMap["taskId"]
+
+        self.guildFunds = self.guildFunds + funds
+        self.reputation = self.reputation + reputation
+        self.guiildUpdate(argMap)
+        playerMB.client.onGuildTaskFinish(taskId,self.reputation,self.guildFunds)
+
+    # 请求公会人事list
+    def guildHrEventList(self,argMap):
+
+        playerMB =  argMap["playerMB"]
+        playerMB.client.onGuildHREventList(self.hrEventList)
+        ERROR_MSG("--guildHrEventList--"+str(self.hrEventList))
+
+        pass
+
+    # 请求公会顾问list
+    def guildAviserEventList(self,argMap):
+
+        playerMB = argMap["playerMB"]
+        playerMB.client.onAdviserEventList(self.adviserEventList)
+        ERROR_MSG("--guildAviserEventList--"+str(self.adviserEventList))
+
+        pass
+
+    # 客户端请求公会政务事件
+
+    def guildGovernEvent(self,argMap):
+        playerMB = argMap["playerMB"]
+        convernmentList = []
+        ERROR_MSG("--guildGovernEvent--"+str(self.guildEventList))
+        for item in self.guildEventList:
+            value = {}
+            value["id"] = item["id"]
+            value["time"] = item["time"]
+            value["adviserId"] = item["adviserId"]
+            value["type"]  = item["type"]
+            value["isSpy"] = item["isSpy"]
+            value["value"] =item["value"]
+            if  item["isSpy"] == 1 :
+                value["guildName"] = item["guildName"]
+            else:
+                value["guildName"] = ''
+
+            convernmentList.append(value)
+
+        playerMB.client.onCovernEventList(convernmentList)
+
+        pass
+
+    # 存储公会人事事件
+    def guildHrEvent(self,argMap):
+
+        maxNum = guildConfig.GuildConfig[1]["eventNum"]
+
+        if len(self.hrEventList) >= maxNum:
+            self.hrEventList.remove()
+
+        value={
+            "time": util.getCurrentTime(),
+            "type": argMap["type"],
+            "playerName":argMap["playerName"],
+            "executor": argMap["executor"],
+        }
+        self.hrEventList.append(value)
+        WARNING_MSG("--guildHrEvent--"+str(len(self.hrEventList)))
+
+        pass
+
+
+    # 公会顾问事件
+    def guildAdviserEvent(self,argMap):
+
+        if "guildName" not in argMap:
+            argMap["guildName"] = self.name
+
+        self.saveAdviserEvent(argMap)
+
+    # 存储公会顾问事件
+    def saveAdviserEvent(self,argMap):
+
+        maxNum = guildConfig.GuildConfig[1]["eventNum"]
+        if len(self.adviserEventList) >= maxNum:
+            self.adviserEventList.remove()
+
+        value = {
+            "time": util.getCurrentTime(),
+            "type": argMap["type"],
+            "playerName":argMap["playerName"],
+            "adviserId": argMap["adviserId"],
+            "friendliness": argMap["friendliness"],
+            "guildName": argMap["guildName"],
+
+        }
+        self.adviserEventList.append(value)
+        WARNING_MSG("--saveAdviserEvent--"+str(len(self.adviserEventList)))
+
+        pass
+
+
+    # 存储公会政务事件
+    def saveGuildEvent(self,argMap):
+
+        maxNum = guildConfig.GuildConfig[1]["eventNum"]
+
+        if len(self.guildEventList) >= maxNum:
+            self.guildEventList.remove()
+
+        if len(self.guildEventList) > 0:
+            lastInfo = self.guildEventList[len(self.guildEventList) - 1]
+            id = lastInfo["id"] + 1
+        else:
+            id = 1
+
+        value = {
+
+            "id" : id,
+            "time": util.getCurrentTime(),
+            "type": argMap["type"],
+            "adviserId": argMap["adviserId"],
+            "value": argMap["value"],
+            "isSpy": 0,
+            "guildName": argMap["guildName"],
+
+        }
+
+        self.guildEventList.append(value)
+
+        # for item in self.guildEventList :
+        #     WARNING_MSG("--saveGuildEvent-id-:"+str(item["id"]))
+
+        pass
+
+    # 侦查公会事件
+    def spyGuildEvent(self, argMap):
+
+        maxSpyCount = self.spyMaxCount()
+        if self.spyTimes >= maxSpyCount:
+            return
+
+        self.spyTimes = self.spyTimes + 1
+
+        playerMB = argMap["playerMB"]
+        spyId = argMap["spyId"]
+
+
+        for item in  self.guildEventList :
+            if item["id"] == spyId:
+                guildName = item["guildName"]
+                item["isSpy"] = 1
+                playerMB.client.onSpyGuildResult(self.spyTimes,spyId,guildName)
+                break
+
+        pass
+
+    # 最大侦查数量
+    def spyMaxCount(self):
+
+        buildData = self.guildBuild[self.buildBDToIndex[BuildEnmu.Hall]]
+        buildConfig = self.buildConfigInfo(BuildEnmu.Hall, buildData["level"])
+        count = buildConfig["inspect"]
+        return count
+
+    # npc拉拢顾问
+    def npcRopeAdviser(self,argMap):
+
+        adviserMB = argMap["adviser"]
+        friendlness =adviserMB.friendliness
+        adviserInfo = self.adviserInfo(adviserMB.databaseID)
+        selfFriendLness = adviserInfo["friendliness"]
+        if friendlness > 0:
+            prob = 3 * 100 * max((selfFriendLness - friendlness), 0) / min(friendlness, 200000)
+            succProb = min(100, prob)
+        else:
+            succProb = 100
+
+        if succProb < 100:
+            return
+
+        guildDBIDAgo = adviserMB.guildDBID
+
+        adviserMB.guildDBID = self.configID
+        adviserMB.guildName = self.name
+        adviserMB.friendliness = selfFriendLness
+
+        # 刷新前归属公会的顾问信息
+        param={
+            "guildDBID" : guildDBIDAgo,
+            "adviser" :adviserMB
+        }
+
+        guildMgr = KBEngine.globalData["GuildMgr"]
+        guildMgr.onCmd("onCmdRefreshGuildAviser", param)
+
+        pass
+
+    # 刷新前顾问归属公会 顾问信息
+    def refreshGuildAviser(self,argMap):
+        adviserMB = argMap["adviser"]
+        for member in self.guildMember:
+            playerDBID = member["dbid"]
+
+            def onLookUpCB(applyerAvatar):
+                # 在线
+                if type(applyerAvatar) is not bool:
+                    values = {}
+                    values["dbid"] = adviserMB.databaseID
+                    values["configID"] = adviserMB.configID
+                    values["guidDBID"] = adviserMB.guildDBID
+                    values["guildName"] = adviserMB.guildName
+                    values["friendliness"] = adviserMB.friendliness
+                    values["confidenceValue"] = adviserMB.confidenceValue
+                    applyerAvatar.client.onUpdataAdviser(values)
+
+            KBEngine.lookUpBaseByDBID("Avatar", playerDBID, onLookUpCB)
+
+        pass
 
 
 
@@ -1056,6 +1785,8 @@ class Guild(BaseModule):
         funds = argMap["funds"]
         self.guildFunds = self.guildFunds + funds
         ERROR_MSG("--addGuildFunds--"+str( self.guildFunds))
+        self.updateGuildValueRank()
+
         # GM增加公会资金
 
     # GM增加公会声望
@@ -1065,6 +1796,8 @@ class Guild(BaseModule):
         ERROR_MSG("--addGuildFunds--" + str(self.reputation))
 
         self.guiildUpdate(argMap)
+        self.updateGuildValueRank()
+
 
     # 重建索引
     def buildIndex(self):
@@ -1079,6 +1812,24 @@ class Guild(BaseModule):
         for index in range(len(self.guildBuild)):
             dbid = self.guildBuild[index]["id"]
             self.buildBDToIndex[dbid] = index
+
+    def adviserIndex(self):
+        self.adviserToIndex ={}
+        for index in range(len(self.adviserList)):
+            dbid = self.adviserList[index]["dbid"]
+            self.adviserToIndex[dbid] = index
+
+    def destroyGuild(self):
+        if self.cell is not None:
+            # 销毁cell实体
+            self.destroyCellEntity()
+            self.cellLoseReason = "clientDeath"
+            return
+        refs = gc.get_referents(self)
+        gc.set_debug()
+        ERROR_MSG("  Guild   onDestroy    " + refs.__str__())
+        self.destroy()
+
 
 
 

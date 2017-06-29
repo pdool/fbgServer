@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
-import datetime
-import traceback
 
-import TimerDefine
 import ballerRelateConfig
 import benchOpenConfig
 import formationConfig
 import formationSysStrongConfig
 import formationSystemConfig
-from BagConfig import BagConfig
 from ErrorCode import CardMgrModuleError
 from benchConfig import BenchConfig
-from itemsConfig import itemsIndex
 from KBEDebug import *
 """
 阵型模块
@@ -27,7 +22,6 @@ class FormationModule:
         self.fomationPropContainer = {}
         self.relatPropContainer={}
 
-        pass
 
     def onEntitiesEnabled(self):
         # 球员羁绊属性

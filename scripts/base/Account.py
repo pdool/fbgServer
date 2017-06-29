@@ -3,6 +3,7 @@ import time
 import socket
 import struct
 import BabyTouchItemConfig
+import gc
 import initCardConfig
 import util
 from KBEDebug import *
@@ -40,6 +41,10 @@ class Account(KBEngine.Proxy):
         # if self.lastSelCharacter is not None:
         #     return
         # 判断是否重名
+
+        if "kbe_bot_" in name:
+            ERROR_MSG("kbe_bot_                                           " + name)
+
         colTuple=("id",)
         sql = util.getSelectSql("tbl_avatar",colTuple,filterValueMap={"sm_name":name})
 
@@ -50,7 +55,7 @@ class Account(KBEngine.Proxy):
             # 重名
             if len(result) >= 1:
                 DEBUG_MSG("onCreateAvatarFail--------------------------------------------------")
-                self.client.onCreateAvatarFail()
+                # self.client.onCreateAvatarFail()
                 return
 
             otherConfig = initCardConfig.OtherConfig[1]
@@ -127,7 +132,7 @@ class Account(KBEngine.Proxy):
 
         if self.isDestroyed:
             ERROR_MSG("Account::__onAvatarCreated:(%i): i dead, will the destroy of Avatar!" % (self.id))
-            avatar.destroy()
+            avatar.destroySelf()
             return
         self.activeAvatar = avatar
         avatar.roleId = avatar.databaseID
@@ -231,3 +236,8 @@ class Account(KBEngine.Proxy):
             INFO_MSG("create Baby success  " + str(baby.databaseID))
 
         baby.writeToDB(__createBabyCB)
+
+    def onDestroy( self ):
+
+        refs = gc.get_referents(self)
+        ERROR_MSG("  Account   onDestroy    " + refs.__str__())

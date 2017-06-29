@@ -1,33 +1,40 @@
 <root>
-	<Properties>
+    <Properties>
 
         <!--公会名字-->
         <guildInfoList>
-            <Type> ARRAY <of> GuildMgr_ItemInfo </of> </Type>
-            <Flags> BASE </Flags>
+            <Type>ARRAY <of>GuildMgr_ItemInfo</of>
+            </Type>
+            <Flags>BASE</Flags>
             <Default>{}</Default>
-            <Persistent> true </Persistent>
+            <Persistent>true</Persistent>
         </guildInfoList>
+
+        <!--公会NPC-->
+        <guildNPCList>
+            <Type>ARRAY <of>GuildNPC</of>
+            </Type>
+            <Flags>BASE</Flags>
+            <Default>{}</Default>
+            <Persistent>true</Persistent>
+        </guildNPCList>
 
 
     </Properties>
     <BaseMethods>
 
-
-    <onCmd>
-         <Arg> STRING </Arg>
-         <Arg>PY_DICT</Arg>
-    </onCmd>
+        <onCmd>
+            <Arg>STRING</Arg>
+            <Arg>PY_DICT</Arg>
+        </onCmd>
 
     </BaseMethods>
 
-	<CellMethods>
+    <CellMethods>
         <!--<setAvatarID>-->
-            <!--<Arg>UINT32</Arg>-->
+        <!--<Arg>UINT32</Arg>-->
         <!--</setAvatarID>-->
-	</CellMethods>
-
-
+    </CellMethods>
 
 
 </root>

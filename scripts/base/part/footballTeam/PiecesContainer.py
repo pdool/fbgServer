@@ -131,28 +131,6 @@ class PiecesContainer:
     def onClientBroke(self, uuid):
         pass
 
-    def onClientGetAllPieces(self):
-
-        DEBUG_MSG("-------------onClientGetAllPieces-------------------------------")
-        # vs = self.piecesContainer.values()
-        #
-        # for v1 in vs:
-        #     for k,v in v1.items():
-        #         ERROR_MSG("  k " + str(k) + "  v   " + str(v))
-        #     break
-        # ERROR_MSG(" kkkkkkkkkkkkkkkkkk              " + str( type(self.piecesContainer.values())))
-        pieces = []
-        for v in self.piecesContainer.values():
-            item ={}
-            item["UUID"] = v["UUID"]
-            item["itemID"] = v["itemID"]
-            item["amount"] = v["amount"]
-
-            pieces.append(item)
-
-        self.client.onGetAllPieces(pieces)
-        pass
-
     # --------------------------------------------------------------------------------------------
     #                              工具函数
     # --------------------------------------------------------------------------------------------

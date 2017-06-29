@@ -85,6 +85,7 @@ class InheritModule:
         maxLevel = levelConfig["maxLevel"]
 
         while (inHeriter.level <= maxLevel):
+            ERROR_MSG("      OnClientInherit         while         ")
             # 等级最大
             if inHeriter.level == maxLevel:
                 self.BallerCallBack(CardMgrModuleError.Baller_level_is_max)

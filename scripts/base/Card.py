@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import KBEngine
+import gc
 import propChangeFightConfig
 from KBEDebug import ERROR_MSG
 import math
@@ -35,13 +36,22 @@ class Card(KBEngine.Base):
         # DEBUG_MSG("------------Player-----init-------------------------")
 
 
+    def onDestroy( self ):
+
+        refs = gc.get_referents(self)
+
+        ERROR_MSG("  Card   onDestroy    " + refs.__str__())
+
+
     def __initProp__(self,configId):
         pass
 
     def destroyCard( self ):
         if self.cell is not None:
         # 销毁cell实体
-            self.destroyCellEntity()
+
+            # ERROR_MSG("                  self.destroyCellEntity() ")
+            # self.destroyCellEntity()
             self.cellLoseReason = "clientDeath"
             return
         self.destroy()
@@ -50,13 +60,12 @@ class Card(KBEngine.Base):
         KBEngine method.
         entity的cell部分实体丢失
         """
-        if hasattr(self, "cellLoseReason"):
-            ERROR_MSG("cellLoseReason   is " + self.cellLoseReason)
-
-
-
         if hasattr(self,"cellLoseReason") and self.cellLoseReason == "clientDeath":
+
+            # ERROR_MSG("   card  onLoseCell  cellLoseReason       ")
             self.destroy()
+            return
+
     def destroyCardCell( self ):
         if self.cell is not None:
         # 销毁cell实体
@@ -107,14 +116,11 @@ class Card(KBEngine.Base):
             if oldFightValue != fightValue:
                 avatar.fightValue = avatar.fightValue - oldFightValue + fightValue
 
-
-        avatar.client.onCardFightValueChange(self.id,fightValue)
-        avatar.updateFightValueRank()
-        card = KBEngine.entities.get(self.id)
-        if card is None:
-            return
-        if card.isSelf != 1:
-            avatar.updateBallerValueRank(card)
+        if fightValue != oldFightValue:
+            avatar.client.onCardFightValueChange(self.id,fightValue)
+            avatar.updateFightValueRank()
+        if self.isSelf != 1:
+            avatar.updateBallerValueRank(self)
         return  fightValue
 
     # 减去下阵球员战斗力

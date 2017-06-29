@@ -2,10 +2,8 @@
 from interfaces.BaseModule import BaseModule
 
 __author__ = 'chongxin'
-import KBEngine
-import util
 from KBEDebug import *
-import random
+
 
 class Room(BaseModule):
 
@@ -22,6 +20,13 @@ class Room(BaseModule):
         KBEngine method.
         entity的cell部分实体丢失
         """
+
+        param = {
+            "roomID"   : self.roomID,
+        }
+        KBEngine.globalData["RoomMgr"].onCmd("onRoomDestroy",param)
+
+
         ERROR_MSG("--------------Base::Room.onLoseCell-------------------------")
         self.destroy()
 
@@ -34,14 +39,15 @@ class Room(BaseModule):
 
         param = {
             "roomID"   : self.roomID,
-            "roomMB"    : self,
+            "roomMB"   : self,
+            "roomCellMB"    : self.cell,
             "actionType" : self.actionType
         }
 
-        KBEngine.globalData["RoomMgr"].onRoomGetCell(param)
+        KBEngine.globalData["RoomMgr"].onCmd("onRoomGetCell",param)
 
     def onTimer(self, id, userArg):
-        ERROR_MSG("ontimer" + str(userArg))
+        # ERROR_MSG("ontimer" + str(userArg))
         """
         KBEngine method.
         使用addTimer后， 当时间到达则该接口被调用
@@ -62,4 +68,9 @@ class Room(BaseModule):
         ERROR_MSG("--------------destroyRoom-------------------------")
         if self.isDestroyed is not True and self is not None and self.cell is not None:
             self.destroyCellEntity()
+
+    def onDestroy( self ):
+
+        # j记得取消注册
+        pass
 

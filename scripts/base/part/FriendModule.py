@@ -29,7 +29,6 @@ class FriendModule:
     # --------------------------------------------------------------------------------------------
     # 获得好友列表
     def onClientGetFriendList(self):
-        palyeMgr = KBEngine.globalData["PlayerMgr"]
         self.friendInfoList = []
         self.friendRetFlagSet = set(self.friendDBIDList)
 
@@ -40,11 +39,11 @@ class FriendModule:
             return
         ERROR_MSG("     onClientGetFriendList    ")
         for dbid in self.friendDBIDList:
-            palyeMgr.queryPlayerInfo(dbid,"onCmdQueryMyInfo",self,"onCmdRetFriendInfo")
+            KBEngine.globalData["PlayerMgr"].queryPlayerInfo(dbid,"onCmdQueryMyInfo",self,"onCmdRetFriendInfo")
+            pass
 
     # 获得申请列表
     def onClientGetApplyList(self):
-        palyeMgr = KBEngine.globalData["PlayerMgr"]
 
         if len(self.applyDBIDList) == 0:
             friends = {}
@@ -56,14 +55,13 @@ class FriendModule:
         self.ApplyRetFlagSet = set(self.applyDBIDList)
         self.applyFriendInfoList = []
         for dbid in self.applyDBIDList:
-            palyeMgr.queryPlayerInfo(dbid, "onCmdQueryMyInfo", self, "onCmdRetApplyFriendInfo")
-
+            KBEngine.globalData["PlayerMgr"].queryPlayerInfo(dbid, "onCmdQueryMyInfo", self, "onCmdRetApplyFriendInfo")
+            pass
         ERROR_MSG("-------------------------  onClientGetApplyList  -------------------------------")
         pass
 
     # 获得黑名单列表
     def onClientGetBlackList(self):
-        palyeMgr = KBEngine.globalData["PlayerMgr"]
 
         if len(self.blackDBIDList) == 0:
             friends = {}
@@ -74,17 +72,15 @@ class FriendModule:
         self.blackRetFlagSet = set(self.blackDBIDList)
         self.blackFriendInfoList = []
         for dbid in self.blackDBIDList:
-            palyeMgr.queryPlayerInfo(dbid, "onCmdQueryMyInfo", self, "onCmdRetBlackFriendInfo")
-        pass
+            KBEngine.globalData["PlayerMgr"].queryPlayerInfo(dbid, "onCmdQueryMyInfo", self, "onCmdRetBlackFriendInfo")
+            pass
     # 获得发现列表
     def onClientRecommendList(self):
-
-        palyeMgr = KBEngine.globalData["PlayerMgr"]
         selfLevel = self.level
         self.recommendInfoList = []
         excludeList = self.friendDBIDList + self.applyDBIDList
         excludeList.append(self.databaseID)
-        palyeMgr.getRecommendList(excludeList,selfLevel, self, "onCmdRetRecommendList")
+        KBEngine.globalData["PlayerMgr"].getRecommendList(excludeList,selfLevel, self, "onCmdRetRecommendList")
         pass
 
     # 申请加为好友
@@ -105,7 +101,7 @@ class FriendModule:
             return
 
         args = {"applyDBID":self.databaseID}
-        # KBEngine.globalData["PlayerMgr"].onCmdByDBID(dbid, "onCmdRecvFriendApply", args)
+        KBEngine.globalData["PlayerMgr"].onCmdByDBID(dbid, "onCmdRecvFriendApply", args)
         KBEngine.globalData["PlayerMgr"].onReqAddFriend(dbid, "onCmdRecvFriendApply", self.databaseID)
         pass
     # 同意加好友
@@ -135,8 +131,7 @@ class FriendModule:
             self.writeToDB()
 
         self.onClientGetFriendList()
-        palyeMgr = KBEngine.globalData["PlayerMgr"]
-        palyeMgr.onAcceptAddFriend(self.databaseID, dbid,"onCmdAcceptAdd")
+        KBEngine.globalData["PlayerMgr"].onAcceptAddFriend(self.databaseID, dbid,"onCmdAcceptAdd")
     # 全部同意
     def onClientAgreeAllAddFriend(self):
         for dbid in self.applyDBIDList:
@@ -166,8 +161,7 @@ class FriendModule:
             DEBUG_MSG("-------onClientDelFriend----------------------" + str(dbid))
 
 
-            palyeMgr = KBEngine.globalData["PlayerMgr"]
-            palyeMgr.onDelYouFriend(self.databaseID, dbid, "onCmdDelYou")
+            KBEngine.globalData["PlayerMgr"].onDelYouFriend(self.databaseID, dbid, "onCmdDelYou")
         else:
         #     不是好友
             return
@@ -193,8 +187,7 @@ class FriendModule:
 
 
     def onClientQueryFriendInfo(self,dbid):
-        palyeMgr = KBEngine.globalData["PlayerMgr"]
-        palyeMgr.onQueryFriendInfo(dbid, "onCmdQueryMyInfo", self, "onCmdRetQueryFriendInfo")
+        KBEngine.globalData["PlayerMgr"].onQueryFriendInfo(dbid, "onCmdQueryMyInfo", self, "onCmdRetQueryFriendInfo")
 
 
     def onClientRemoveFromBlack(self,dbid):
@@ -332,23 +325,6 @@ class FriendModule:
             self.applyDBIDList.remove(acceptorDBID)
 
         self.onClientGetFriendList()
-
-    def onWasActiveFriendInfo(self, argMap):
-        playerMB = argMap["playerMB"]
-        avatar = argMap["avatar"]
-        param = {
-            "fightValue": avatar.fightValue,
-            "vipLevel": avatar.vipLevel,
-            "slogan": avatar.slogan,
-            "club": avatar.club,
-            "camp": avatar.camp,
-            "playerName": avatar.name,
-            "dbid": avatar.databaseID,
-            "offical": avatar.officalPosition,
-            "level": avatar.level,
-            "guildName": avatar.guildName,
-        }
-        playerMB.client.onGetPlayerInfo(param)
 
     def onCmdDelYou(self,args):
         delDBID = args["delDBID"]

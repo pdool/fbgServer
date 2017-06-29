@@ -20,12 +20,19 @@
     <ItemUses/>
     <ItemMaterial/>
     <Guild/>
+    <Adviser/>
+    <AdviserMgr/>
     <GuildMgr/>
     <ArenaMgr/>
     <ArenaRow/>
     <RankMgr/>
+    <WorldBossMgr/>
     <RoomMgr/>
     <Room/>
+    <AutoRoomMgr/>
+    <AutoRoom/>
     <NpcController/>
     <Monster hasClient="true"/>
+    <OfficialMgr/>
+    <LeagueMgr/>
 </root>

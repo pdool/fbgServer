@@ -2,18 +2,19 @@
 import random
 
 import Avatar
+import TimerDefine
 import playerAtkPosition
 import positionAttribute
 import positionConfig
 import util
-from CommonEnum import PlayerOp
+from CommonEnum import PlayerOp, HalfEnum
 from KBEDebug import *
-from common.skill.SkillConditionModule import ConditionEnum
+from common.skill.SkillConditionModule import ConditionEnum, PassiveSkillCondition
 
 
 class Room(KBEngine.Entity):
 
-#========================KBE方法=================================================
+    #========================KBE方法=================================================
     """
     游戏房间
     """
@@ -32,6 +33,9 @@ class Room(KBEngine.Entity):
         # 得分
         self.aScore = 0
         self.bScore = 0
+
+        self.aAnimFinish = False
+        self.bAnimFinish = False
 
         self.aReady = False
         self.bReady = False
@@ -62,6 +66,8 @@ class Room(KBEngine.Entity):
         # 补射
         self.reShootCardID = -1
 
+        self.half = HalfEnum.first
+
 
 
     # 设置当前两个玩家的ID
@@ -75,7 +81,7 @@ class Room(KBEngine.Entity):
     def __calcAttackTimes(self, aID, bID):
 
         # A队进攻次数MA=max(round(回合设定基数*(A队攻击系数+B队攻击系数-5)/(A队防御系数+B队防御系数-5)*(A队控球系数)/(A队控球系数+B队控球系数)*(0.1*rand(1)+0.95),0),1)
-        roundBase = 6
+        roundBase = 12
         seed = random.random()
 
         a = KBEngine.entities.get(aID)
@@ -146,7 +152,14 @@ class Room(KBEngine.Entity):
 
         self.totalAttackTimes = aAttackTimes + bAttackTimes
 
-        timePeriodList =  random.sample(range(5400), self.totalAttackTimes)
+        if self.half == HalfEnum.first:
+            up = 2700
+            down = 0
+        else:
+            up = 5400
+            down = 2701
+
+        timePeriodList =  random.sample(range(down,up), self.totalAttackTimes)
         timePeriodList.sort()
 
         for i in range(1,len(timePeriodList)):
@@ -166,6 +179,8 @@ class Room(KBEngine.Entity):
         if self.curAttackIndex in self.bAttackList:
             self.controllerID = self.avatarBID
             self.defenderID = self.avatarAID
+
+
 
 
 
@@ -304,7 +319,7 @@ class Room(KBEngine.Entity):
             card = KBEngine.entities.get(id)
             sss = sss + "  " + str(card.pos)
             if card.pos in adaptDefList:
-              canDefList.append(id)
+                canDefList.append(id)
 
 
         # ERROR_MSG(sss)
@@ -349,6 +364,10 @@ class Room(KBEngine.Entity):
             ERROR_MSG(" ====================================== attackID   is None")
         defList = self.getCurRoundDefList(self.curPart)
 
+        # 突破时
+        self.breakTimePassive(attackID,defList)
+
+
         # keyStr = "====================== __canSteal  curPart |  " + str(self.curPart)
         # keyStr = keyStr + "| attackObj.reel | " + str(attackObj.reel)
         # keyStr = keyStr +" | attackObj.tech |  " + str(attackObj.tech)
@@ -359,6 +378,10 @@ class Room(KBEngine.Entity):
 
         result = -1
         attackReel = attackObj.getReel() * 0.8
+
+        defCount = len(defList)
+        if defCount == 2  and attackObj.skill2_B == 2001:
+            attackObj.usePassiveSkill200101()
         for id in defList:
             defPlayer = KBEngine.entities.get(id)
             # (防守者1抢断值-进攻者盘带值*0.8)*(1-进攻者技术值+防守者身体值)/进攻者等级抢断系数
@@ -368,10 +391,18 @@ class Room(KBEngine.Entity):
             p = p - attackObj.breakthroughSkillPer
 
             seed = util.randFunc()
-            # DEBUG_MSG("__canSteal  curPart |  " + str(self.curPart) + "| defPlayer | " + str(defPlayer.steal) + "  | defPlayer.health |  " + str(defPlayer.health) + " | p     |  " + str(p) + "  |     seed|  " + str(seed))
+            ERROR_MSG("L385   " + "steal | " + str(steal) + "  | attackReel=" + str(attackReel) + " | attackObj.tech = " + str(attackObj.tech) +" |defPlayer.health= " + str(defPlayer.health) +" |attackObj.levelSteal=" + str(attackObj.levelSteal))
+
+
             if  seed <= p:
                 result = id
+                self.usePassiveSkill(attackID,PassiveSkillCondition.be_steal)
+
                 break
+
+            if defCount == 2:
+                attackObj.usePassiveSkill200102()
+
         # # TODO:调试用。，必然守门员抢断
         # if self.curPart == 3:
         #     defendObj = KBEngine.entities.get(self.defenderID)
@@ -394,6 +425,9 @@ class Room(KBEngine.Entity):
 
         defList = self.getCurRoundDefList(self.curPart)
 
+
+        self.passTimePassive(attackObj.id)
+
         defCount = len(defList)
         # 防守者拦截值 防守者身体值
         defTrickSum = 0.0
@@ -414,13 +448,19 @@ class Room(KBEngine.Entity):
 
         # P3 =(进攻者传球值 - 防守者拦截值 * 0.8) * (1 + 进攻者技术值 - 防守者身体值) / 进攻者等级传球系数 < -等级传球系数待定
         passBall = attackObj.getPassBall()
+
+        ERROR_MSG(" L 441   passBall = " + str(passBall) +  " | defTrickSum= " + str(defTrickSum) + " | attackObj.tech = " +str(attackObj.tech) +  " | defHealthSum= " + str(defHealthSum) +str(attackObj.tech) +  " | attackObj.levelPass= " + str(attackObj.levelPass))
+
         p = (passBall - defTrickSum * 0.8) * (1 + attackObj.tech - defHealthSum) / attackObj.levelPass
 
+        ERROR_MSG(
+            "  L445   p  " + str(p) + "  attackObj.perfectPassballSkillPer   " + str(attackObj.perfectPassballSkillPer))
         p = p + attackObj.perfectPassballSkillPer
         seed = util.randFunc()
 
 
         controllerObj.o1 = 1.0
+
         result = False
         if  seed<= p:
             controllerObj.o1 = 1.2
@@ -459,6 +499,8 @@ class Room(KBEngine.Entity):
         else:
             defList = self.getCurRoundDefList(self.curPart)
 
+        self.defendShootTimePassive(defList,defenderObj.keeperID)
+
         defCount = len(defList) + 1  # +1 为门将
 
         # 防守人数拦截系数
@@ -472,7 +514,6 @@ class Room(KBEngine.Entity):
         defSum = keeperObj.getDefend() * defRatio
         defHealth = keeperObj.health * defRatio
         # 防守者防守值=(防守者1防守值+防守者2防守值+门将防守值)*防守人数防守系数
-        # 防守者身体值=(防守者1身体值+防守者2身体值+门将身体值)*防守人数防守系数
         for id in defList:
             defPlayer = KBEngine.entities.get(id)
 
@@ -580,27 +621,39 @@ class Room(KBEngine.Entity):
         self.onCmdNextRound()
 
     # 客户端动画播放完毕
-    def onCmdPlayAnimFinish(self):
-        if self.endRound is True:
-            ERROR_MSG("--------------------------------onCmdPlayAnimFinish---  end round-------------------------------------------------------")
+    def onCmdPlayAnimFinish(self,controllerID):
 
-            avatarA = KBEngine.entities.get(self.avatarAID)
-            if isinstance(avatarA, Avatar.Avatar):
-                avatarA.client.onRoundEnd(self.aScore,self.bScore)
+        if controllerID == self.avatarAID:
+            self.aAnimFinish = True
+            # 使用前置技能
+        if controllerID == self.avatarBID:
+            self.bAnimFinish = True
+        if self.aAnimFinish and self.bAnimFinish:
+            self.aAnimFinish = False
+            self.bAnimFinish = False
 
-            avatarB = KBEngine.entities.get(self.avatarBID)
-            if isinstance(avatarB, Avatar.Avatar):
-                avatarB.client.onRoundEnd(self.bScore,self.aScore)
-            # 进入下一轮
-            self.onCmdNextRound()
-            return
-        self.curPart = self.curPart + 1
-        if  self.curPart == 2:
-            ERROR_MSG("--------------------------------onCmdPlayAnimFinish---  2 part-------------------------------------------------------")
-            self.__onSecondPart()
-        if self.curPart == 3:
-            ERROR_MSG("--------------------------------onCmdPlayAnimFinish---  3 part-------------------------------------------------------")
-            self.__onThirdPart()
+            if self.endRound is True:
+                ERROR_MSG("--------------------------------onCmdPlayAnimFinish---  end round-------------------------------------------------------")
+
+                avatarA = KBEngine.entities.get(self.avatarAID)
+                if isinstance(avatarA, Avatar.Avatar):
+
+                    ERROR_MSG("onCmdPlayAnimFinish   ascore  " + str(self.aScore) )
+                    avatarA.client.onRoundEnd(self.aScore,self.bScore)
+
+                avatarB = KBEngine.entities.get(self.avatarBID)
+                if isinstance(avatarB, Avatar.Avatar):
+                    avatarB.client.onRoundEnd(self.bScore,self.aScore)
+                # 进入下一轮
+                self.onCmdNextRound()
+                return
+            self.curPart = self.curPart + 1
+            if  self.curPart == 2:
+                ERROR_MSG("--------------------------------onCmdPlayAnimFinish---  2 part-------------------------------------------------------")
+                self.__onSecondPart()
+            if self.curPart == 3:
+                ERROR_MSG("--------------------------------onCmdPlayAnimFinish---  3 part-------------------------------------------------------")
+                self.__onThirdPart()
 
     # 客户端选择技能
     def onCmdSelectSkill(self, op):
@@ -608,22 +661,28 @@ class Room(KBEngine.Entity):
         # ERROR_MSG( "--------------------------------onCmdSelectSkill--- part ---------" + str(self.curPart) +"       skillId   "+ str(skillId))
         # 补射
         if self.reShootCardID != -1:
-            self.onCmdShoot()
+            self.roundResult = self.onCmdShoot()
             self.reShootCardID = -1
             self.noticeClientResult()
         else:
             if self.curPart == 1:
                 if op == PlayerOp.passball:
                     self.roundResult  = self.onCmdPass()
+                else:
+                    ERROR_MSG("  error  1 " )
+                ERROR_MSG( "  error  1 " + str(self.roundResult) )
             elif self.curPart == 2:
                 if op == PlayerOp.passball:
                     self.roundResult = self.onCmdPass()
                 elif op == PlayerOp.shoot:
-                     self.onCmdShoot()
+                    self.roundResult = self.onCmdShoot()
+                ERROR_MSG("  error  2 " + str(self.roundResult))
             elif self.curPart == 3:
                 if op == PlayerOp.shoot:
-                    self.onCmdShoot()
-
+                    self.roundResult = self.onCmdShoot()
+                else:
+                    ERROR_MSG("  error  3 ")
+                ERROR_MSG("  error  3 " + str(self.roundResult))
             avatarA = KBEngine.entities.get(self.avatarAID)
             avatarB = KBEngine.entities.get(self.avatarBID)
 
@@ -632,10 +691,10 @@ class Room(KBEngine.Entity):
             if self.roundResult == ConditionEnum.con_result_reshoot_fail:
                 self.roundResult = ConditionEnum.con_result_shoot_fail
 
-                ERROR_MSG("  onCmdSelectSkill  " + str("  reshoot fail"))
+                ERROR_MSG("  onCmdSelectSkill    reshoot fail")
             if self.roundResult == ConditionEnum.con_result_reshoot_succ:
                 self.roundResult = ConditionEnum.con_result_shoot_succ
-                ERROR_MSG("  onCmdSelectSkill  " + str("  reshoot succ"))
+                ERROR_MSG("  onCmdSelectSkill    reshoot succ")
 
             avatarA.controllerAfterRound(self.roundResult)
             avatarB.controllerAfterRound(self.roundResult)
@@ -647,6 +706,10 @@ class Room(KBEngine.Entity):
     def noticeClientResult(self):
         avatarA = KBEngine.entities.get(self.avatarAID)
         avatarB = KBEngine.entities.get(self.avatarBID)
+
+        if self.roundResult == -1:
+            ERROR_MSG(util.printStackTrace("     round result is -1"))
+
 
         ERROR_MSG("noticeClientResult    " + str(self.roundResult))
 
@@ -665,16 +728,22 @@ class Room(KBEngine.Entity):
         avatarB = KBEngine.entities.get(self.avatarBID)
         # 本局结束
         if self.curAttackIndex >= self.totalAttackTimes:
-            if isinstance(avatarA,Avatar.Avatar):
-                avatarA.client.onGameOver()
-            if isinstance(avatarB, Avatar.Avatar):
-                avatarB.client.onGameOver()
-            # 传送出去结果
-            if avatarA.typeStr == "Avatar":
-                avatarA.base.onRoomEndResult(self.avatarAID,self.aScore,self.avatarBID,self.bScore)
-            if avatarB.typeStr == "Avatar":
-                avatarB.base.onRoomEndResult( self.avatarAID, self.aScore, self.avatarBID, self.bScore)
-            return
+            if self.half == HalfEnum.sencond:
+                if isinstance(avatarA,Avatar.Avatar):
+                    avatarA.client.onGameOver()
+                if isinstance(avatarB, Avatar.Avatar):
+                    avatarB.client.onGameOver()
+                # 传送出去结果
+                if avatarA.typeStr == "Avatar":
+                    avatarA.base.onRoomEndResult(self.avatarAID,self.aScore,self.avatarBID,self.bScore)
+                if avatarB.typeStr == "Avatar":
+                    avatarB.base.onRoomEndResult( self.avatarAID, self.aScore, self.avatarBID, self.bScore)
+
+
+                return
+            else:
+                self.addTimer(10,0,TimerDefine.Time_halfTime)
+                return
 
 
         if isinstance(avatarA, Avatar.Avatar):
@@ -849,40 +918,40 @@ class Room(KBEngine.Entity):
     def onCmdShoot(self):
 
 
+
         if self.reShootCardID != -1:
             # 补射的时候设置为不可抢断
-            result = -1
+            stealCardID = -1
         else:
-            result = self.__canSteal()
-        ERROR_MSG("onCmdShoot   result is    "+ str(result) + "  reShootCardID  " + str(self.reShootCardID))
+            stealCardID = self.__canSteal()
+        ERROR_MSG("onCmdShoot   stealCardID    "+ str(stealCardID) + "  reShootCardID  " + str(self.reShootCardID))
 
         self.endRound = True
 
-        if result != -1:
+
+
+        if stealCardID != -1:
             # 抢断成功 通知客户端播放动画
             ERROR_MSG("-------onOprateResult------trickSucc----------------self.curPart  " + str(self.curPart))
             defendObj = KBEngine.entities.get(self.defenderID)
-            if result == defendObj.keeperID:
+            if stealCardID == defendObj.keeperID:
 
                 result = ConditionEnum.con_result_be_keeper_steal
             else:
                 result = ConditionEnum.con_result_be_steal
-            self.roundResult = result
         else:
-
-            result = self.isShootSucc()
-            ERROR_MSG("-----------onCmdShoot    " + result.__str__())
-            controller = KBEngine.entities.get(self.controllerID)
+            self.shootTimePassive(self.getCurRoundAtkId(self.curPart))
+            shootResult = self.isShootSucc()
+            ERROR_MSG("-----------onCmdShoot    " + shootResult.__str__())
             if hasattr(self,"gmShootFail") and self.gmShootFail:
-                result =   False
+                shootResult =   False
             if hasattr(self, "gmShootSucc") and self.gmShootSucc:
-                result = True
+                shootResult = True
 
-            if result is True:
+            if shootResult:
                 # 通知客户端射门成功
                 ERROR_MSG("-------onOprateResult------shootSucc 1 ----------------self.curPart  " + str(self.curPart))
                 result = ConditionEnum.con_result_shoot_succ
-                self.roundResult = ConditionEnum.con_result_shoot_succ
 
                 if self.controllerID == self.avatarAID:
                     self.aScore = self.aScore + 1
@@ -890,15 +959,14 @@ class Room(KBEngine.Entity):
                     self.bScore = self.bScore + 1
 
                 if self.reShootCardID != -1:
-                    self.roundResult  = ConditionEnum.con_result_reshoot_succ
+                    result  = ConditionEnum.con_result_reshoot_succ
             else:
                 # 通知客户端射门失败
                 ERROR_MSG("-------onOprateResult------shootFail----------------self.curPart  " + str(self.curPart))
-                self.roundResult = ConditionEnum.con_result_shoot_fail
                 result = ConditionEnum.con_result_shoot_fail
                 if self.reShootCardID != -1:
                     ERROR_MSG("-------onOprateResult------reshoot  Fail----------------self.curPart  " + str(self.curPart))
-                    self.roundResult = ConditionEnum.con_result_reshoot_fail
+                    result = ConditionEnum.con_result_reshoot_fail
 
 
         return  result
@@ -956,7 +1024,7 @@ class Room(KBEngine.Entity):
         try:
             attackCoordinate = controllerObj.atkPosList[part -1]
 
-            # ERROR_MSG("------------------------self.curPart - 1    "+str(part-1 )+"   attackCoordinate-------------" +str(attackCoordinate))
+             # ERROR_MSG("------------------------self.curPart - 1    "+str(part-1 )+"   attackCoordinate-------------" +str(attackCoordinate))
         except:
             ERROR_MSG("========= list index out of range  self.curPart  =========  " + str(part-1) +"   atklist len   " + str(len(controllerObj.atkList)))
 
@@ -973,12 +1041,16 @@ class Room(KBEngine.Entity):
 
 
     def setControllerID(self,controllerID):
+
+        ERROR_MSG("setControllerID   " + str(controllerID))
+
         if self.avatarAID == -1:
             self.avatarAID = controllerID
         else:
             self.avatarBID = controllerID
 
     def setReadyState(self,controllerID):
+        ERROR_MSG("setReadyState   " + str(controllerID) + "  aReady  is " + str(self.aReady) +"     bready is " + str(self.bReady))
         if controllerID == self.avatarAID:
             self.aReady = True
         if controllerID == self.avatarBID:
@@ -986,11 +1058,26 @@ class Room(KBEngine.Entity):
 
         WARNING_MSG("aReady  is " + str(self.aReady) +"     bready is " + str(self.bReady))
         if self.aReady and self.bReady:
+
+            ERROR_MSG("setReadyState    " + util.printStackTrace("setReadyState"))
+
+            inTeamCardIDList = KBEngine.entities.get(self.avatarAID).inTeamcardIDList
+            for cardID in inTeamCardIDList:
+                self.usePassiveSkill(cardID, PassiveSkillCondition.game_start)
+                self.usePassiveSkill(cardID, PassiveSkillCondition.first_half)
+
+            inTeamCardIDList = KBEngine.entities.get(self.avatarBID).inTeamcardIDList
+            for cardID in inTeamCardIDList:
+                self.usePassiveSkill(cardID, PassiveSkillCondition.game_start)
+                self.usePassiveSkill(cardID, PassiveSkillCondition.first_half)
+
             self.onCmdBeginFight()
 
 
     def setSelectState(self,controllerID,op):
         if op != -1:
+
+            ERROR_MSG(util.printStackTrace( "op select from  "))
             self.curPartOp = op
         if controllerID == self.avatarAID:
             self.aSelect = True
@@ -998,9 +1085,9 @@ class Room(KBEngine.Entity):
         if controllerID == self.avatarBID:
             self.bSelect = True
         if self.aSelect and self.bSelect:
-            self.onCmdSelectSkill(self.curPartOp)
             self.aSelect = False
             self.bSelect = False
+            self.onCmdSelectSkill(self.curPartOp)
 
 
     def onDestroy(self):
@@ -1009,7 +1096,7 @@ class Room(KBEngine.Entity):
         """
         self.destroySpace()
 
-#========================房间内事件=================================================
+    #========================房间内事件=================================================
 
     def onEnter(self, entityMailbox):
         """
@@ -1024,12 +1111,113 @@ class Room(KBEngine.Entity):
         print("Cell::Room.onLeave")
 
 
-        # 一轮开始之前
-#=========================================================================
 
+    def onTimer(self, id, userArg):
+        # ERROR_MSG("ontimer" + str(userArg))
+        """
+        KBEngine method.
+        使用addTimer后， 当时间到达则该接口被调用
+        @param id		: addTimer 的返回值ID
+        @param userArg	: addTimer 最后一个参数所给入的数据
+        """
+        if userArg == TimerDefine.Time_halfTime:
+            ERROR_MSG(" second  half =======================================================================================================================  ")
+            self.delTimer(id)
+            self.half = HalfEnum.sencond
+            inTeamCardIDList = KBEngine.entities.get(self.avatarAID).inTeamcardIDList
+            for cardID in inTeamCardIDList:
+                self.usePassiveSkill(cardID, PassiveSkillCondition.second_half)
+
+            inTeamCardIDList = KBEngine.entities.get(self.avatarBID).inTeamcardIDList
+            for cardID in inTeamCardIDList:
+                self.usePassiveSkill(cardID, PassiveSkillCondition.second_half)
+            self.curAttackIndex = 0
+            self.onCmdBeginFight()
+            pass
+        pass
+
+    # 单个卡牌使用被动技能
+    def usePassiveSkill(self,cardID,time):
+        card = KBEngine.entities.get(cardID)
+        card.usePassive(time)
+
+
+
+    # 射门的时候（被动技能触发）
+    def shootTimePassive(self,cardID):
+        pos = self.getCurRoundAtkCoordinate(self.curPart)
+
+        ERROR_MSG("shootTimePassive  shoot pos    "  + str(pos))
+        # 小角度射门
+        if pos in (12,13,22,23,17,18,27,28):
+            self.usePassiveSkill(cardID, PassiveSkillCondition.small_degree_shoot)
+        # 禁区内射门
+        if pos in (34, 35, 36, 44, 45, 46, 54, 55, 56):
+            self.usePassiveSkill(cardID,PassiveSkillCondition.in_penalty_area)
+        #  禁区外射门
+        if pos not  in (34, 35, 36, 44, 45, 46, 54, 55, 56):
+            self.usePassiveSkill(cardID,PassiveSkillCondition.out_penalty_area)
+
+
+    # 射门的时候-防守方
+    def defendShootTimePassive(self,defendList,keepID):
+        # 2015 门线救险：门将出击时，奔向门前封堵射门，40%几率封堵穿透门将的射门。
+        self.usePassiveSkill(keepID,PassiveSkillCondition.shoot)
+
+        for cardID in defendList:
+            self.usePassiveSkill(cardID,PassiveSkillCondition.in_defend)
+            # 门墙：身高臂长的库尔图瓦，使得对方前锋射门时必须寻找更刁钻的角度，降低射门者射偏率n%
+            self.usePassiveSkill(cardID,PassiveSkillCondition.shoot)
+
+        # 单刀
+        # defendList = []
+        # ERROR_MSG("2020=================defendList==========================")
+        if self.curPart == 3 and len(defendList) == 0:
+            inTeamCardIDList = KBEngine.entities.get(self.defenderID).inTeamcardIDList
+            for cardID in inTeamCardIDList:
+                self.usePassiveSkill(cardID, PassiveSkillCondition.no_defender)
+# 传球的时候
+    def passTimePassive(self,cardID):
+        pos = self.getCurRoundAtkCoordinate(self.curPart)
+        if pos in (11,12,21,22,31,32,41,42,18,19,28,29,38,39,48,49):
+            # 在边路时
+            self.usePassiveSkill(cardID, PassiveSkillCondition.in_wing)
+            # 边路传中
+            self.usePassiveSkill(cardID, PassiveSkillCondition.pass_in_wings)
+
+        # 下底传中：下底传中时，提升n%传球值
+        if pos in (11,12,13,21,22,23,17,18,19,27,28,29):
+            self.usePassiveSkill(cardID, PassiveSkillCondition.pass_in_wings)
+
+
+    # 突破的时候 （攻击方）
+    def breakTimePassive(self,attackID,defList):
+        self.usePassiveSkill(attackID, PassiveSkillCondition.break_start)
+        self.usePassiveSkill(attackID, PassiveSkillCondition.attacker)
+        for cardID in defList:
+            self.usePassiveSkill(cardID, PassiveSkillCondition.in_defend)
+        # 2013 佯装接应：本方球员（除自己）面对两人防守时，有几率插上带走一个防守球员
+        if len(defList) == 2:
+            ERROR_MSG("breakTimePassive           ++++++++++++++++++++++++++++++++++++++++++++             ")
+            inTeamCardIDList = KBEngine.entities.get(self.controllerID).inTeamcardIDList
+            for cardID in inTeamCardIDList:
+                if attackID != cardID:
+                    self.usePassiveSkill(cardID, PassiveSkillCondition.two_defender)
+
+
+
+    # 被抢断的时候
+    def beStealTimePassive(self,cardID):
+        self.usePassiveSkill(cardID, PassiveSkillCondition.be_steal)
+
+
+
+
+    #=========================================================================
     def destroyRoom(self):
         ERROR_MSG(" destroyRoom is called ")
         self.destroy()
+
 class ClientResult:
     # 抢断成功
     trickSucc = 1

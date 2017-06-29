@@ -56,20 +56,20 @@ class BufferModule:
         startType = subSkillConf["startType"]
 
         if  startType == StartTypeEnmu.cur_round:
-            self.makeEffect(targetList,subSkillID)
+            self.makeEffect(targetList,subSkillConf)
 
             if subSkillConf["lastRound"] > 1:
                 buffer["lastRound"]  = subSkillConf["lastRound"] - 1
                 card.bufferContainer.append(buffer)
         elif startType == StartTypeEnmu.cur_round_and_attack_round:
             if isAttackRound:
-                self.makeEffect(targetList, subSkillID)
+                self.makeEffect(targetList, subSkillConf)
                 if subSkillConf["lastRound"] > 1:
                     buffer["lastRound"] = subSkillConf["lastRound"] - 1
                     card.bufferContainer.append(buffer)
         elif startType == StartTypeEnmu.cur_round_and_defend_round:
             if not isAttackRound:
-                self.makeEffect(targetList, subSkillID)
+                self.makeEffect(targetList, subSkillConf)
 
                 if subSkillConf["lastRound"] > 1:
                     buffer["lastRound"] = subSkillConf["lastRound"] - 1
@@ -96,15 +96,17 @@ class BufferModule:
             condition = buffer["condition"]
             noticeClient = buffer["noticeClient"]
             controller = KBEngine.entities.get(self.controllerID)
+
+            subSkillConf = skillConfig.SkillConfig[subSkillID]
             # 1、一轮之前
             if condition ==  ConditionEnum.con_result_None:
                 if isAttackRound:
                     if statrType == StartTypeEnmu.cur_round_and_attack_round or statrType == StartTypeEnmu.next_round_attack_round or statrType == StartTypeEnmu.cur_round:
-                        self.makeEffect(targetList, subSkillID)
+                        self.makeEffect(targetList, subSkillConf)
                         self.bufferAfterUse(i)
                 else:
                     if statrType == StartTypeEnmu.cur_round_and_defend_round or statrType == StartTypeEnmu.next_round_defend_round or statrType == StartTypeEnmu.cur_round:
-                        self.makeEffect(targetList, subSkillID)
+                        self.makeEffect(targetList, subSkillConf)
                         self.bufferAfterUse(i)
                 pass
             # 2、一轮之后

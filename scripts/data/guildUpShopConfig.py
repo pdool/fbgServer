@@ -1,14 +1,7 @@
 # -*- coding: utf-8 -*-
 
-GuildUpShopConfig = {1: {'openNum': 0, 'id': 1, 'needFunds': 1000, 'needTime': 10000},
-                     2: {'openNum': 10, 'id': 2, 'needFunds': 1001, 'needTime': 10000},
-                     3: {'openNum': 20, 'id': 3, 'needFunds': 1002, 'needTime': 10001},
-                     4: {'openNum': 30, 'id': 4, 'needFunds': 1003, 'needTime': 10002},
-                     5: {'openNum': 31, 'id': 5, 'needFunds': 1004, 'needTime': 10003},
-                     6: {'openNum': 32, 'id': 6, 'needFunds': 1005, 'needTime': 10004},
-                     7: {'openNum': 33, 'id': 7, 'needFunds': 1006, 'needTime': 10005},
-                     8: {'openNum': 34, 'id': 8, 'needFunds': 0, 'needTime': 0}}
+GuildUpShopConfig={1: {'needTime': 1, 'needFunds': 1200000, 'id': 1, 'openNum': 0}, 2: {'needTime': 2, 'needFunds': 2000000, 'id': 2, 'openNum': 10}, 3: {'needTime': 4, 'needFunds': 4000000, 'id': 3, 'openNum': 20}, 4: {'needTime': 8, 'needFunds': 6000000, 'id': 4, 'openNum': 30}, 5: {'needTime': 16, 'needFunds': 10000000, 'id': 5, 'openNum': 31}, 6: {'needTime': 32, 'needFunds': 35000000, 'id': 6, 'openNum': 32}, 7: {'needTime': 64, 'needFunds': 80000000, 'id': 7, 'openNum': 33}, 8: {'needTime': 0, 'needFunds': 0, 'id': 8, 'openNum': 34}}
 
 allDatas = {
-    '公会商城升级配置': GuildUpShopConfig,
+	'公会商城升级配置':GuildUpShopConfig,
 }

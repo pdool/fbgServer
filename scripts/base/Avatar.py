@@ -2,6 +2,9 @@
 import importlib
 import time
 import datetime
+
+import gc
+import guildConfig
 import util
 from CommonEnum import ActionTypeEnum
 from GMConfig import GMConfig
@@ -41,11 +44,17 @@ from part.MoneyModule import MoneyModule
 from part.OfficialModule import OfficialModule
 from part.ArenaModule import ArenaModule
 from part.SkillModule import SkillModule
+from part.WorldBossModule import WorldBossModule
 from badWords import badWords
+from part.guild.GuildTask import GuildTask
+from part.league.LeagueModule import LeagueModule
+
 import TimerDefine
 
 
 # 使用技巧 先放在根级目录。，调好之后拖走，编辑器自动组织引用
+
+
 class Avatar(KBEngine.Proxy,
              MailsModule,
              LotteryModule,
@@ -71,6 +80,7 @@ class Avatar(KBEngine.Proxy,
              AbilityModule,
              BabyModule,
              GuildModule,
+             GuildTask,
              FormationModule,
              GameShopModule,
              RankModule,
@@ -79,6 +89,8 @@ class Avatar(KBEngine.Proxy,
              OfficialModule,
              ArenaModule,
              SkillModule,
+             WorldBossModule,
+             LeagueModule
              ):
     """
     角色实体
@@ -112,6 +124,11 @@ class Avatar(KBEngine.Proxy,
         self.buyArenaTimes = vipConfig.VipConfig[self.vipLevel]["buyArenaTimes"]
         # 竞技次数
         self.arenaTimes = CommonConfig.CommonConfig[6]["value"]
+
+
+
+        # 解锁章节
+        self.onCreateRoleUnlockChapter()
     # 上线
     def onEntitiesEnabled(self):
         """
@@ -147,8 +164,8 @@ class Avatar(KBEngine.Proxy,
         playerInfo[FriendInfoKey.fightValue] = self.fightValue
         playerInfo[FriendInfoKey.vipLevel] = self.vipLevel
         playerInfo[FriendInfoKey.formation] = self.formation
-
         playerInfo[FriendInfoKey.onlineState] = FriendOnlineState.online
+
         KBEngine.globalData["PlayerMgr"].playerLogin(self, self.databaseID, playerInfo)
 
 
@@ -162,11 +179,10 @@ class Avatar(KBEngine.Proxy,
         """
         """
         if self.client is not None:
+            ERROR_MSG("self.client is not None ==================================================")
             return
 
-        if self.cell is not None:
-            self.destroyCellEntity()
-            return
+
 
         # 如果帐号ENTITY存在 则也通知销毁它
         if self.accountEntity != None:
@@ -175,19 +191,43 @@ class Avatar(KBEngine.Proxy,
 
             self.accountEntity.destroy()
 
-            DEBUG_MSG("------------ self.accountEntity.destroy()")
+            ERROR_MSG("------------ self.accountEntity.destroy()")
             # if time.time() - self.accountEntity.relogin > 1:
             #     self.accountEntity.activeAvatar = None
             #     self.accountEntity.destroy()
-            #     self.accountEntity = None
+            self.accountEntity = None
             # else:
             #     DEBUG_MSG("Avatar[%i].destroySelf: relogin =%i" % (self.id, time.time() - self.accountEntity.relogin))
 
         # 销毁base
-
+        if self.cell is not None:
+            # self.destroyCellEntity()
+            self.cellLoseReason = "clientDeath"
+            ERROR_MSG("cellLoseReason ==================================================")
+            return
+        self.onTimerSaveBag()
         self.destroy()
 
-        DEBUG_MSG("destroy ==================================================")
+        ERROR_MSG("avatar  destroy ==================================================")
+
+    def onLoseCell(self):
+        """
+        KBEngine method.
+        entity的cell部分实体丢失
+        """
+        if hasattr(self, "cellLoseReason") and self.cellLoseReason == "clientDeath":
+            self.destroy()
+            return
+
+    def onDestroy( self ):
+
+        # refs = gc.get_referents(self)
+        #
+        # ERROR_MSG("  avatar   onDestroy    " + refs.__str__())
+        pass
+
+
+
 
     def initProp(self):
         self.initMail()  # 初始化邮件
@@ -262,7 +302,7 @@ class Avatar(KBEngine.Proxy,
         if hasattr(self, "spaceMb") and self.spaceMb is not None and self.spaceMb.isDestroyed is not True:
             self.spaceMb.destroyClone()
 
-        self.onTimerSaveBag()
+
         self.destroySelf()
 
     # 获取离上次下线过了几天
@@ -285,6 +325,11 @@ class Avatar(KBEngine.Proxy,
             self.buyArenaTimes = int(vipConfig.VipConfig[self.vipLevel]["buyArenaTimes"])
             # 竞技次数
             self.arenaTimes = int(CommonConfig.CommonConfig[6]["value"])
+            self.isPrompt = 0
+            self.isCanEncourage = 0
+            self.officialReward = 0
+            self.buyLinePower = 0
+            self.updateforPermissionInfo()
         ERROR_MSG("-------have  "+str(days)+"  days not enter game-------")
         return days
 
@@ -331,6 +376,10 @@ class Avatar(KBEngine.Proxy,
             return
         if gmList[0] == "guildFunds":
             self.guildFunds = self.guildFunds + int(gmList[1])
+
+        if gmList[0] == "fame":
+            self.fame = self.fame + int(gmList[1])
+
         if hasattr(self, gmList[0]):
             attrType = type(getattr(self, gmList[0]))
             value = attrType(gmList[1])
@@ -342,12 +391,13 @@ class Avatar(KBEngine.Proxy,
         importlib.reload(module)
         KBEngine.reloadScript()
 
+    def onClientGmAddItem(self,itemID,count):
+        self.putItemInBag(itemID, count)
+
     def onClientGmAddAll(self):
         self.diamond = 99999999
         self.addRmb(99999999)
         self.rechargeEuro(99999999)
-        for k, v in GMConfig.items():
-            self.putItemInBag(k, v["itemCountCount"])
 
     def onClientChangeSolgan(self, slogan):
         slogan = self.replaceBadWords(slogan)
@@ -385,28 +435,22 @@ class Avatar(KBEngine.Proxy,
     def onClientGetPlayerInfo(self, dbid):
         def agreeCB(avatar, dbid, wasActive):
             if avatar != None:
-                # 已经在线了(异步调用)
-                if wasActive:
-                    argMap = {
-                        "playerMB": self,
-                        "avatar" : avatar
-                    }
-                    avatar.onPlayerMgrCmd("onWasActiveFriendInfo", argMap)
-                else:
-                    param = {
-                        "fightValue": avatar.fightValue,
-                        "vipLevel": avatar.vipLevel,
-                        "slogan": avatar.slogan,
-                        "club": avatar.club,
-                        "camp": avatar.camp,
-                        "playerName": avatar.name,
-                        "dbid": avatar.databaseID,
-                        "offical": avatar.officalPosition,
-                        "level": avatar.level,
-                        "guildName": avatar.guildName,
-                    }
-                    self.client.onGetPlayerInfo(param)
-                    avatar.destroy()
+                param = {
+                    "fightValue": avatar.fightValue,
+                    "vipLevel": avatar.vipLevel,
+                    "slogan": avatar.slogan,
+                    "club": avatar.club,
+                    "camp": avatar.camp,
+                    "isRobot": 0,
+                    "playerName": avatar.name,
+                    "dbid": avatar.databaseID,
+                    "offical": avatar.officialPosition,
+                    "level": avatar.level,
+                    "guildName": avatar.guildName,
+                }
+                self.client.onGetPlayerInfo(param)
+                if wasActive == 0:
+                    avatar.destroySelf()
             else:
                 ERROR_MSG("---------Cannot add unknown player:-------------")
 
@@ -414,10 +458,21 @@ class Avatar(KBEngine.Proxy,
 
     def onRoomEndResult(self,avatarAID,aScore,avatarBID,bScore):
 
-        ERROR_MSG("onRoomEndResult       ============================")
+        ERROR_MSG(util.printStackTrace("onRoomEndResult "))
 
-        if self.inClone == ActionTypeEnum.action_clone:
-            self.onCloneRoomEndResult(avatarAID,aScore,avatarBID,bScore)
+        if self.inActionType == ActionTypeEnum.action_clone:
+            self.judgeInFootBallFeast(avatarAID,aScore,avatarBID,bScore)
+        elif self.inActionType == ActionTypeEnum.action_world_boss:
+            self.onWorldBossEndResult(avatarAID,aScore,avatarBID,bScore)
+        elif self.inActionType == ActionTypeEnum.official_promotion:
+            self.onOfficialEndResult(avatarAID,aScore,avatarBID,bScore)
+        elif self.inActionType == ActionTypeEnum.action_arena:
+            self.onArenaEndResult(avatarAID,aScore,avatarBID,bScore)
+        elif self.inActionType == ActionTypeEnum.league_clone:
+            self.onLeagueEndResult(avatarAID, aScore, avatarBID, bScore)
+        elif self.inActionType == ActionTypeEnum.league_player:
+            self.onLeagueEndResult(avatarAID, aScore, avatarBID, bScore)
+        self.inRoom = 0
 
 
 

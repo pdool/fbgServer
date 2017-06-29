@@ -143,18 +143,17 @@ class LotteryModule:
         else:
             return (ErrorCode.LotteryError.Diamond_not_enough, "")
 
-        count = 10
         dropIds = configDict["dropIds"]
         tenDropIds = configDict["tenDropIds"]
+
         if self.tenFirstCall == 0:
-            count = count -1
             for key in tenDropIds:
                 result += str(key) + ","
-
+                self.putItemInBag(key, 1)
             self.tenFirstCall = 1
 
 
-        for i in range(count):
+        else:
             for key in dropIds:
                 self.putItemInBag(key, 1)
                 result += str(key) + ","
@@ -164,7 +163,7 @@ class LotteryModule:
 
 
     def onTimer(self, tid, userArg):
-        ERROR_MSG("ontimer" + str(userArg))
+        # ERROR_MSG("ontimer" + str(userArg))
         if userArg != TimerDefine.Timer_reset_lottery_free_times:
             return
 
